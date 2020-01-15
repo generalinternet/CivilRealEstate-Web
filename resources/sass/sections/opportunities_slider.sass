@@ -1,0 +1,65 @@
+.section
+    &_type_home-slider
+        .section
+            &__button-wrap
+                margin-top: 2em
+                text-align: center
+                .button
+                    color: $color_dark
+            &__slider-buttons
+                float: right
+                .button
+                    font-size: 0.4em
+                    &:first-child
+                        margin-right: 5em
+                    &__icon
+                        width: 1em
+                        bottom: 3px
+        .investment
+            &__wrap
+                padding: 0 1em
+        .opportunity-slider
+            .slick-track
+                display: flex!important
+                min-width: 100%
+            .slick-slide
+                height: inherit!important
+                margin-left: auto
+                margin-right: auto
+                min-width: 300px
+
+@media screen and ( max-width: 767px)
+    .section
+        &_type_home-slider
+            .section
+                &__slider-buttons
+                    display: none
+                    position: absolute
+                    left: 0
+                    top: 4em
+                    z-index: 1
+                    width: 100%
+                    height: 0
+                    opacity: 0.9
+                    transition: .1s
+                    .button
+                        font-size: .4em
+                        background: #fff
+                        padding: 0.2em 0.8em
+                        border: solid 1px $color_grey
+                    // #home_slider_wrap_prev
+                        // left: 0
+                    #home_slider_wrap_next
+                        float: right
+            .investment
+                // &_theme_slider
+                //     padding-bottom: 0
+                //     .investment__button-wrap
+                //         position: static
+                // &__wrap
+                //     padding: 0
+                //     &:not(:last-child)
+                //         margin-bottom: 2em
+            .opportunity-slider
+                .slick-track
+                    width: 100%

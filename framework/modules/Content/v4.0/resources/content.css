@@ -1,0 +1,211 @@
+.content_form_block_wrap{
+    border: 1px dashed rgba(0,0,0,0.2);
+}
+form > .content_form_block_wrap{
+    border: none;
+}
+.content_form_block_wrap, .content_form_block, .content_form_parent, .content_detail_view{
+    margin-bottom: 2em;
+    position: relative;
+}
+
+.content_form_block_wrap:last-child, .content_form_block:last-child, .content_form_parent:last-child, .content_detail_view:last-child{
+    margin-bottom: 0;
+}
+
+#content .content_in_content_form h1, #content .content_in_content h1{
+    font-size: 1.4em;
+    line-height: 1em;
+}
+
+.content_in_content_form .content_form_block_wrap, .content_in_content .content_detail_view{
+    
+}
+
+.content_form_block_wrap.sorting_now, .content_form_block_wrap.ui-sortable-helper{
+    height: 4em !important;
+    overflow: hidden;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #808080 !important;
+    padding: 1em;
+}
+
+.sort_preview{
+    display: none;
+}
+
+.content_form_block_wrap.sorting_now .sort_preview{
+    display: block;
+    min-height: 4em;
+}
+
+.add_content_in_content .custom_btn{
+    margin-right: 0.5em;
+}
+
+.add_content_in_content .custom_btn:last-child{
+    margin-right: 0;
+}
+
+.content_in_content{
+    
+}
+
+/*.content_in_content .right_btns{
+    display: none;
+}*/
+
+.content_placeholder{
+    height: 4em;
+    outline: 1px dashed #000;
+    position: relative;
+    margin-bottom: 2em;
+}
+
+.content_form_block_wrap .sort_handle{
+    cursor: grab !important;
+}
+
+.content_detail_view h1 .thin{
+    font-size: 0.8em;
+    margin-left: 0.5em;
+    display:-moz-inline-stack;
+    display:inline-block;
+    zoom:1;
+    *display:inline;
+}
+
+.content_ref{
+    vertical-align: middle;
+    display:-moz-inline-stack;
+    display:inline-block;
+    zoom:1;
+    *display:inline;
+}
+
+.content_form_block_wrap.content_ref{
+    display: block;
+}
+
+.content_form_block_wrap.content_ref .content_form_block{
+    pointer-events: none;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+    filter: alpha(opacity=70);
+    -moz-opacity: 0.7;
+    -khtml-opacity: 0.7;
+    opacity: 0.7;
+}
+
+.content_form_block_wrap.not_deletable > .right_btns > .remove_content{
+    display: none;
+}
+
+.content_slider{
+    position: relative;
+    margin-bottom: 1em;
+}
+
+.content_slider:last-child{
+    margin-bottom: 0;
+}
+
+.content_gallery, .content_slider_nav{
+    margin-bottom: -1em;
+}
+
+.content_slider_nav .content_slider_change_slide, .content_gallery .sized_img_wrap{
+    margin-right: 1em;
+    margin-bottom: 1em;
+    display:-moz-inline-stack;
+    display:inline-block;
+    zoom:1;
+    *display:inline;
+}
+
+.content_slider_nav .content_slider_change_slide:last-child{
+    margin-right: 0;
+}
+
+h3.content_title{
+    font-size: 1.7em;
+    line-height: 1em;
+}
+
+.content_detail_view div,
+.content_detail_view ul,
+.content_detail_view ol{
+    margin-bottom: 1em;
+}
+
+.content_detail_view li{
+    margin-bottom: 0.2em;
+    list-style: none;
+    position: relative;
+    padding-left: 1em;
+    counter-increment: inst;
+}
+
+.content_detail_view li:before{
+    content: '\00b7';
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.content_detail_view ul li:before{
+    font-size: 1.5em;
+    font-weight: 700;
+}
+
+.content_detail_view ol li:before{
+    content: counter(inst) '.';
+    font-size: 0.8em;
+    font-weight: 700;
+}
+
+.content_detail_view div:last-child,
+.content_detail_view ul:last-child,
+.content_detail_view ol:last-child,
+.content_detail_view li:last-child{
+    margin-bottom: 0;
+}
+
+.df_placeholder{
+    position: relative;
+    padding: 3em;
+    background: rgba(255,255,255,0.5);
+    border: 1px solid #808080;
+}
+.df_placeholder .form_title{
+    position: relative;
+    width: 100%;
+    text-align: center;
+    font-size: 2em;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: block;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+}
+
+.df_elm_wrap{
+    margin-bottom: 2em;
+}
+
+.df_elm_wrap:last-child{
+    margin-bottom: 0;
+}
+
+.auto_columns > .df_elm_wrap{
+    /*margin-bottom: 0;*/
+}
+
+.df_elm_wrap .auto_columns{
+    margin-bottom: -2em;
+}

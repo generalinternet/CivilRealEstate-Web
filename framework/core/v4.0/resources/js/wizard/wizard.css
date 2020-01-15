@@ -1,0 +1,123 @@
+.wiz_step_wrap.wizard{
+    position: relative;
+}
+
+.wiz_step_wrap.wizard.loading{
+    min-height: 200px;
+}
+
+.wiz_step_wrap.wizard.loading:after{
+    position: absolute;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    content: '';
+    background: url('images/gears.gif') no-repeat center #fff;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    filter: alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+}
+
+.wiz_step_wrap.wizard .wiz_step{
+    position: absolute;
+    background: #f0f0f0;
+    top: 0;
+    left: 0;
+    right: 0;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    z-index: -1;
+    display: none;
+}
+
+.wiz_step_wrap.wizard .wiz_step.current{
+    z-index: 1;
+    position: relative;
+    left: 0;
+    right: 0;
+    display: block;
+}
+
+.wiz_step_timeline{
+    margin-bottom: 1em;
+}
+
+.wiz_step_timeline:last-child{
+    margin-bottom: 0;
+}
+
+.wiz_step_timeline .go_to_wiz_step{
+    display:-moz-inline-stack;
+    display:inline-block;
+    zoom:1;
+    *display:inline;
+    cursor: pointer;
+    color: #808080;
+    font-weight: 700;
+    margin-right: 1em;
+    line-height: 1.2em;
+}
+
+.wiz_step_timeline .go_to_wiz_step:last-child{
+    margin: 0;
+}
+
+.wiz_step_timeline .go_to_wiz_step.disabled{
+    cursor: default;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    filter: alpha(opacity=50);
+    -moz-opacity: 0.5;
+    -khtml-opacity: 0.5;
+    opacity: 0.5;
+}
+
+.wiz_step_timeline .go_to_wiz_step.current{
+    cursor: default;
+    color: #000;
+}
+
+.wiz_step_timeline .go_to_wiz_step:after{
+    content: '\2014\203A';
+    display:-moz-inline-stack;
+    display:inline-block;
+    zoom:1;
+    *display:inline;
+    margin-left: 1em;
+}
+
+.wiz_step_timeline .go_to_wiz_step:last-child:after{
+    display: none;
+}
+
+.wiz_step_nav:after{
+    content: '';
+    display: block;
+    clear: both;
+}
+
+.wiz_step_nav .left_nav{
+    float: left;
+    width: 50%;
+    text-align: left;
+}
+
+.wiz_step_nav .right_nav{
+    float: right;
+    width: 50%;
+    text-align: right;
+}
+
+.wiz_step_nav .other_btn,
+.wiz_step_nav .submit_btn{
+    margin-right: 1em;
+}
+
+.wiz_step_nav .other_btn:last-child,
+.wiz_step_nav .submit_btn:last-child{
+    margin-right: 0;
+}

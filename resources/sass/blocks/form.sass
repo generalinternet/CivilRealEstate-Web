@@ -1,0 +1,202 @@
+.form
+    // elemenet
+    &__title
+        font-family: $font_serif
+        font-weight: 900
+        font-size: 1.8em
+        // &_has-number
+    &__title-number
+        margin-right: 1em
+        font-family: $font_serif
+    &__input
+        label.main,
+        .radio_label,
+        .checkbox_label
+            +form_input_label()
+        input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
+        textarea,
+        .StripeElement,
+        .jsignature_signarea
+            background: $color_lighter_grey
+            box-shadow: none
+            padding: 0.4em 1em
+            line-height: normal
+        .field_error
+            font-size: 0.9em
+            font-weight: 700
+            color: $color_primary
+        // types
+        &_type
+            &_radio
+                text-align: center
+                margin-bottom: 2em
+                label.main
+                    font-family: $font_serif
+                    font-weight: 900
+                    font-size: 1.3em
+                    color: $color_primary
+                .options_wrap
+                    .radio_box
+                        border-radius: 4px!important
+                    label
+                         input[type="radio"]:checked + .radio_box:before
+                            content: "✔" !important
+                            background: none !important
+                            font-size: 1em
+                            margin: 0!important
+                            transform: translate(-50%, -50%)
+                            color: $color_dark
+                            width: 100%
+                            height: 100%
+                    .radio_label
+                        font-weight: 400
+                        color: $color_dark
+                        transition: .3s
+                    label:hover,
+                    label:focus
+                        .radio_label
+                            font-weight: 400!important
+                            color: $color_primary
+            &_address-set
+                margin-bottom: 2em
+                legend.main
+                    +form_input_label()
+                input.gi_field_text,
+                .selectric
+                    background: $color_lighter_grey!important
+                    padding: 0.4em 1em
+                    line-height: normal!important
+                    .label
+                        padding: 0
+                        line-height: inherit
+                        font-size: inherit
+                        font-weight: inherit
+                        color: $color_dark
+                        text-align: left
+                    .button
+                        border: none
+                        box-shadow: none
+                .addr_element .addr_row,
+                .addr_element .addr_row .form_element,
+                .addr_element
+                    border-color: $color_white
+            &_phone
+                .addr_element .addr_row.halves > .form_element
+                    max-width: unset
+                input.phone_field
+                    background: $color_lighter_grey!important
+                    padding: 0.4em 1em
+                    line-height: normal!important
+            &_dropdown
+                .selectric
+                    background: $color_primary
+                    padding: 0.4em 1em
+                    line-height: normal
+                    box-shadow: none
+                .label
+                    padding: 0
+                    line-height: inherit
+                    font-size: inherit
+                    font-weight: inherit
+                    text-align: left
+                    .null_option
+                        color: $color_white
+                .button
+                    border: none
+                    box-shadow: none
+                    &::after
+                        border-top-color: $color_white!important
+            &_signature
+                .jsignature_signarea
+                    min-height: 10em
+                    position: relative
+                    &.hide_pad
+                        display: none
+                    input[type="button"]:last-child
+                        left: 1em!important
+                        top: 1em!important
+                        background: $color_bolder_grey
+                        color: $color_white
+                        position: absolute
+                    &.error
+                        margin-bottom: 2em
+                        .field_error
+                            bottom: -2em
+                            top: unset
+                            position: absolute
+                            left: 0
+                .jsignature_imgdata
+                    min-height: 10em
+                .checkbox_box
+                    background: $color_grey
+                    &::before
+                        background-position-y: -100px!important
+                .btn_jsignature_rewrite,
+                .other_btn
+                    padding: 0.5em 2em
+                    border: solid 1px
+                    font-weight: 500
+                    border-radius: 5px
+                    transition: .3s
+                    box-shadow: 0 0 5px rgba(0,0,0,.1)
+                    cursor: pointer
+                    top: 1em!important
+                    left: 1em!important
+                    text-transform: capitalize
+                    background: $color_dark
+                    border: solid 1px $color_dark
+                    color: $color_white
+                    font-size: 1em
+                    &:hover
+                        background: none!important
+                        color: $color_dark
+                .form_element.error
+                    input
+                        border-color: #d9392e!important
+            &_checkbox
+                .checkbox_label
+                    font-weight: 500!important
+                    transition: .3s
+                    color: $color_white
+                .checkbox_box
+                    background: $color_grey
+                    &::before
+                        background-position-y: -100px!important
+            &_otp-message
+                margin-bottom: 2em
+                padding-top: 2em
+                .field_content
+                    &.has_hidden_desc
+                        .svg_icon > svg *
+                            fill: $color_bolder_grey!important
+                .hidden_desc_wrap
+                    background: $color_primary
+                    font-size: 0.8em
+                .hidden_desc_title
+                    font-weight: 700
+                .hidden_desc
+                    font-weight: 400
+        // theme
+        &_label-color_grey
+            label.main,
+            .radio_label,
+            .checkbox_label
+                color: $color_white
+    // types
+    &_type_contact-form
+        .form
+            &__title
+                margin-bottom: 1em
+            &__input
+                &_type_textarea
+                    textarea
+                        height: 10em!important
+
+
+
+@media screen and ( max-width: 767px )
+    .form
+        &__title
+            font-size: 1.5em
+        &__title-number
+            margin-right: 0.2em

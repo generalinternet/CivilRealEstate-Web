@@ -1,0 +1,43 @@
+.accreditation-preview
+    background: #fff
+    padding: 2em
+    position: relative
+    box-shadow: 0 1px 15px rgba(0,0,0,.1)
+    height: 20em
+    overflow: hidden
+    transition: ease-in-out .3s
+    // &__item
+    //     &__type_signature
+    &__agreement-item
+        &:not(:last-child)
+            margin-bottom: 1em
+    &__show_more
+        position: absolute
+        left: 0
+        width: 100%
+        text-align: center
+        padding: 1.5em 0
+        padding-top: 2em
+        bottom: 0
+        font-weight: 700
+        font-size: 0.8em
+        cursor: pointer
+        background: linear-gradient(to top, $color_white, rgba(255,255,255,.8))
+        transition: .3s
+    &__text_more
+        display: block
+    &__text_less
+        display: none
+
+
+    // show more animation
+    &.full-content
+        height: auto
+        padding-bottom: 4em
+        .accreditation-preview
+            &__show_more
+                background: none
+            &__text_more
+                display: none
+            &__text_less
+                display: block

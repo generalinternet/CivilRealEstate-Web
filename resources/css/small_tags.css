@@ -1,0 +1,25 @@
+@page {
+    margin: 12.7mm 9.87mm;
+}
+
+.container_tag{
+    /*background: #000;*/
+    padding-left: 5.96mm;
+    padding-right: 5.96mm;
+    padding-top: 3.46mm;
+    padding-bottom: 3.46mm;
+    width: 82.6mm;
+    height: 120mm;
+}
+
+.container_tag_content{
+    background: #fff;
+    width: 82.6mm;
+    height: 120mm;
+    margin: auto;
+    /*border: 1px solid #005588;*/
+}
+
+table.top_border{
+    width: 100%;
+}

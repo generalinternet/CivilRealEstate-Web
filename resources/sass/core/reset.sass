@@ -1,0 +1,62 @@
+body
+    font-size: 1em
+    color: $color_dark
+    font-family: $font_sans_serif
+    line-height: normal
+    font-weight: 400
+*
+    font-family: $font_sans_serif
+#header_wrap
+    background: none
+#header
+    width: auto
+.view_wrap
+    width: auto
+#content
+    height: auto
+    background: none
+.sized_img_wrap
+    width: auto!important
+    height: auto!important
+body.controller_user.action_signup
+    .section_type_sign-up
+        background-attachment: fixed
+
+
+// scrollbar
+::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb 
+  background: $color_primary
+
+img
+    max-width: 100%
+/** FireFox **/
+#content_wrap
+    scrollbar-color: $color_primary
+
+body.logged_in
+    #bottom_register_btn,
+    #video_register_btn
+        display: none
+body.controller_login
+    background: none!important
+
+// modal title
+.gi_modal .content_padding.gi_modal_no_pad
+    h1,
+    h2
+        background: $color_primary
+
+.login_actions a
+    font-weight: normal!important
+    text-shadow: unset!important
+    margin-top: 0
+
+
+@media screen and ( max-width: 767px )
+    body
+        font-size: 0.9em
+
+@media screen and ( max-width: 350px )
+    body
+        font-size: 0.8em

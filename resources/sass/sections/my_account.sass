@@ -1,0 +1,35 @@
+#content > .section_type_account-info:nth-child(odd)
+    background: $color_lighter_grey
+.section
+    &_type_account-info
+        .section
+            &__title
+                font-size: 2em
+            &__buttons
+                float: right
+                .button
+                    font-size: .4em
+                    padding: 0 1.5em
+                    bottom: 0.5em
+                    position: relative
+            &__info-wrap
+                &:not(:last-child)
+                    margin-bottom: 4em
+                .info-item
+                    margin-bottom: 1em
+                    &__name
+                        font-weight: 700
+                        margin-right: 0.5em
+                    &__value
+                        font-weight: 500
+@media screen and ( max-width: 991px )
+    .section
+        &_type_account-info
+            padding-bottom: 6em
+            .section
+                &__buttons
+                    position: absolute
+                    width: 100%
+                    bottom: -1.5em
+                    left: 0
+                    padding: 0 0.6em

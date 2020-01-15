@@ -1,0 +1,38 @@
+.service
+    background: $color_primary
+    box-shadow: 0 0 4px rgba(0,0,0,.1)
+    padding: 1em 1.5em
+    position: relative
+    height: 100%
+    padding-bottom: 3em
+    &__icon-image
+        margin-bottom: 1em
+    &__title
+        font-weight: 900
+        font-family: $font_serif
+        font-size: 1.5em
+        margin-bottom: 0.2em
+        &_color_dark
+            color: $color_dark
+        &_color_white
+            color: $color_white
+    &__description
+        color: $color_dark
+        font-size: 1em
+        margin-top: 1em
+        margin-bottom: 0
+    &__button
+        color: $color_white
+        padding: 1.5em
+        position: absolute
+        left: 0
+        width: 100%
+        bottom: 0
+        &:hover
+            color: $color_white
+
+@media screen and ( max-width: 991px )
+    .service
+        margin-bottom: 3em
+        height: auto
+        padding-bottom: 4em

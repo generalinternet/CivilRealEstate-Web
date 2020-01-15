@@ -1,0 +1,53 @@
+.login
+    &__logo
+        text-align: center
+        padding: 0 2em
+        margin-bottom: 1em
+        img
+            max-width: 100%
+    &__form
+        .login_actions
+            // .form__input_type_checkbox
+            &>a
+                text-shadow: none
+                transition: .3s
+                color: $color_grey
+                font-weight: 700
+                &:hover
+                    color: $color_primary
+                    text-decoration: unset
+            .form__input_type_checkbox .checkbox_box
+                background: $color_grey!important
+    &__submit-wrap
+        text-align: center
+        .button
+            padding: .6em 3em
+            font-weight: 700
+            width: auto!important
+            display: inline-block!important
+    &__sign-up-link-wrap
+        text-align: center
+        margin-top: 2em
+        color: $color_white
+    &__sign-up-link
+        color: $color_primary
+        font-weight: 600
+        transition: .3s
+        &:hover
+            color: $color_primary
+            opacity: 0.8
+            text-decoration: none
+
+    
+@media screen and ( max-width: 480px)
+    .login
+        &__form
+            .login_actions
+                &>*
+                    width: 100%
+                    display: block
+                    text-align: center
+            .form__input_type_checkbox
+                margin-bottom: 20px
+                .field_content
+                    float: none

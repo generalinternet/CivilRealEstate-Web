@@ -1,0 +1,224 @@
+.tabs_wrap{
+    position: relative;
+    border: 1px solid #808080;
+    margin-top: 5em;
+    padding: 0 2em;
+    background: #f0f0f0;
+}
+
+.tab{
+    border-top: 1px solid #808080;
+    position: absolute;
+    background: #f0f0f0;
+    top: -1px;
+    left: 2em;
+    right: 2em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    z-index: 0;
+}
+
+.tab.current{
+    z-index: 1;
+    position: relative;
+    left: 0;
+    right: 0;
+}
+
+.tab_label{
+    display: block;
+    /*padding: 1em 0;*/
+    line-height: 1em;
+    text-align: center;
+    cursor: pointer;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.tab > .tab_label{
+    border: 1px solid #808080;
+    border-bottom: none;
+    position: absolute;
+    top: -3em;
+    width: 50%;
+}
+
+.tab_label_text{
+    padding: 1em;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.tab.current > .tab_label{
+    color: #000;
+}
+
+.tab_content{
+    padding: 2em;
+    display: none;
+    z-index: 2;
+    position: relative;
+    background: #f0f0f0;
+}
+
+.tab.current > .tab_content{
+    display: block;
+}
+
+.tab:nth-child(2) > .tab_label{
+    left: 50%;
+}
+
+/* three tabs */
+.tab:first-child:nth-last-child(3) > .tab_label,
+.tab:first-child:nth-last-child(3) ~ .tab > .tab_label {
+    width: 33.3333%;
+}
+.tab:nth-child(2):nth-last-child(2) > .tab_label{
+    left: 33.3333%;
+}
+.tab:nth-child(3):nth-last-child(1) > .tab_label{
+    left: 66.6666%;
+}
+
+/* four tabs */
+.tab:first-child:nth-last-child(4) > .tab_label,
+.tab:first-child:nth-last-child(4) ~ .tab > .tab_label {
+    width: 25%;
+}
+.tab:nth-child(2):nth-last-child(3) > .tab_label{
+    left: 25%;
+}
+.tab:nth-child(3):nth-last-child(2) > .tab_label{
+    left: 50%;
+}
+.tab:nth-child(4):nth-last-child(1) > .tab_label{
+    left: 75%;
+}
+
+/* five tabs */
+.tab:first-child:nth-last-child(5) > .tab_label,
+.tab:first-child:nth-last-child(5) ~ .tab > .tab_label {
+    width: 20%;
+}
+.tab:nth-child(2):nth-last-child(4) > .tab_label{
+    left: 20%;
+}
+.tab:nth-child(3):nth-last-child(3) > .tab_label{
+    left: 40%;
+}
+.tab:nth-child(4):nth-last-child(2) > .tab_label{
+    left: 60%;
+}
+.tab:nth-child(5):nth-last-child(1) > .tab_label{
+    left: 80%;
+}
+
+/* six tabs */
+.tab:first-child:nth-last-child(6) > .tab_label,
+.tab:first-child:nth-last-child(6) ~ .tab > .tab_label {
+    width: 16.6666%;
+}
+.tab:nth-child(2):nth-last-child(5) > .tab_label{
+    left: 16.6666%;
+}
+.tab:nth-child(3):nth-last-child(4) > .tab_label{
+    left: 33.3333%;
+    width: 16.67% !important;
+}
+.tab:nth-child(4):nth-last-child(3) > .tab_label{
+    left: 50%;
+}
+.tab:nth-child(5):nth-last-child(2) > .tab_label{
+    left: 66.6666%;
+}
+.tab:nth-child(6):nth-last-child(1) > .tab_label{
+    left: 83.3333%;
+}
+/**********************/
+.tabs_wrap.side_labels{
+    padding: 0;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-top: 2em;
+}
+
+.tabs_wrap.side_labels:before,
+.tabs_wrap.side_labels:after{
+    content: normal; /** To fix Safari bug with flex-wrap **/
+}
+
+.tabs_wrap.side_labels .tab_labels{
+    flex: 1;
+}
+
+.tabs_wrap.side_labels .tab_contents{
+    flex: 4;
+    position: relative;
+}
+
+.tabs_wrap.side_labels .tab_labels .tab_label{
+    position: relative;
+}
+
+.tabs_wrap.side_labels .tab_labels .tab_label:before{
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: -1px;
+    left: 0;
+    right: -1px;
+}
+
+.tabs_wrap.side_labels.right_side_labels .tab_labels .tab_label:before{
+    left: -1px;
+    right: 0px;
+}
+
+/**TABS WITH PADDING BETWEEN**/
+/*
+.tabs_wrap, .tab, .tab .tab_label{
+    border-width: 2px;
+}
+
+.tab{
+    top: -2px;
+    left: 1em;
+    right: 1em;
+}
+
+.tab .tab_label{
+    padding: 0 0.5em;
+    border: none;
+    background: none;
+}
+
+.tab_label_text{
+    padding: 1em;
+    border: 2px solid #808080;
+    background: #f0f0f0;
+    -webkit-border-top-left-radius: 0.5em;
+    -moz-border-radius-topleft: 0.5em;
+    border-top-left-radius: 0.5em;
+    -webkit-border-top-right-radius: 0.5em;
+    -moz-border-radius-topright: 0.5em;
+    border-top-right-radius: 0.5em;
+    behavior: url('external/css/PIE-1.0.0/PIE.htc');
+}
+
+.tabs_wrap{
+    padding: 0 1em;
+}
+*/

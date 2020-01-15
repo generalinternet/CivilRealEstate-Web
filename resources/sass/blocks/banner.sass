@@ -1,0 +1,187 @@
+.banner
+    background-position: center
+    background-size: cover
+    // elements
+    &__title
+        font-family: $font_serif
+        font-weight: 900
+        font-size: 3em
+        color: $color_white
+        padding-bottom: 0
+        margin-bottom: .4em
+        line-height: 1.2em
+        &_color_primary
+            color: $color_primary
+        &_size_medium
+            font-size: 2.3em
+    &__description-wrap
+        height: 100%
+    &__description
+        color: $color_white
+        max-width: 32em
+        font-size: 1.2em
+        line-height: 1.5
+        &_align_bottom
+            position: absolute
+            bottom: 0
+            right: 0
+            width: 100%
+            text-align: right
+    &__buttons
+        padding: 10px 0
+        .button:first-child
+            margin-right: 20px
+        &_type_listing
+            padding: 0
+            .button
+                &:last-child
+                    margin-top: 1em
+                    margin-left: 1em
+                &:first-child
+                    margin-right: 0
+    &__content
+        &_type_investment-header
+            .investment
+                &__header-wrap
+                    padding: 0
+                    margin-bottom: 1em
+                &__header-title-bottom
+                    display: none
+    // modifiers
+    &_size_full-width
+        height: 100vh
+        min-height: 40em
+        .container,
+        .row,
+        div[class*="col-"]
+            height: 100%
+            position: relative
+        .banner
+            &__content-wrap
+                position: absolute
+                top: 50%
+                transform: translateY(-50%)
+            &__title
+                max-width: 10em
+    &_size_normal
+        height: auto
+        padding-top: 12em
+    // set background images for specific pages
+    &_page_my-account,
+    &_page_home
+        background-image: url('../media/img/bgs/home.jpg')
+    &_page_opportunity-detail,
+    &_page_opportunities
+        background-image: url('../media/img/bgs/opportunities.jpg')
+    &_page_opportunity-detail
+        position: relative
+        padding-bottom: 5em
+    &_page_about
+        background-image: url('../media/img/bgs/about.jpg')
+    &_page_contact
+        background-image: url('../media/img/bgs/contact.jpg')
+    &_page_oppor-realestate
+        background-image: url('../media/img/bgs/investment/realestate.jpg')
+    &_page_oppor-start
+        background-image: url('../media/img/bgs/investment/start.jpg')
+    &_page_oppor-kids
+        background-image: url('../media/img/bgs/investment/kids.jpg')
+
+    // style modifiers
+    &_dark-overlayed
+        position: relative
+        &::before
+            content: ""
+            width: 100%
+            height: 100%
+            left: 0
+            top: 0
+            display: block
+            position: absolute
+            background: rgba(0,0,0,.7)
+        .banner
+            &__title
+                text-shadow: 0 1px 4px rgba(0,0,0,.4)
+    &_fixed
+        background-attachment: fixed
+
+
+    // bottom-tag
+    &__bottom-tag
+        position: absolute
+        bottom: 0
+        left: 0
+        width: 100%
+        padding: 0.8em 0
+    &__bottom-tag-text
+        font-weight: 700
+        color: $color_white
+        font-size: 1em
+        text-transform: uppercase
+
+
+
+@media screen and ( max-width: 991px )
+    .banner
+        &__description
+            &_align_bottom
+                position: static
+                text-align: left
+                margin-top: 1em
+    
+    
+    
+@media screen and ( max-width: 767px )
+    .banner
+        &__buttons
+            .button
+                &:not(:last-child)
+                    margin-bottom: 1em
+            &_type_listing
+                .button
+                    &:last-child
+                        margin: 0
+        &_size_full-width
+            .banner
+                &__content-wrap
+                    position: static
+                    margin-top: 40%
+                    transform: unset
+                &__buttons
+                    position: absolute
+                    bottom: 10%
+                    width: 100%
+                    left: 0
+                    padding: 0 1em
+
+
+
+
+
+@media screen and ( max-width: 480px )
+    .banner
+        // set background images for specific pages
+        &_page_my-account,
+        &_page_home
+            background-image: url('../media/img/bgs/home_mobile.jpg')
+        // &_page_opportunities
+        //     background-image: url('../media/img/bgs/opportunities.jpg')
+        &_page_about
+            background-image: url('../media/img/bgs/about_mobile.jpg')
+        // &_page_contact
+        //     background-image: url('../media/img/bgs/contact.jpg')
+
+
+
+
+
+@media screen and ( max-width: 350px )
+    .banner
+        &__buttons
+            .button
+                &:not(:last-child)
+                    margin-right: 10px
+        &_size_full-width
+            .banner
+                &__content-wrap
+                    margin-top: 40%

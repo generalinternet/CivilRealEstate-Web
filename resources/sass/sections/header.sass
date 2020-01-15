@@ -1,0 +1,67 @@
+.section
+    &_type_header
+        position: absolute
+        left: 0
+        top: 0
+        width: 100%
+        z-index: 100
+
+// responsive
+@media only screen and (max-width: 960px)
+    #logo
+        width: 100%
+        max-width: 300px
+        padding: 0
+    .menu_open
+        #logo
+            position: fixed
+            left: 1em
+            z-index: 4000
+            top: 1.7em
+
+    #menu_btn
+        display: block
+        right: 1em
+        left: unset
+        top: 2em
+        width: 2.5em
+        height: 2.5em
+        padding: 0 0.2em
+        &::before
+            display: none
+        &>span
+            display: block
+            width: 100%
+            height: 0.3em
+            transition: ease .3s
+            transform-origin: right
+            background: $color_primary
+            &:not(:last-child)
+                margin-bottom: 0.5em
+    .menu_open
+        #menu_btn
+            span.top
+                transform: rotate(-45deg) translateY(1px)
+            span.middle
+                opacity: 0
+            span.bottom
+                transform: rotate(45deg) translateY(-1px)
+
+    #main_nav_wrap
+        display: block
+        width: 100%
+        right: -100%
+        overflow-x: hidden
+        overflow-y: auto
+        background-color: $color_dark
+        touch-action: auto!important
+    .section
+        &_type_header
+            padding: 1.7em 0
+
+
+@media only screen and (max-width: 767px)
+    #header_wrap
+        #logo
+            img
+                max-width: 60%

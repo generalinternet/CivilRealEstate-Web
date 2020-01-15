@@ -1,0 +1,100 @@
+/***.form_group***/
+.form_rows_group{
+    margin-bottom: 1em;
+}
+
+.form_rows_group:last-child{
+    margin-bottom: 0;
+}
+
+.form_rows.keep_one_row > .form_row:only-child > .remove_form_row_wrap .remove_form_row{
+    display: none;
+}
+
+.form_rows, .form_row, .form_row_views, .form_row_view{
+    padding-bottom: 1.5em;
+    transition: padding;
+    -webkit-transition: padding;
+    transition-duration: 0.4s;
+    -webkit-transition-duration: 0.4s;
+}
+
+.form_rows:last-child, .form_row:last-child, .form_row_views:last-child, .form_row_view:last-child{
+    padding-bottom: 0;
+}
+
+.form_row:after, .form_row_view:after{
+    clear: both;
+    content: '';
+    display: block;
+}
+
+tr.form_row:after{
+    display: none;
+}
+
+.remove_form_row_wrap
+,.form_row .sort_handle_wrap{
+    width: 40px;
+    display:-moz-inline-stack;
+    display:inline-block;
+    zoom:1;
+    *display:inline;
+    vertical-align: top;
+    margin-top: 2.4em;
+}
+
+.no_labels .remove_form_row_wrap{
+    margin-top: 0.6em;
+}
+
+.remove_form_row_wrap.two_btns{
+    margin-top: 1em;
+}
+.remove_form_row_wrap.two_btns .custom_btn:first-child{
+    display: block;
+    margin-bottom: 0.5em;
+}
+.form_row_fields{
+    width: calc(100% - 40px);
+    display:-moz-inline-stack;
+    display:inline-block;
+    zoom:1;
+    *display:inline;
+    vertical-align: top;
+}
+
+.form_row_fields + .remove_form_row_wrap{
+    text-align: right;
+}
+
+.form_rows.keep_one_row > .form_row:only-child > .form_row_fields{
+    width: 100%;
+}
+
+.form_rows.labels_on_first_row .form_row:not(:first-child) label.main,
+.form_row_views.labels_on_first_row .form_row_view:not(:first-child) .content_block_title,
+.form_rows.no_labels .form_row label.main{
+    display: none;
+}
+
+.form_rows.labels_on_first_row .form_row:not(:first-child) .remove_form_row_wrap{
+    margin-top: 0.7em;
+}
+
+.form_row .form_row{
+    padding-bottom: 1em;
+}
+
+.form_row .form_row:last-child{
+    padding-bottom: 0;
+}
+.flex_table .form_row{
+    padding-bottom: 0;
+}
+.form_row.discounted td
+,.flex_table .form_row.discounted > .flex_row
+,.form_row.discounted td
+,.flex_table .form_row.discount > .flex_row{
+    background: rgba(115,171,211,0.4);
+}

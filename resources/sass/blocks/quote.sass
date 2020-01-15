@@ -1,0 +1,54 @@
+.quote
+    display: block
+    position: relative
+    &__content-wrap
+        position: absolute
+        top: 40%
+        right: 0
+        text-align: right
+        padding: 3em
+        padding-left: 4em
+        transform: translateY(-50%)
+    &__icon-img
+        position: absolute
+        top: 3em
+        left: 3em
+    &__text
+        font-family: $font_serif
+        font-weight: 700
+        font-size: 1.3em
+        line-height: normal
+    &__author
+        font-family: $font_serif
+        font-size: 1.3em
+        font-weight: 700
+        margin-bottom: 0
+    &__sub-title
+        font-family: $font_serif
+        font-size: 0.9em
+        margin-top: 0.5em
+        font-weight: 700
+    &__logo-img
+        position: absolute
+        bottom: 4em
+        left: 0
+        width: 100%
+        padding: 0 3em
+    // --- types
+    &_type_form-quote
+        min-height: 35em
+    &_theme_primary
+        background-color: $color_primary
+        color: $color_white
+
+
+
+@media screen and ( max-width: 767px )
+    .quote
+        &_type_form-quote
+            .quote
+                &__content-wrap
+                    position: static
+                    transform: unset
+                    padding: 0.5em
+                    padding-top: 8em

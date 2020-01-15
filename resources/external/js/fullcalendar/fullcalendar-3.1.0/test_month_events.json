@@ -1,0 +1,82 @@
+[
+  {
+    "id": "9876503",
+    "title": "Work Order 9876503",
+    "start": "2017-02-01T16:00:00",
+    "end": "2017-02-22T12:30:00",
+    "className": "eventbg_green",
+    "resources" :["David Kolby","Ryan Lair"],
+    "status": "active",
+    "sort": 3 
+  },
+  {
+    "id": "9876507",
+    "title": "Work Order 9876507",
+    "start": "2017-01-07T08:00:00",
+    "end": "2017-03-22T17:00:00",
+    "resources" :["Nick Watson","Mike Kelly","Ryan Lair"],
+    "status": "active",
+    "sort": 2
+  },
+  {
+    "id": "9876511",
+    "title": "Work Order 9876511",
+    "start": "2017-02-09T16:00:00",
+    "end": "2017-02-13T12:30:00",
+    "resources" :["Ryan Lair"],
+    "status": "active",
+    "sort": 1
+  },
+  {
+    "id": "9876514",
+    "title": "Work Order 9876514",
+    "start": "2017-02-27T16:00:00",
+    "end": "2017-03-05T12:30:00",
+    "resources" :["Zoe Watson","Ryan Lair"],
+    "status": "end",
+    "sort": 4
+  },
+  {
+    "id": "9876517",
+    "title": "Work Order 9876517",
+    "start": "2017-02-11T07:00:00",
+    "end": "2017-03-13T20:30:00",
+    "resources" :["Zoey Watson","Nick Watson"],
+    "status": "active",
+    "sort": 5
+  },
+  {
+    "id": "9876520",
+    "title": "Long Meeting",
+    "start": "2017-02-15T10:30:00",
+    "end": "2017-02-22T12:30:00",
+    "status": "end",
+    "sort": 6
+  },
+  {
+    "id": "9876527",
+    "title": "Project2",
+    "start": "2017-02-10T12:00:00-05:00",
+    "end": "2017-03-22T12:30:00-05:00",
+    "sort": 8
+  },
+  {
+    "id": "9876541",
+    "title": "Happy Hour",
+    "start": "2017-02-12T11:30:00-05:00",
+    "end": "2017-03-22T12:30:00-05:00",
+    "sort": 12
+  },
+  {
+    "id": "9876543",
+    "title": "Dinner",
+    "start": "2017-02-12T20:00:00",
+    "sort": 13
+  },
+  {
+    "id": "9876545",
+    "title": "Birthday Party",
+    "start": "2017-03-12T07:00:00-05:00",
+    "sort": 14
+  }
+]

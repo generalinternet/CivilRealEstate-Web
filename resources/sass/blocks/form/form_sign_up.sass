@@ -1,0 +1,170 @@
+.form
+    &_type_sign-up
+        .form
+            &__title
+                margin-bottom: 2em
+            &__title-number
+                span
+                    font-family: inherit
+            &__form-content
+                background: $color_white
+                &_type_half-form
+                    display: flex
+                    flex-wrap: wrap
+                    &>*
+                        width: 50%
+            &__wrapper
+                position: relative
+                padding: 2.5em 3em
+            &__form-buttons
+                text-align: center
+                padding-top: 2em
+                &_type_agreement
+                    .form__left-buttons,
+                    .form__right-buttons
+                        position: absolute
+                        width: 50%
+                        bottom: 0
+                        background: #fff
+                        z-index: 1
+                        padding: 2.7em 3em
+                    .form__left-buttons
+                        left: 0
+                        padding-right: 0
+                        display: none
+                    .form__right-buttons
+                        right: 0
+                        padding-left: 0
+            &__top-buttons
+                display: block
+                margin-bottom: 2em
+            &__bottom-buttons
+                display: block
+                .submit_btn
+                    font-size: 1em!important
+                    line-height: normal
+            &__left-buttons
+                display: inline-block
+                width: 50%
+            &__right-buttons
+                width: 50%
+                display: inline-block
+            &__description
+                font-weight: 500
+                // &_has-link
+            &__description-link
+                font-weight: 700
+                color: $color_primary
+                transition: .3s
+                &:hover
+                    opacity: 0.5
+                    text-decoration: none
+        // otp message
+        .alert_message.green
+            background: $color_grey
+            border: solid 1px $color_bolder_grey
+            p
+                color: $color_dark!important
+                text-shadow: none
+                font-weight: 500
+                font-size: 0.8em
+                .submit_btn
+                    font-weight: 700
+                    color: $color_primary!important
+        // agreement form switch
+        &.show_prev_btn
+            .form__form-buttons_type_agreement
+                .form__left-buttons
+                    display: block
+        &.show_complete_btn
+            .form__form-buttons_type_agreement
+                .form__right-buttons
+                    display: none
+        .slider_page_wrap
+            // overflow: hidden
+            .slider_page
+                display: none
+                &.current
+                    display: block
+        .slider_page
+            .form_element
+                // &.onoff_element
+                .checkbox_box
+                    vertical-align: top
+                .onoff_label,
+                .checkbox_label
+                    font-weight: 500
+                    width: calc(100% - 2em)
+                    padding-left: 1em
+                    line-height: normal
+                    transition: .3s
+                    &:hover
+                        font-weight: 500
+                        color: $color_dark
+                .options_wrap>label
+                    display: block
+                    &:hover
+                        .onoff_label,
+                        .checkbox_label
+                            font-weight: 500!important
+                            color: $color_dark
+
+    &_type_civil-account-edit
+        .form
+            &__form-buttons_type_agreement
+                display: none
+        .slider_page
+            .form_body
+                margin-bottom: 2em
+            .form_element
+                // &.onoff_element
+                .checkbox_box
+                    vertical-align: top
+                .onoff_label,
+                .checkbox_label
+                    font-weight: 500
+                    width: calc(100% - 2em)
+                    padding-left: 1em
+                    line-height: normal
+                    transition: .3s
+                    &:hover
+                        font-weight: 500
+                        color: $color_dark
+                .options_wrap>label
+                    display: block
+                    &:hover
+                        .onoff_label,
+                        .checkbox_label
+                            font-weight: 500!important
+                            color: $color_dark
+
+@media screen and ( max-width: 767px )
+    .form
+        &_type_sign-up
+            .form
+                &__form-content
+                    &_type_half-form
+                        display: block
+                        & > *
+                            width: 100%
+                            padding: 2em 1.5em
+                &__wrapper
+                    padding: 2em 1.5em
+                &__left-buttons,
+                &__right-buttons
+                    width: 100%
+                    display: block
+                &__left-buttons
+                    margin-bottom: 2em
+                &__form-buttons
+                    &_type_agreement
+                        .form__left-buttons,
+                        .form__right-buttons
+                            left: 0
+                            right: unset
+                            padding: 1.5em .5em
+                            width: 100%
+                        .form__right-buttons
+                            bottom: 0
+                        .form__left-buttons
+                            bottom: 3em

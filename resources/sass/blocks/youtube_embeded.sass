@@ -1,0 +1,22 @@
+.youtube-embeded
+    position: relative
+    cursor: pointer
+    &__player,
+    &__placeholder,
+    &__placeholder img
+        +fullparent()
+    &__placeholder
+        transition: .2s
+        img
+            object-fit: cover
+            object-position: center
+    &__play-icon
+        +absolutely_centralized()
+        width: 3em
+        height: 3em
+    // loaded
+    &__player
+        &.loaded
+            .youtube-embeded
+                &__placeholder
+                    // display: none

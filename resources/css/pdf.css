@@ -1,0 +1,358 @@
+body{
+    font-size: 8pt;
+    font-family: 'freesans';
+    color: #575757;
+}
+
+.float_left{
+    float: left;
+}
+
+.float_right{
+    float: right;
+}
+
+div.left_align{
+    float: left;
+    width: 50%;
+/*    border: 1px solid #000;*/
+}
+div.right_align{
+    float: right;
+    text-align: right;
+    width: 50%;
+}
+.align_left{
+    text-align: left;
+}
+.align_right{
+    text-align: right;
+}
+.align_center{
+    text-align: center;
+}
+div.clear{
+    clear: both;
+    margin-bottom: 1em;
+}
+
+.inline_block{
+    display: inline-block;
+}
+
+table.header, table.footer, table.order_table, table.invoice_table{
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: fixed;
+}
+
+table.header td{
+    border-bottom: 1px solid #005588;
+}
+
+table.header td.first_col{
+    border-right: none;
+}
+
+table.header td.second_col{
+    border-left: none;
+    text-align: right;
+}
+
+table.header td table.no_border td{
+    border: none;
+}
+
+table.header th{
+    color: #000;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 1.2em;
+}
+
+table.header tr td{
+    color: #000;
+    padding: 0.5em;
+    vertical-align: top;
+    font-size: 1.1em;
+    width: 50%;
+}
+
+table.header tr td.company_name{
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+table.header tr td.logo{
+    width: 30px;
+}
+
+table.footer{
+    border-top: 1px solid #575757;
+}
+table.footer tr td{
+    vertical-align: middle;
+    padding: 0.5em 0;
+}
+table.footer .page_number{
+    text-align: left;
+    font-weight: bold;
+    color: #000;
+    /*font-size: 2.6em;*/
+}
+table.footer .print_date{
+    text-align: right;
+}
+
+h1{
+    text-transform: uppercase;
+    color: #000;
+    line-height: 1em;
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+h2{
+    color: #000;
+    font-size: 1.1em;
+    line-height: 1em;
+    font-weight: bold;
+    margin-bottom: 0em;  
+}
+
+h2.tag_num{
+    font-size: 2em;
+}
+
+h2.info{
+    line-height: 2em;
+    color: #000;
+    font-size: 1.2em;
+    font-weight: 400;
+    margin-bottom: 1em;
+    border-bottom: 1px solid #005588;
+    margin-right: 10px;
+    padding-bottom: 0.2em;
+}
+
+h2.info .value{
+    font-size: 2em;
+    margin-bottom: 0;
+    display: block;
+    color: #000;
+    font-weight: bold;
+}
+
+h3{
+    font-size: 1em;
+    line-height: 1em;
+    margin-bottom: 0em;
+    color: #000;
+}
+
+h1.no_marg{
+    margin-bottom: 0;
+}
+
+p{
+    margin-bottom: 1em;
+    color: #000;
+    font-size: 1.2em;
+}
+
+table td.empty{
+    background: none;
+    border: none;
+}
+
+table.timesheet{
+    font-size: 1.5em;
+}
+
+.red{
+    color: #dc0000;
+}
+
+.blue{
+    color: #005588;
+}
+
+.caps{
+    text-transform: uppercase;
+}
+
+table.top_align tr td{
+    vertical-align: top;
+}
+
+hr{
+    background: none;
+    border: 1px solid #808080;
+    height: 0;
+    margin: 1em auto;
+}
+
+table.header tr td.contact_info div{
+    float: left;
+}
+
+.smaller_text{
+    font-size: 0.8em;
+}
+
+.pdf_content{
+    padding: 1em 0;
+}
+
+table.order_table{
+    border: 1px solid #d0d0d0;
+}
+table.order_table th, table.order_table td, table.invoice_table th, table.invoice_table td{
+    color: #000;
+    background: #efefef;
+    text-align: left;
+    padding: 0.5em 1em;
+}
+
+table.order_table th.item_name, table.order_table td.item_name{
+    width: 30%;
+}
+
+table.order_table th, table.invoice_table th{
+    font-size: 1.2em;
+}
+
+table.order_table td, table.invoice_table td{
+    
+}
+
+.qrcodecell{
+    text-align: center;
+}
+
+.qrcode{
+    color: #000;
+}
+
+.w2{
+    width:20%;
+}
+.w4{
+    width:30%;
+}
+.price_column{
+    width: 65px;
+}
+.total_price_column{
+    width: 90px;
+}
+table.invoice_table{
+    margin-top: 10px;
+}
+table.invoice_table th{
+    background: #d0d0d0;
+    color: #000;
+    font-size: 0.8em;
+}
+th.sort_column{
+    width: 40px;
+}
+th.sort_column, th.checkbox_column{
+    width: 40px;
+}
+tfoot tr.invoice_net_total td
+,tfoot tr.invoice_tax_total td
+,tfoot tr.invoice_total td
+,tfoot tr.invoice_balance td{
+    border: 1px solid #d0d0d0 !important;
+}
+.no_print{
+    display:none;
+}
+
+.sign_here{
+    width: 300px;
+    margin-top: 1em;
+}
+
+.sign_here th{
+    font-size: 1em;
+    color: #000;
+    text-align: left;
+    font-weight: 400;
+    padding-top: 2em;
+}
+
+.sign_here td{
+    border-bottom: 1px solid #000;
+    width: 200px;
+    padding-top: 2em;
+}
+.signature_img{
+    width: 200px;
+}
+.important_notice{
+    font-size: 3em;
+    font-weight: 800;
+    color: #f00;
+    border: 3px solid #f00;
+    text-align: center;
+    padding: 10px;
+}
+tr.border_top_tr td{
+    border-top: 1px solid #999999;
+}
+
+.halves{
+    width: 100%;
+}
+.halves .df_elm_wrap{
+    width: 50%;
+    float: left;
+}
+.thirds .df_elm_wrap{
+    width: 33%;
+    float: left;
+}
+.quarters .df_elm_wrap{
+    width: 25%;
+    float: left;
+}
+.advanced_title{
+    font-size: 16px;
+    font-weight: bold;
+    color: #6ca7da;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+.advanced_content{
+    border: 2px solid #bfbdbd;
+    background: #f1f1f1;
+    padding: 5px 10px;
+}
+.admin_section{
+    border-top: 2px solid #bfbdbd;
+    border-bottom: 2px solid #bfbdbd;
+    background: #e0e9f1;
+    padding: 5px 10px;
+    margin-left: -10px;
+    margin-right: -10px;
+    margin-bottom: -7px;
+}
+.admin_section h3{
+    text-transform: uppercase;
+}
+.inline_felms .df_elm_wrap{
+    float: left;
+    width: 200px;
+}
+.df_elm_section h3{
+    font-size: 1.2em;
+    text-transform: uppercase;
+}
+.df_elm_section .content_block_title{
+    font-size: 1em;
+    text-transform: none;
+}

@@ -1,0 +1,47 @@
+.section
+    padding: 3em 0
+
+    // elements
+    &__title
+        font-size: 2.5em
+        font-weight: 900
+        font-family: $font_serif
+        color: $color_dark
+        &_color_white
+            color: $color_white
+    &__sub-title
+        font-size: 2em
+        font-weight: 900
+        font-family: $font_serif
+        color: $color_dark
+    &__description
+        font-size: 1.2em
+        line-height: 1.4em
+        &_color_white
+            color: $color_white
+        &_color_grey
+            color: $color_grey
+
+    // background color
+    &_bg_dark
+        background-color: $color_dark
+    &_bg_primary
+        background-color: $color_primary
+    &_bg_grey
+        background-color: $color_grey
+    &_bg_white
+        background-color: $color_white
+
+    // type error
+    &_type_error
+        color: $color_white
+        .main_head
+            font-weight: 700
+            margin-bottom: 1em
+            font-size: 1.5em
+
+
+@media screen and ( max-width: 767px )
+    .section
+        &__title
+            font-size: 2em

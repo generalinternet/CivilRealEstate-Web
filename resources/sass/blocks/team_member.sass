@@ -1,0 +1,31 @@
+.team-member
+    text-align: center
+    &__image
+        border-radius: 100%
+        overflow: hidden
+        border: solid 1px $color_grey
+    &__fullname
+        font-weight: 500
+        margin-top: 20px
+        color: $color_dark
+    &__title
+        color: $color_team_title
+        font-weight: 400
+    &__image
+        display: block
+        width: 100%
+    &__image-wrap
+        padding: 1em 5em
+    &__description
+        line-height: 1.5em
+    
+    // types
+    &_type_director
+        .team-member
+            &__title
+                color: $color_primary
+@media screen and ( max-width: 991px )
+    .team-member
+        margin-bottom: 3em
+        &__image-wrap
+            padding: 1em 3em

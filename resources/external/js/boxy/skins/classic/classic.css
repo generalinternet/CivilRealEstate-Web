@@ -1,0 +1,29 @@
+#bring_back_boxy{
+    background-image: url('boxy.png');
+}
+#boxy{
+    background-image: url('boxy.png');
+}
+#boxy_bg{
+    background-image: url('boxy_page.png');
+}
+#boxy_shadow{
+    background-image: url('boxy_shadow.png');
+}
+
+#boxy_eyes, #boxy_eyes.open{
+    background-image: url('boxy_eyes_open.png');
+}
+
+#boxy_eyes.left{
+    background-image: url('boxy_eyes_left.png');
+}
+#boxy_eyes.right{
+    background-image: url('boxy_eyes_right.png');
+}
+#boxy_eyes.closed{
+    background-image: url('boxy_eyes_closed.png');
+}
+#boxy_eyes.surprised{
+    background-image: url('boxy_eyes_surprised.png');
+}

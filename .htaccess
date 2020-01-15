@@ -1,0 +1,134 @@
+<IfModule mod_deflate.c>
+  # Compress HTML, CSS, JavaScript, Text, XML and fonts
+  AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE application/rss+xml
+  AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+  AddOutputFilterByType DEFLATE application/x-font
+  AddOutputFilterByType DEFLATE application/x-font-opentype
+  AddOutputFilterByType DEFLATE application/x-font-otf
+  AddOutputFilterByType DEFLATE application/x-font-truetype
+  AddOutputFilterByType DEFLATE application/x-font-ttf
+  AddOutputFilterByType DEFLATE application/x-javascript
+  AddOutputFilterByType DEFLATE application/xhtml+xml
+  AddOutputFilterByType DEFLATE application/xml
+  AddOutputFilterByType DEFLATE font/opentype
+  AddOutputFilterByType DEFLATE font/otf
+  AddOutputFilterByType DEFLATE font/ttf
+  AddOutputFilterByType DEFLATE image/svg+xml
+  AddOutputFilterByType DEFLATE image/x-icon
+  AddOutputFilterByType DEFLATE text/css
+  AddOutputFilterByType DEFLATE text/html
+  AddOutputFilterByType DEFLATE text/javascript
+  AddOutputFilterByType DEFLATE text/plain
+  AddOutputFilterByType DEFLATE text/xml
+
+  # Remove browser bugs (only needed for really old browsers)
+  BrowserMatch ^Mozilla/4 gzip-only-text/html
+  BrowserMatch ^Mozilla/4\.0[678] no-gzip
+  BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+  Header append Vary User-Agent
+</IfModule>
+
+## UPDATE BELOW BEFORE DEPLOYING FOR PROPER ERROR REPORTING ##
+ErrorDocument 400 /index.php?controller=static&action=error&errorCode=400
+ErrorDocument 401 /index.php?controller=static&action=error&errorCode=401
+ErrorDocument 403 /index.php?controller=static&action=error&errorCode=403
+ErrorDocument 404 /index.php?controller=static&action=error&errorCode=404
+ErrorDocument 405 /index.php?controller=static&action=error&errorCode=405
+ErrorDocument 406 /index.php?controller=static&action=error&errorCode=406
+ErrorDocument 407 /index.php?controller=static&action=error&errorCode=407
+ErrorDocument 412 /index.php?controller=static&action=error&errorCode=412
+ErrorDocument 414 /index.php?controller=static&action=error&errorCode=414
+ErrorDocument 415 /index.php?controller=static&action=error&errorCode=415
+ErrorDocument 500 /index.php?controller=static&action=error&errorCode=500
+ErrorDocument 501 /index.php?controller=static&action=error&errorCode=501
+ErrorDocument 502 /index.php?controller=static&action=error&errorCode=502
+
+Options +FollowSymlinks
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+
+RewriteRule ^login$ index.php?controller=login&action=index [NC,L]
+RewriteRule ^login/$ index.php?controller=login&action=index [NC,L]
+
+RewriteRule ^logout$ index.php?controller=login&action=logout [NC,L]
+RewriteRule ^logout/$ index.php?controller=login&action=logout [NC,L]
+
+RewriteRule ^register index.php?controller=login&action=register [NC,L]
+RewriteRule ^register/$ index.php?controller=login&action=register [NC,L]
+
+RewriteRule ^signup index.php?controller=login&action=register [NC,L]
+RewriteRule ^signup/$ index.php?controller=login&action=register [NC,L]
+
+#Remove forward slash
+RewriteRule ^(.*)/$ /$1 [L,R=301]
+
+RewriteRule ^([^/.]+)$ index.php?controller=static&action=$1 [NC,L]
+RewriteRule ^([^/.]+)/$ index.php?controller=static&action=$1 [NC,L]
+
+RewriteRule ^error/([^/.]+)$ index.php?controller=static&action=error&errorCode=$1 [NC,L]
+RewriteRule ^error/([^/.]+)/$ index.php?controller=static&action=error&errorCode=$1 [NC,L]
+
+##opportunities
+RewriteRule ^opportunities/([^/.]+)$ index.php?controller=static&action=opportunities&ref=$1 [NC,L]
+RewriteRule ^opportunities/category/([^/.]+)$ index.php?controller=static&action=opportunities&type=category&type_ref=$1 [NC,L]
+
+##signup steps
+RewriteRule ^user/signup/([0-9]+)/([0-9]+)/([0-9]+)$ index.php?controller=user&action=signup&step=$1&ajax=$2&id=$3 [NC,L]
+RewriteRule ^user/signup/([0-9]+)/([0-9]+)$ index.php?controller=user&action=signup&step=$1&ajax=$2 [NC,L]
+RewriteRule ^user/signup/([0-9]+)$ index.php?controller=user&action=signup&step=$1 [NC,L]
+
+##my accounts
+RewriteRule ^user/weAccountEdit/([a-zA-Z0-9-z\-]+)$ index.php?controller=user&action=weAccountEdit&step=$1 [NC,L]
+RewriteRule ^user/weAccountDetail/([0-9]+)$ index.php?controller=user&action=weAccountDetail&downloadPDF=$1 [NC,L]
+
+##contact
+RewriteRule ^contact/([0-9]+)$ index.php?controller=static&action=contact&sent=$1 [NC,L]
+RewriteRule ^angelNetwork/([0-9]+)$ index.php?controller=static&action=angelNetwork&sent=$1 [NC,L]
+
+##contact module
+RewriteRule ^contact/angelContactViewPdf/([0-9]+)$ index.php?controller=contact&action=angelContactViewPdf&userId=$1 [NC,L]
+
+RewriteRule ^([^/.]+)/([^/.]+)$ index.php?controller=$1&action=$2 [NC,L]
+RewriteRule ^([^/.]+)/([^/.]+)/$ index.php?controller=$1&action=$2 [NC,L]
+
+RewriteRule ^([^/.]+)/([^/.]+)/([0-9]+)$ index.php?controller=$1&action=$2&id=$3 [NC,L]
+RewriteRule ^([^/.]+)/([^/.]+)/([0-9]+)/$ index.php?controller=$1&action=$2&id=$3 [NC,L]
+
+RewriteRule ^content/([^/.]+)/([^/.]+)$ index.php?controller=content&action=$1&ref=$2 [NC,L]
+RewriteRule ^content/([^/.]+)/([^/.]+)/$ index.php?controller=content&action=$1&ref=$2 [NC,L]
+
+
+## UPDATE BELOW TO DOMAIN FOR WEBSITE ##
+RewriteCond %{HTTP_HOST} www.website.com$ [NC]
+RewriteRule ^(.*)$ http://website.com/$1 [L,R=301]
+
+AddType text/x-component .htc
+
+## EXPIRES CACHING ##
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/pdf "access plus 1 month"
+    ExpiresByType text/x-javascript "access plus 1 month"
+    ExpiresByType application/x-shockwave-flash "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 year"
+    ExpiresDefault "access plus 2 days"
+</IfModule>
+
+# One year for image files
+<filesMatch ".(jpg|jpeg|png|gif|ico|svg)$">
+Header set Cache-Control "max-age=31536000, public"
+</filesMatch>
+# One month for css and js
+<filesMatch ".(css|js)$">
+Header set Cache-Control "max-age=2628000, public"
+</filesMatch>	
+
+## Blocking access from libwww-perl ##
+RewriteCond %{HTTP_USER_AGENT} libwww-perl.* 
+RewriteRule .* ? [F,L]

@@ -1,0 +1,56 @@
+.trumbowyg-editor pre, .trumbowyg-editor pre code{
+    background: #33373b !important;
+    color: #fff !important;
+    display: block;
+    position: relative;
+}
+
+.trumbowyg-editor pre{
+    padding-top: 2.1em;
+    border: 1px solid #9da7b0;
+}
+
+.trumbowyg-editor pre:before{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: block;
+    content: 'Code';
+    font-weight: 700;
+    letter-spacing: 0;
+    color: #fff;
+    background: #636b72;
+    border-bottom: 1px solid #9da7b0;
+    line-height: 1.6em;
+    padding: 0 0.5em;
+    font-size: 1em;
+    text-transform: uppercase;
+}
+
+.trumbowyg-editor table, .trumbowyg-editor pre{
+    -webkit-box-shadow: rgba(0,0,0,0.5) 0px 1px 2px;
+    -moz-box-shadow: rgba(0,0,0,0.5) 0px 1px 2px;
+    box-shadow: rgba(0,0,0,0.5) 0px 1px 2px;
+}
+
+.trumbowyg-editor table th{
+    border: 1px solid #9da7b0;
+    border-bottom-width: 2px;
+    padding: 0.5em;
+    background: #636b72;
+    color: #fff;
+    text-align: left;
+}
+
+.trumbowyg-editor table td{
+    border: 1px solid #9da7b0;
+    padding: 0.5em;
+}
+
+.trumbowyg-editor table tr:nth-child(odd) td{
+    background: #d7d7d7;
+}
+.trumbowyg-editor table tr:nth-child(even) td{
+    background: #f0f0f0;
+}

@@ -1,0 +1,41 @@
+.sticky-menu
+    display: none
+    position: fixed
+    bottom: 0
+    left: 0
+    width: 100%
+    background: $color_dark
+    z-index: 100
+    overflow: hidden
+    transform: translateY(100%)
+    transition: .5s
+    &__item
+        width: 25%
+        display: block
+        float: left
+        text-align: center
+    &__item-link
+        padding: 1em 0
+        display: block
+    &__item-icon
+        display: block
+        margin-bottom: 0.4em
+        text-align: center
+        img
+            width: 1.5em
+            height: 1.5em
+            object-fit: contain
+            object-position: center
+    &__item-text
+        display: block
+        color: $color_white
+        font-size: 0.8em
+
+    
+    
+@media screen and ( max-width: 960px )
+    .sticky-menu
+        display: block
+    body.on-top
+        .sticky-menu
+            transform: translateY(0)

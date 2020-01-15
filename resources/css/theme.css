@@ -1,0 +1,80 @@
+
+/** form.css **/
+.form_element:not(.equals_or_tilde):not(.hidden_or_visible):not(.custom_checkbox):not(.neg_or_pos) .options_wrap label input[type="checkbox"].gi_field_onoff + .checkbox_box:before{
+    width: 14px;
+    height: 14px;
+}
+a:focus, a:hover{
+    text-decoration: none;
+}
+.label{
+    font-size: 1em;
+    color: #7a7373;
+}
+.display_box{
+    display: none;
+    padding: 15px;
+    background-color: #eee;
+    margin-bottom: 2em;
+}
+#form_item_lines{
+    min-height: 100px;
+    background-color: #eee;
+    margin-left: 0;
+    padding: 5px;
+}
+#form_item_lines li{
+    background: #f6f6f6;
+    list-style: decimal;
+    padding: 0.7em 1em;
+    border-radius: 6px;
+    border: 0;
+    position: relative;
+    padding-right: 30px;
+    list-style-position: inside;
+    font-weight: 700;
+    color: #7899b0;
+}
+#form_item_lines li:not(:last-child){
+    margin-bottom: 5px;
+}
+#form_item_lines li .delete_item
+,#form_item_lines li .edit_item{
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 9;
+    cursor: pointer;
+}
+.form_element input.position_input {
+    width: 60px!important;
+    margin-left: 10px!important;
+}
+.add_row_wrap .input-placeholder{
+    display: none;
+}
+#form_item_lines .sort_handle{
+    display: inline-block;
+    width: 100%;
+}
+.banner_image_content .file_thumb.image{
+    width: 200px;
+}
+.banner_image_content .file_thumb.image .corner{
+    display: none;
+}
+p.content_block, a.content_block, div.content_block{
+    background: #eee;
+}
+.content_block_wrap{
+    margin-bottom: 2em!important;
+}
+.form_element .selectric .label{
+    color: #505050;
+    font-size: 1em;
+    font-weight: 500;
+}
+body.gi_modal_open{
+    height: 100%!important;
+    overflow: hidden!important;
+}

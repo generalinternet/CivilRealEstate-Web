@@ -1,0 +1,12 @@
+tempData/*
+nbproject/*
+vendor/*
+config/client_config/config.keys.php
+
+# Elastic Beanstalk Files
+
+.elasticbeanstalk/*
+
+!.elasticbeanstalk/*.cfg.yml
+
+!.elasticbeanstalk/*.global.yml

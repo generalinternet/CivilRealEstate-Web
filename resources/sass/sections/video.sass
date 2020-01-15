@@ -1,0 +1,44 @@
+.section
+    // type
+    &_type_video
+        .section
+            &__title
+                margin-bottom: 1em
+            &__embeded-video
+                max-width: 400px
+                cursor: pointer
+                .placeholder-bg
+                    background-size: cover
+                    background-position: center
+                .video-btn
+                    z-index: 10
+                    position: absolute
+                    left: 50%
+                    top: 50%
+                    transform: translate(-50%, -50%)
+                    width: 3em
+                    height: 3em
+                    object-fit: contain
+                    object-position: center
+            &__description
+                padding-right: 4em
+                line-height: 1.6em
+
+
+@media screen and ( max-width: 991px )
+    .section
+        // type
+        &_type_video
+            .section
+                &__buttons
+                    margin-top: 1em
+                    margin-bottom: 3em
+@media screen and ( max-width: 767px )
+    .section
+        // type
+        &_type_video
+            .section
+                &__title
+                    padding-right: 1em
+                &__description
+                    padding-right: 0

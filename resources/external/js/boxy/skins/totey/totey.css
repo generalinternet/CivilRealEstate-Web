@@ -1,0 +1,13 @@
+#bring_back_boxy{
+    background-image: url('totey.png');
+}
+#boxy{
+    background-image: url('totey.png');
+}
+#boxy_bg{
+/*    background-image: url('totey_page.png');*/
+    background: none;
+}
+#boxy_shadow{
+    background-image: url('totey_shadow.png');
+}

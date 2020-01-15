@@ -1,0 +1,150 @@
+*{
+    font-family: 'Open Sans', sans-serif !important;
+}
+h1, h2 {
+    color: #6ca7da;
+}
+.advanced_title{
+    text-transform: uppercase;
+    color: #6ca7da;
+    font-weight: 600;
+}
+/** tab.css **/
+.tabs_wrap{
+    background: #fff;
+}
+.tab > .tab_label{
+    cursor: pointer;
+}
+.tab_labels {
+    border-right: 1px solid #808080;
+}
+.tab_label_text{
+    font-weight: 800;
+}
+.tab.current > .tab_label, .tab_label.current{
+    color: #6ca7da;
+    background: #fff;
+}
+.tabs_wrap.side_labels .tab_labels .tab_label {
+    border-bottom: 1px solid #808080;
+}
+.tabs_wrap.side_labels .tab_labels .tab_label.current:before{
+    border-right: 1px solid #f0f0f0;
+}
+
+/* angel_contact_view_wrap */
+.angel_contact_view_wrap .advanced.has_right_btns > .advanced_content{
+    padding: 1.2em 1em!important;
+}
+.angel_contact_view_wrap .advanced.has_right_btns > .advanced_content::before{
+    display: none!important;
+}
+.angel_contact_view_wrap .advanced.has_right_btns > .advanced_content .info-item{
+    display: block;
+    font-size: 1.1em;
+    line-height: normal;
+    padding: 5px 0;
+    margin-bottom: 10px;
+}
+.angel_contact_view_wrap .advanced.has_right_btns > .advanced_content .info-item > span{
+    color: #777;
+    font-weight: 700;
+    margin-right: 20px;
+    vertical-align: top;
+}
+.angel_contact_view_wrap .open_overlay{
+    display: none;
+}
+/* end angel_contact_view_wrap */
+
+/* angel_contact_info */
+.download_pdf_info .accreditation_form_content{
+    margin-top: 20px;
+    padding: 20px;
+    background: #f3f3f3;
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+    transition: .3s;
+    padding-bottom: 70px;
+}
+
+.download_pdf_info .accreditation_form_content .agreement_form_item_content:not(:last-child){
+    margin-bottom: 30px;
+}
+
+.download_pdf_info .accreditation_form_content .agreement_form_item_content .signature_file img{
+    display: block;
+    width: 50%;
+    max-width: 700px;
+}
+
+.download_pdf_info .accreditation_form_content .form_item_content_view *{
+    max-width: 100%!important;
+    white-space: unset;
+}
+
+.download_pdf_info .accreditation_form_content .show_more{
+    display: block;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    left: 0;
+    bottom: 0;
+    padding: 15px 0;
+    cursor: pointer;
+    background: linear-gradient(to bottom, rgba(255,255,255,.0), #fff);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #555;
+}
+
+.download_pdf_info .accreditation_form_content .show_more .text_more{
+    display: inline-block;
+}
+
+.download_pdf_info .accreditation_form_content .show_more .text_less{
+    display: none;
+}
+
+.download_pdf_info .accreditation_form_content .show_more::before{
+    content: "⇣";
+    margin-right: 10px;
+}
+
+.download_pdf_info .accreditation_form_content.full_content{
+    height: auto;
+}
+.download_pdf_info .accreditation_form_content.full_content .show_more .text_more{
+    display: none;
+}
+.download_pdf_info .accreditation_form_content.full_content .show_more .text_less{
+    display: inline-block;
+}
+.download_pdf_info .accreditation_form_content.full_content .show_more::before{
+    content: "⇡";
+}
+.download_pdf_info .accreditation_form_content.full_content .show_more{
+    background: none;
+}
+/* end angel_contact_info */
+
+@media only screen and (max-width : 1300px){
+    
+}
+
+@media only screen and (max-device-width: 960px) {
+    
+}
+
+@media only screen and (max-width : 1050px){
+    
+}
+
+@media only screen and (max-width : 960px){
+
+}
+@media only screen and (max-width : 640px){
+    
+}
