@@ -3,12 +3,29 @@
 
     // elements
     &__title
-        font-size: 2.5em
-        font-weight: 900
-        font-family: $font_serif
+        font-size: 1.5em
+        font-weight: 300
         color: $color_dark
+        letter-spacing: 2px
         &_color_white
             color: $color_white
+        &_theme_overline
+            display: inline-block
+            position: relative
+            background: $color_white
+            padding: 0 1em
+            &::before
+                content: ""
+                position: absolute
+                width: calc(100% + 10em)
+                left: -5em
+                top: 50%
+                transform: translateY(-50%)
+                background: $color_primary
+                height: 1px
+                z-index: -1
+        &_size_small
+            font-size: 1.3em
     &__sub-title
         font-size: 2em
         font-weight: 900

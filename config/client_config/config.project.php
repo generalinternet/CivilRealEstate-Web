@@ -42,7 +42,7 @@ define('SESSION_NAME', APP_REF);
 define('SITE_NAME', 'Civil Real Estate');
 
 /** @const base site title */
-define('SITE_TITLE', 'Civil Real Estate Investment Corporation');
+define('SITE_TITLE', 'Civil Real Estate Solutions');
 
 /** @const email address of root user account */
 define('ROOT_USER_EMAIL', 'admin@generalinternet.ca');

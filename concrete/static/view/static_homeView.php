@@ -30,207 +30,149 @@ class StaticHomeView extends GI_View{
     
     public function addViewBody() {
         $this->addHeaderBannerSection();
-        $this->addHomeSliderSection();
-        $this->addVideoSection();
-        $this->addServiceSection();
+        $this->addHomeProcessSection();
+        $this->addCommunitySection();
+        $this->addFeaturedListingSection();
+        $this->addCharitySection();
     }
     
     public function addHeaderBannerSection() {
-        $title = "Seeking the <br>Next Big Idea";
-        $description = SITE_NAME." is where new business happens in Western Canada. Connecting seasoned investors with visionary entrepreneurs, '.SITE_NAME.' provides access to early stage opportunities.";
-        $aboutUsURL = GI_URLUtils::buildURL(array(
-            'controller' => 'static',
-            'action' => 'about',
-        ));
-        $signUpURL = GI_URLUtils::buildURL(array(
-            'controller' => 'user',
-            'action' => 'signup',
-        ));
-        $this->addHTML('<section id="header-banner-section" class="section section_type_banner banner banner_size_full-width banner_page_home">');
+        $title = "When Buying or Selling You get to Choose a Charity that Beneﬁts";
+        $this->addHTML('<section class="section section_type_banner banner banner_size_normal banner_page_home">');
             $this->addHTML('<div class="container">');
                 $this->addHTML('<div class="row">');
                     $this->addHTML('<div class="col-xs-12">');
-                        // $this->addHTML('<video loop muted autoplay preload="auto" poster="resources/media/video/bg_hero_placeholder.jpg" playsinline class="bg-video"><source src="resources/media/video/Slider_video.mp4" type="video/mp4"></video>');
-                        $this->addHTML('<div class="banner__content-wrap">');
+                        $this->addHTML('<div class="banner__content-wrap text-center">');
                             $this->addHTML('<h1 class="banner__title">'.$title.'</h1>');
-                            $this->addHTML('<p class="banner__description">'.$description.'</p>');
-                            $this->addHTML('<div class="banner__buttons">');
-                                $this->addHTML('<a href="'.$aboutUsURL.'" class="button button_theme_primary button_has-icon">LEARN MORE <span class="button__icon button__icon_color_dark"></span></a>');
-                                $this->addHTML('<a href="'.$signUpURL.'" class="button button_theme_white">REGISTER</a>');
-                            $this->addHTML('</div>'); // banner__buttons
+                        $this->addHTML('</div>');
+                        $this->addHTML('<div class="col-xs-12 col-md-6 col-md-push-3">');
+                            $this->addHTML('<div class="home-search">');
+                                $this->addHTML('<div class="home-search__tabs">');
+                                    $this->addHTML('<a href="" class="home-search__tab-item">ﬁnd a home</a> ');
+                                    $this->addHTML('<a href="" class="home-search__tab-item">sell a home</a> ');
+                                $this->addHTML('</div>'); // home-search
+                                $this->addHTML('<div class="home-search__input-wrap">');
+                                    $this->addHTML('<input type="text" class="home-search__input">');
+                                $this->addHTML('</div>'); // home-search__input-wrap
+                            $this->addHTML('</div>'); // home-search
                         $this->addHTML('</div>'); // banner__content-wrap
                     $this->addHTML('</div>');
                 $this->addHTML('</div>');
             $this->addHTML('</div>');
         $this->addHTML('</section>');
     }
-    
-    public function addUnderHeaderBannerSection() {
-        $this->addHTML('<section id="under-header-banner-section" class="no-bg-section">');
+
+    public function addHomeProcessSection(){
+        $this->addHTML('<section class="section section_type_home-process home-process">');
+            $this->addHTML('<div class="container">');
+                $this->addHTML('<div class="row">');
+                    $this->addHTML('<div class="col-xs-12 text-center">');
+                        $this->addHTML('<h3 class="section__title section__title_theme_overline section__title_size_small">The Civil Process</h3>');
+                    $this->addHTML('</div>');
+                    $this->addHTML('<div class="col-xs-12 col-md-10 col-md-push-1">');
+                        $this->addHTML('<div class="row home-process__item-wrap">');
+                            $this->addHTML('<div class="col-xs-12 col-md-4">');
+                                $this->addHTML('<div class="home-process__item">');
+                                    $this->addHTML('<h3 class="home-process__item-title">Step 1</h3>');
+                                    $this->addHTML('<img src="resources/media/img/icon/glass-big.png" alt="'.SITE_TITLE.'" class="home-process__item-image"> ');
+                                    $this->addHTML('<h4 class="home-process__item-subtitle">Find a Home or List Yours For Sale</h4>');
+                                    $this->addHTML('<p class="home-process__item-description">Browse our easy-to-navigate platform listings. Or request a consultation to list your home for sale.</p>');
+                                $this->addHTML('</div>');
+                            $this->addHTML('</div>');
+                            $this->addHTML('<div class="col-xs-12 col-md-4">');
+                                $this->addHTML('<div class="home-process__item">');
+                                    $this->addHTML('<h3 class="home-process__item-title">Step 2</h3>');
+                                    $this->addHTML('<img src="resources/media/img/icon/people-big.png" alt="'.SITE_TITLE.'" class="home-process__item-image"> ');
+                                    $this->addHTML('<h4 class="home-process__item-subtitle">Connect with Top Local Realtors</h4>');
+                                    $this->addHTML('<p class="home-process__item-description">Top MLS Realtors will connect with you and provide industry-leading realty services.</p>');
+                                $this->addHTML('</div>');
+                            $this->addHTML('</div>');
+                            $this->addHTML('<div class="col-xs-12 col-md-4">');
+                                $this->addHTML('<div class="home-process__item">');
+                                    $this->addHTML('<h3 class="home-process__item-title">Step 3</h3>');
+                                    $this->addHTML('<img src="resources/media/img/icon/heart-big.png" alt="'.SITE_TITLE.'" class="home-process__item-image"> ');
+                                    $this->addHTML('<h4 class="home-process__item-subtitle">Raise Money for Your Charity</h4>');
+                                    $this->addHTML('<p class="home-process__item-description">Once a home is purchased or sold, choose a charity to which Civil will make a donation in your name!</p>');
+                                $this->addHTML('</div>');
+                            $this->addHTML('</div>');
+                        $this->addHTML('</div>');
+                    $this->addHTML('</div>');
+                    $this->addHTML('<div class="col-xs-12">');
+                        $this->addHTML('<div class="button-wrap text-center">');
+                            $this->addHTML('<a href="" class="button button_theme_primary">Start Now</a>');
+                            $this->addHTML('<a href="" class="button button_theme_outline">Contact Civil</a>');
+                        $this->addHTML('</div>');
+                    $this->addHTML('</div>');
+                $this->addHTML('</div>');
+            $this->addHTML('</div>');
         $this->addHTML('</section>');
-    }
-    
-    public function addServiceSection() {
-        $homeItemList = [
-            [
-                'ref' => 'start',
-                'title' => 'Start',
-                'content' => 'startups seeking capital and creating a stronger Western Canadian economy',
-                'link' => array(
-                    'controller' => 'static',
-                    'action' => 'opportunities',
-                    'type' => 'category',
-                    'ref' => 'start'
-                )
-            ],
-            [
-                'ref' => 'opportunities',
-                'title' => 'Opportunities',
-                'content' => 'private placements, convertible notes and direct investment opportunities',
-                'link' => array(
-                    'controller' => 'static',
-                    'action' => 'opportunities',
-                    'type' => 'category',
-                    'ref' => 'opportunities'
-                )
-            ],
-            [
-                'ref' => 'realestate',
-                'title' => 'Real Estate',
-                'content' => 'commercial, residential, and diverse real estate investment opportunities',
-                'link' => array(
-                    'controller' => 'static',
-                    'action' => 'opportunities',
-                    'type' => 'category',
-                    'ref' => 'realestate'
-                )
-            ],
-            [
-                'ref' => 'kids',
-                'title' => 'Kids',
-                'content' => 'youth-focused startup mentoring program',
-                'link' => array(
-                    'controller' => 'static',
-                    'action' => 'opportunities',
-                    'type' => 'category',
-                    'ref' => 'kids'
-                )
-            ],
-        ];
         
-        $this->addHTML('<section class="section section_type_service">');
+    }
+
+    public function addCommunitySection(){
+        $this->addHTML('<section class="section section_type_home-process banner banner_size_normal banner_page_community">');
             $this->addHTML('<div class="container">');
                 $this->addHTML('<div class="row">');
                     $this->addHTML('<div class="col-xs-12">');
-                        $this->addHTML('<h2 class="section__title">Our Services</h2>');
+                        $this->addHTML('<h3 class="banner__title">Caring & Community</h3>');
+                    $this->addHTML('</div>');
+                    $this->addHTML('<div class="col-xs-12 col-md-8 col-md-push-2">');
+                        $this->addHTML('<div class="community__item-wrap">');
+                            $this->addHTML('<div class="community__item">');
+                                $this->addHTML('<img class="community__item-image" src="resources/media/img/icon/glass.png" alt="'.SITE_TITLE.'">');
+                                $this->addHTML('<p class="community__item-description">1. Find a Home or List Yours For Sale</p>');
+                            $this->addHTML('</div>');
+                            $this->addHTML('<div class="community__item">');
+                                $this->addHTML('<img class="community__item-image" src="resources/media/img/icon/people.png" alt="'.SITE_TITLE.'">');
+                                $this->addHTML('<p class="community__item-description">2. Connect with Top Local Realtors</p>');
+                            $this->addHTML('</div>');
+                            $this->addHTML('<div class="community__item">');
+                                $this->addHTML('<img class="community__item-image" src="resources/media/img/icon/heart.png" alt="'.SITE_TITLE.'">');
+                                $this->addHTML('<p class="community__item-description">3. Raise Money for Your Charity</p>');
+                            $this->addHTML('</div>');
+                        $this->addHTML('</div>');
+                    $this->addHTML('</div>');
+                    $this->addHTML('<div class="col-xs-12">');
+                        $this->addHTML('<div class="button-wrap text-center">');
+                            $this->addHTML('<a href="" class="button button_theme_primary">Start Now</a>');
+                            $this->addHTML('<a href="" class="button button_theme_outline">Contact Civil</a>');
+                        $this->addHTML('</div>');
                     $this->addHTML('</div>');
                 $this->addHTML('</div>');
-                $this->addHTML('<div class="row flex_row">');
-                    foreach($homeItemList as $key => $item){
-                        $opporLink = GI_URLUtils::buildCleanURL($item['link']);
-                        $this->addHTML("<div class='col-xs-12 col-sm-6 col-md-3'>");
-                            $this->addHTML('<div class="service">');
-                                $this->addHTML("<img src='resources/media/img/icons/service_icon_{$item['ref']}.png' alt='{$item['title']}' class='service__icon-image'>");
-                                $this->addHTML("<h4 class='service__title service__title_color_dark'>'.SITE_NAME.'</h4>");
-                                $this->addHTML("<h4 class='service__title service__title_color_white'>{$item['title']}</h4>");
-                                $this->addHTML("<p class='service__description'>{$item['content']}</p>");
-                                $this->addHTML("<a href='{$opporLink}' class='button button_theme_no-border button_has-icon service__button'></span>LEARN MORE<span class='button__icon button__icon_color_dark'></a>");
-                            $this->addHTML('</div><!--.service-->');
-                        $this->addHTML("</div>");
-                    }
-                $this->addHTML('</div><!--.row-->');
-            $this->addHTML('</div><!--.container-->'); 
-        $this->addHTML('</section>');
+            $this->addHTML('</div>');
+        $this->addHTML('</section>');        
     }
-    
-    public function addVideoSection() {
-        $signUpURL = GI_URLUtils::buildURL(array(
-            'controller' => 'user',
-            'action' => 'signup',
-        ));
-        $title = 'What is '.SITE_NAME.'?';
-        $description = SITE_NAME.' is a Western Canadian Investor Network that connects accredited investors with exclusive investment opportunities.  Categories include Start-Up Angel Investments, Real Estate, Kids Programs and other opportunities.';
 
-        $this->addHTML('<section class="section section_bg_grey section_type_video">');
+    public function addFeaturedListingSection(){
+        $this->addHTML('<section class="section section_type_home-listing home-listing">');
             $this->addHTML('<div class="container">');
                 $this->addHTML('<div class="row">');
-
-                    $this->addHTML('<div class="col-xs-12"><h2 class="section__title">'.$title.'</h2></div>');
-
-                    $this->addHTML('<div class="col-md-6">');
-                        $this->addHTML('<div class="content-container">');
-                            $this->addHTML('<p class="section__description">'.$description.'</p>');
-                            $this->addHTML('<div class="section__buttons">');
-                                $this->addHTML('<a href="'.$signUpURL.'" class="button button_theme_dark button_has-icon" id="video_register_btn">JOIN NOW<span class="button__icon button__icon_color_primary"></span></a>');
+                    $this->addHTML('<div class="col-xs-12">');
+                        $this->addHTML('<h3 class="home-listing__title"></h3>');
+                    $this->addHTML('</div>');
+                    $this->addHTML('<div class="col-xs-12 col-md-4">');
+                        $this->addHTML('<div class="listing">');
+                            $this->addHTML('<div class="listing__image-wrap">');
+                                $this->addHTML('<img src="resources/media/img/house-1.jpg" alt="Listing" class="listing__image">');
+                                $this->addHTML('<span class="listing__price"><em>$</em> 4,324,119</span>');
                             $this->addHTML('</div>');
-                        $this->addHTML('</div><!--.content-container-->');
-                    $this->addHTML('</div><!--.col-->');
-
-                    $this->addHTML('<div class="col-md-6">');
-                        $this->addHTML('<div class="video-container section__embeded-video">');
-                            $this->addHTML('<div class="embed-responsive embed-responsive-16by9">');
-                                $this->addHTML('<div class="youtube-player" data-id="Qhi6YE5SGqk" data-related="0" data-control="1" data-info="1" data-fullscreen="1">');
-                                    $this->addHTML('<div class="place_holder">');
-                                    $this->addHTML('<img src="resources/media/video/youtube_placeholder_corporate.jpg" alt="Corporate Video Placeholder" class="placeholder-bg"><div class="video-btn"><img src="resources/media/img/icons/icon_play_red.svg" alt="YouTube Play Icon" title="Play"></div>');
-                                    $this->addHTML('</div></div>');
-                                $this->addHTML('</div>');
+                            $this->addHTML('<div class="listing__content">');
+                                $this->addHTML('<h3 class="listing__title">47 Newton Crescent, Port Coquitlam</h3>');
+                                $this->addHTML('<p class="listing__description">Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat eum iriure dolor hendrerit.</p>');
                             $this->addHTML('</div>');
-                        $this->addHTML('</div><!--.video-container-->');
-                    $this->addHTML('</div><!--.col-->');
-
-                $this->addHTML('</div><!--.row-->');
-            $this->addHTML('</div><!--.container-->'); 
-        $this->addHTML('</section>');
+                            $this->addHTML('<div class="listing_button-wrap">');
+                                $this->addHTML('<a href="" class="button">View Complete Listing</a>');
+                            $this->addHTML('</div>');
+                        $this->addHTML('</div>');
+                    $this->addHTML('</div>');
+                $this->addHTML('</div>');
+            $this->addHTML('</div>');
+        $this->addHTML('</div>');
+    $this->addHTML('</section>');        
     }
 
-    public function addHomeSliderSection(){
-        $opportunitiesURL = GI_URLUtils::buildURL(array(
-            'controller' => 'static',
-            'action' => 'opportunities',
-        ));
-        $title = "Current Opportunities";
-        $html = '
-            <section class="section section_type_home-slider" id="home_slider">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <h2 class="section__title">
-                                '.$title.'
-                                <span class="section__slider-buttons">
-                                    <span id="home_slider_wrap_prev" class="button button_theme_no-border"><span class="button__icon button__icon_type-prev-primary"></span>PREV</span>
-                                    <span id="home_slider_wrap_next" class="button button_theme_no-border">NEXT<span class="button__icon button__icon_type-next-primary"></span></span>
-                                </span>
-                            </h2>
-                            <div class="opportunity-slider" id="home_slider_wrap">'.$this->getSliderItemHTML().'</div>
-                            <div class="section__button-wrap">
-                                <a href="'.$opportunitiesURL.'" class="button button_has-icon button_theme_no-border">SEE MORE OPPORTUNITIES <span class="button__icon button__icon_color_primary"></span></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        ';
-        $this->addHTML($html);
-        return $this;
-    }
-    private function getSliderItemHTML(){
-        // $typeRef = 'investment';
-        // $general = true;
-        // $investStatusArray = array();
-        // $idsAsKey = false;
-        // $isFeatured = true;
-        // $itemList = ContentFactory::getInvestmentContents($typeRef, $general, $investStatusArray, $idsAsKey, $isFeatured);
+    public function addCharitySection(){
 
-        // $html = '';
-        // foreach($itemList as $investmentItem){
-        //     $sliderItemView = $investmentItem->getSliderItemDetailView();
-        //     $html .= '<div class="investment__wrap">';
-        //     $html .= $sliderItemView->getHTMLView();
-        //     $html .= '</div>';
-        // }
-
-        // return $html;
-        return null;
     }
     
     public function beforeReturningView() {

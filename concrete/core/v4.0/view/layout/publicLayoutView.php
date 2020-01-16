@@ -10,7 +10,7 @@ class PublicLayoutView extends AbstractPublicLayoutView {
     ];
     
     protected function addDefaultCSS() {
-        $this->addCSS('https://fonts.googleapis.com/css?family=Merriweather:700,900|Montserrat:400,500,700,900&display=swap');
+        $this->addCSS('https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700,900&display=swap');
         parent::addDefaultCSS();
     }
     
@@ -23,132 +23,67 @@ class PublicLayoutView extends AbstractPublicLayoutView {
     
     protected function buildMainNav() {
         $linkClassArr = array('linkClass' => "nav__li");
-        // set up user menu
-        $userMenu = [
-            ['ref' => 'main',
-            'label' => 'Sign Up',
-            'sub' => 'my_menu',
-            'subItems' => [
-                    ['label' => 'Sign Up',
-                    'link' => GI_URLUtils::buildURL(array(
-                                'controller' => 'user',
-                                'action' => 'signup',
-                            )),
-                    ],
-                    ['label' => 'Log In',
-                    'link' => GI_URLUtils::buildURL(array(
-                                'controller' => 'login',
-                                'action' => 'index',
-                            )),
-                    ],
-                ]
-            ],
-        ];
-        if(!empty($this->currentUser)) {
-            $myAccountURL = GI_URLUtils::buildURL(array(
-                'controller' => 'user',
-                'action' => 'weAccountDetail',
-            ));
-            if(Permission::verifyByRef('super_admin')){
-                $myAccountURL = GI_URLUtils::buildURL(array(
-                    'controller' => 'contact',
-                    'action' => 'catIndex',
-                    'type' => 'client',
-                ));
-            }
-
-            $userMenu = [
-                ['ref' => 'main',
-                'label' => 'My Menu',
-                'sub' => 'my_menu',
-                'subItems' => [
-                        ['label' => 'My Account',
-                        'link' => $myAccountURL,
-                        ],
-                        ['label' => 'Log Out',
-                        'link' => GI_URLUtils::buildURL(array(
-                                    'controller' => 'login',
-                                    'action' => 'logout',
-                                )),
-                        ],
-                    ]
-                ],
-            ];
-            
-        }
 
         // main menu
-        $mainMenu = [
+        $menuItems = [
             [
                 'ref' => 'main',
-                'label' => 'Opportunities',
-                'sub' => 'opportunities',
-                'subItems' => [
-                    [
-                        'label' => 'Start',
-                        'link' => GI_URLUtils::buildURL(array(
-                            'controller' => 'static',
-                            'action' => 'opportunities',
-                            'type' => 'category',
-                            'type_ref' => 'start'
-                        )),
-                    ],
-                    [
-                        'label' => 'Opportunities',
-                        'link' => GI_URLUtils::buildURL(array(
-                            'controller' => 'static',
-                            'action' => 'opportunities',
-                            'type' => 'category',
-                            'type_ref' => 'opportunities'
-                        )),
-                    ],
-                    [
-                        'label' => 'Real Estate',
-                        'link' => GI_URLUtils::buildURL(array(
-                            'controller' => 'static',
-                            'action' => 'opportunities',
-                            'type' => 'category',
-                            'type_ref' => 'realestate'
-                        )),
-                    ],
-                    [
-                        'label' => 'Kids',
-                        'link' => GI_URLUtils::buildURL(array(
-                            'controller' => 'static',
-                            'action' => 'opportunities',
-                            'type' => 'category',
-                            'type_ref' => 'kids'
-                        )),
-                    ],
-                ]
-            ],
-            // [
-            //     'ref' => 'main',
-            //     'label' => 'History',
-            //     'link' => GI_URLUtils::buildURL(array(
-            //         'controller' => 'static',
-            //         'action' => 'history',
-            //     )),
-            // ],
-            [
-                'ref' => 'main',
-                'label' => 'About',
+                'label' => 'buy',
                 'link' => GI_URLUtils::buildURL(array(
                      'controller' => 'static',
-                     'action' => 'about',
+                     'action' => 'buy',
                  )),
             ],
             [
                 'ref' => 'main',
-                'label' => 'Contact',
+                'label' => 'sell',
+                'link' => GI_URLUtils::buildURL(array(
+                     'controller' => 'static',
+                     'action' => 'sell',
+                 )),
+            ],
+            [
+                'ref' => 'main',
+                'label' => 'listings',
+                'link' => GI_URLUtils::buildURL(array(
+                     'controller' => 'static',
+                     'action' => 'listings',
+                 )),
+            ],
+            [
+                'ref' => 'main',
+                'label' => 'open houses',
+                'link' => GI_URLUtils::buildURL(array(
+                     'controller' => 'static',
+                     'action' => 'open-houses',
+                 )),
+            ],
+            [
+                'ref' => 'main',
+                'label' => 'about us',
+                'link' => GI_URLUtils::buildURL(array(
+                     'controller' => 'static',
+                     'action' => 'about-us',
+                 )),
+            ],
+            [
+                'ref' => 'main',
+                'label' => 'realty',
                 'link' => GI_URLUtils::buildURL(array(
                     'controller' => 'static',
-                    'action' => 'contact',
+                    'action' => 'realty',
+                )),
+            ],
+            [
+                'ref' => 'main',
+                'label' => 'contact us',
+                'link' => GI_URLUtils::buildURL(array(
+                    'controller' => 'static',
+                    'action' => 'contact-us',
                 )),
             ],
         ];
 
-        $menuItems = array_merge($userMenu, $mainMenu);
         foreach ($menuItems as $menuItem) {
             if (isset($menuItem['sub'])) {
                 $sub = $menuItem['sub'];
@@ -170,12 +105,24 @@ class PublicLayoutView extends AbstractPublicLayoutView {
         $this->addHTML('<div class="section section_type_header">');
         $this->addHTML('<div class="container">');
         $this->addHTML('<div class="row">');
-        $this->addHTML('<div class="col-xs-12">');
         return $this;
     }
 
     public function closeHeaderContainer(){
         $this->addHTML('</div>');
+        $this->addHTML('</div>');
+        $this->addHTML('</div>');
+        return $this;
+    }
+
+    public function openMenuContainer(){
+        $this->addHTML('<div class="section section_type_menu">');
+        $this->addHTML('<div class="container">');
+        $this->addHTML('<div class="row">');
+        return $this;
+    }
+
+    public function closeMenuContainer(){
         $this->addHTML('</div>');
         $this->addHTML('</div>');
         $this->addHTML('</div>');
@@ -189,10 +136,14 @@ class PublicLayoutView extends AbstractPublicLayoutView {
                 ->openHeaderWrapDiv()
                     ->openHeaderDiv()
                         ->openHeaderContainer()
-                            ->addLogo()
+                            ->addOpenLogoWrap()
+                                ->addLogo()
+                            ->addCloseLogoWrap()
+                        ->closeHeaderContainer()
+                        ->openMenuContainer()
                             ->addMenuBtn()
                             ->addMenu()
-                        ->closeHeaderContainer()
+                        ->closeMenuContainer()
                     ->closeHeaderDiv()
                 ->closeHeaderWrapDiv()
                 ->openContentWrapDiv()
@@ -211,23 +162,31 @@ class PublicLayoutView extends AbstractPublicLayoutView {
     
     protected function openMenuDiv($class = ''){
         $class ='nav';
+        $this->addHTML('<div class="col-xs-12">');
         $this->addHTML('<div class="' . $class . '">');
         $this->addHTML('<nav>');
-
-        $contactPhone = SITE_PHONE;
-        $this->addHTML('<a href="tel:'.$contactPhone.'" class="nav__contact-button button button_theme_primary">CALL '.$contactPhone.'</a>');
-
         return $this;
     }
     
     protected function closeMenuDiv(){
         $this->addHTML('</nav>');
         $this->addHTML('</div>');
+        $this->addHTML('</div>');
+        return $this;
+    }
+
+    protected function addOpenLogoWrap(){
+        $this->addHTML('<div class="col-xs-12">');
         return $this;
     }
     
-    protected function addLogo($fileName = 'logo-header.png', $path="resources/media/img/logos/"){
+    protected function addLogo($fileName = 'header_logo.png', $path="resources/media/img/logo/"){
         parent::addLogo($fileName, $path);
+        return $this;
+    }
+
+    protected function addCloseLogoWrap(){
+        $this->addHTML('</div>');
         return $this;
     }
     
@@ -242,9 +201,21 @@ class PublicLayoutView extends AbstractPublicLayoutView {
     }
     
     protected function addFooterContent() {
-        $this->addFooterTestimonialsBlock();
-        $this->addFooterLinkBlock();
-        $this->addStickyMenu();
+        $this->addHTML('<section id="footer_links" class="section footer">');
+            $this->addHTML('<div class="container">');
+            // row
+            $currentYear = date('Y');
+            $this->addHTML('<div class="row">');
+                $this->addHTML('<div class="col-lg-6">');
+                self::addLogo();
+                $this->addHTML('</div><!--.col-->');
+                $this->addHTML('<div class="col-lg-6">');
+                    $this->addHTML('<p class="footer__bottom-text">© Copyright '. SITE_TITLE . ' 2004 - '.$currentYear.'. All Rights Reserved.</p>');
+                $this->addHTML('</div><!--.col-->');
+            $this->addHTML('</div><!--.row-->');
+            // end row
+            $this->addHTML('</div><!--.container-->');
+        $this->addHTML('</div>');
         return $this;
     }
     
@@ -274,55 +245,6 @@ class PublicLayoutView extends AbstractPublicLayoutView {
                 $this->addHTML('</div><!--.row-->');
             $this->addHTML('</div><!--.container-->'); 
         $this->addHTML('</section>');
-    }
-    
-    protected function addFooterLinkBlock() {
-        $this->addHTML('<section id="footer_links" class="section footer">');
-            $this->addHTML('<div class="container">');
-                // row
-                $this->addHTML('<div class="row">');
-                    $this->addHTML('<div class="col-lg-12">');
-                        $this->addHTML('<div class="logo footer__logo">');
-                            $this->addFooterLogo('logo-footer.png');
-                        $this->addHTML('</div>');
-                    $this->addHTML('</div><!--.col-->');
-                $this->addHTML('</div><!--.row-->');
-                // end row
-                // row
-                $this->addHTML('<div class="row">');
-                    $this->addHTML('<div class="col-xl-12">');
-                        $this->addHTML('<div class="nav footer__nav nav_type_footer">');
-                        $this->addHTML($this->menuView->getHTMLView());
-                        $this->addHTML('</div><!--.col-->');
-                    $this->addHTML('</div><!--.col-->');
-                $this->addHTML('</div><!--.row-->');
-                // end row
-            $this->addHTML('</div><!--.container-->');
-        $this->addHTML('</section>');
-
-        // footer bottom
-        $this->addHTML('<div class="section section_bg_primary footer">');
-            $this->addHTML('<div class="container">');
-            // row
-            $this->addHTML('<div class="row">');
-                $this->addHTML('<div class="col-lg-12">');
-                    $this->addHTML('<div class="footer__social-list">');
-                        $this->addHTML(static::getSocialMediaLinkHTML());
-                    $this->addHTML('</div>');
-                $this->addHTML('</div><!--.col-->');
-            $this->addHTML('</div><!--.row-->');
-            // end row
-            // row
-            $currentYear = date('Y');
-            $this->addHTML('<div class="row">');
-                $this->addHTML('<div class="col-lg-12">');
-                    $this->addHTML('<p class="footer__bottom-text">© '.$currentYear. SITE_TITLE . '. All Rights reserved.</p>');
-                $this->addHTML('</div><!--.col-->');
-            $this->addHTML('</div><!--.row-->');
-            // end row
-            $this->addHTML('</div><!--.container-->');
-        $this->addHTML('</div>');
-        return $this;
     }
     
     public static function getSocialMediaLinkHTML() {
@@ -437,20 +359,6 @@ class PublicLayoutView extends AbstractPublicLayoutView {
                 'attribute' => 'data-toggle="modal" data-target="#office_hour_modal"'
             ],
         ];
-
-        $this->addHTML('<div class="sticky-menu">');
-        foreach($items as $menuItem){
-            $this->addHTML('<div class="sticky-menu__item '.$menuItem['classes'].'">');
-                $this->addHTML('<a class="sticky-menu__item-link" href="'.$menuItem['ref'].'" '.$menuItem['attribute'].'>');
-                    $this->addHTML('<span class="sticky-menu__item-icon"><img src="resources/media/img/icons/'.$menuItem['icon'].'.svg" alt="'.SITE_NAME.'"></span>');
-                    $this->addHTML('<span class="sticky-menu__item-text">'.$menuItem['title'].'</span>');
-                $this->addHTML('</a>');
-            $this->addHTML('</div>');
-        }
-        $this->addHTML('</div>');
-
-        $this->addMapModal();
-        $this->addOfficeHoursModal();
     }
 
     protected function addMapModal(){

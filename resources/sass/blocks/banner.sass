@@ -3,13 +3,16 @@
     background-size: cover
     // elements
     &__title
-        font-family: $font_serif
-        font-weight: 900
-        font-size: 3em
+        font-weight: 300
+        font-size: 2em
         color: $color_white
         padding-bottom: 0
+        margin: auto
         margin-bottom: .4em
         line-height: 1.2em
+        text-align: center
+        letter-spacing: 5px
+        max-width: 22em
         &_color_primary
             color: $color_primary
         &_size_medium
@@ -67,25 +70,17 @@
         height: auto
         padding-top: 12em
     // set background images for specific pages
-    &_page_my-account,
     &_page_home
-        background-image: url('../media/img/bgs/home.jpg')
-    &_page_opportunity-detail,
-    &_page_opportunities
-        background-image: url('../media/img/bgs/opportunities.jpg')
-    &_page_opportunity-detail
-        position: relative
-        padding-bottom: 5em
-    &_page_about
-        background-image: url('../media/img/bgs/about.jpg')
-    &_page_contact
-        background-image: url('../media/img/bgs/contact.jpg')
-    &_page_oppor-realestate
-        background-image: url('../media/img/bgs/investment/realestate.jpg')
-    &_page_oppor-start
-        background-image: url('../media/img/bgs/investment/start.jpg')
-    &_page_oppor-kids
-        background-image: url('../media/img/bgs/investment/kids.jpg')
+        background-image: url('../media/img/banner/city.jpg')
+        +color_overlay($color_black, 0.33)
+        padding: 5em 0
+        .banner__title
+            margin-bottom: 2em
+    &_page_community
+        background-image: url('../media/img/banner/family.jpg')
+        +color_overlay($color_black, 0.33)
+        padding: 3em 0
+
 
     // style modifiers
     &_dark-overlayed
