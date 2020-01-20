@@ -209,7 +209,35 @@ class StaticHomeView extends GI_View{
     }
 
     public function addCharitySection(){
-
+        $this->addHTML('<div class="section section_type_charity">');
+            $this->addHTML('<div class="container-fluid">');
+                $this->addHTML('<div class="row">');
+                    $this->addHTML('<div class="col-xs-12 col-md-6">');
+                        $this->addHTML('<div class="charity__banner">');
+                            $this->addHTML('<img src="resources/media/img/banner/footer-small.jpg" alt="'.SITE_TITLE.'" class="charity__banner-img">');
+                        $this->addHTML('</div>');
+                    $this->addHTML('</div>');
+                    $this->addHTML('<div class="col-xs-12 col-md-6">');
+                        $this->addHTML('<div class="charity__content">');
+                            $this->addHTML('<div class="charity__content-wrap">');
+                                $this->addHTML('<h3 class="charity__title"><b>STEP 1</b> Select your Charity</h3>');
+                                $this->addHTML('<p class="charity__description">Choose the charity you would like funds from your real estate transaction to be directed to</p>');
+                            $this->addHTML('</div>');
+                            $this->addHTML('<div class="charity__content-wrap charity__content-wrap_bg_blue">');
+                                $this->addHTML('<div class="charity__input-wrap">');
+                                    $this->addHTML('<label class="charity__input-wrap" for="">Choose your Charity</label>');
+                                    $this->addHTML('<input type="text" class="charity__input" placeholder="Start Typing the Name of your Charity">');
+                                $this->addHTML('</div>');
+                            $this->addHTML('</div>');
+                            $this->addHTML('<div class="charity__content-wrap">');
+                                $this->addHTML('<p class="charity__description">Some of Civil’s featured Charities</p>');
+                                $this->addHTML('<a href="" class="button">Go To Next Step</a>');
+                            $this->addHTML('</div>');
+                        $this->addHTML('</div>');
+                    $this->addHTML('</div>');
+                $this->addHTML('</div>');
+            $this->addHTML('</div>');
+        $this->addHTML('</div>');
     }
     
     public function beforeReturningView() {
