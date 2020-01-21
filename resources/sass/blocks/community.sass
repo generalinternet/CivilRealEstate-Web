@@ -7,9 +7,27 @@
         &:not(:last-child)
             margin-bottom: 2em
     &__item-image
+        width: 100%
+        height: 100%
+        object-fit: contain
+        object-position: center
+    &__item-image-wrap
         display: inline-block
         vertical-align: middle
         margin-right: 1em
+        padding: .8em
+        border-radius: 100%
+        width: 4em
+        height: 4em
+        &_bg_primary
+            background: $color_primary
+        &_bg_secondary
+            background: $color_secondary
+        &_bg_thirdary
+            background: $color_thirdary
     &__item-description
         display: inline-block
         color: $color_white
+        font-weight: 300
+        letter-spacing: 3px
+        font-size: 1.1em

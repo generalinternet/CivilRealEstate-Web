@@ -17,16 +17,13 @@
         vertical-align: middle
         position: relative
         bottom: 1px
-        &_color_dark
-            background-image: url('../media/img/icons/button_icon_dark.png')
-        &_color_primary
-            background-image: url('../media/img/icons/button_icon_primary.png')
-        &_type-prev-primary
-            background-image: url('../media/img/icons/button_icon_prev_primary.png')
-            margin-right: 6px
-            margin-left: 0
-        &_type-next-primary
-            background-image: url('../media/img/icons/button_icon_next_primary.png')
+        background-image: url('../media/img/icon/arrow_right.png')
+        width: 20px
+        height: 16px
+        background-size: contain
+        background-repeat: no-repeat
+        margin-left: 1em
+        transform: scale(1.5)
     &_has-icon
         .button__icon
             transition: .2s
@@ -49,6 +46,14 @@
             background: none
             color: $color_primary
             border-color: $color_primary
+    &_theme_secondary
+        border-color: $color_secondary
+        background: $color_secondary
+        color: $color_white
+        &:hover
+            background: none
+            color: $color_secondary
+            border-color: $color_secondary
     &_theme_dark
         border-color: $color_dark
         background: $color_dark
@@ -62,6 +67,9 @@
         box-shadow: none
     &_theme_outline
         border: solid 2px $color_secondary
+    &_theme_outline_white
+        border: solid 2px $color_white
+        color: $color_white
 
 .button-wrap
     .button:not(last-child)

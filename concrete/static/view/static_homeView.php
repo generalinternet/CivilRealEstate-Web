@@ -119,15 +119,21 @@ class StaticHomeView extends GI_View{
                     $this->addHTML('<div class="col-xs-12 col-md-8 col-md-push-2">');
                         $this->addHTML('<div class="community__item-wrap">');
                             $this->addHTML('<div class="community__item">');
-                                $this->addHTML('<img class="community__item-image" src="resources/media/img/icon/glass.png" alt="'.SITE_TITLE.'">');
+                                $this->addHTML('<div class="community__item-image-wrap community__item-image-wrap_bg_thirdary">');
+                                    $this->addHTML('<img class="community__item-image" src="resources/media/img/icon/glass.png" alt="'.SITE_TITLE.'">');
+                                $this->addHTML('</div>');
                                 $this->addHTML('<p class="community__item-description">1. Find a Home or List Yours For Sale</p>');
                             $this->addHTML('</div>');
                             $this->addHTML('<div class="community__item">');
-                                $this->addHTML('<img class="community__item-image" src="resources/media/img/icon/people.png" alt="'.SITE_TITLE.'">');
+                                $this->addHTML('<div class="community__item-image-wrap community__item-image-wrap_bg_primary">');
+                                    $this->addHTML('<img class="community__item-image" src="resources/media/img/icon/people.png" alt="'.SITE_TITLE.'">');
+                                $this->addHTML('</div>');
                                 $this->addHTML('<p class="community__item-description">2. Connect with Top Local Realtors</p>');
                             $this->addHTML('</div>');
                             $this->addHTML('<div class="community__item">');
-                                $this->addHTML('<img class="community__item-image" src="resources/media/img/icon/heart.png" alt="'.SITE_TITLE.'">');
+                                $this->addHTML('<div class="community__item-image-wrap community__item-image-wrap_bg_secondary">');
+                                    $this->addHTML('<img class="community__item-image" src="resources/media/img/icon/heart.png" alt="'.SITE_TITLE.'">');
+                                $this->addHTML('</div>');
                                 $this->addHTML('<p class="community__item-description">3. Raise Money for Your Charity</p>');
                             $this->addHTML('</div>');
                         $this->addHTML('</div>');
@@ -135,7 +141,7 @@ class StaticHomeView extends GI_View{
                     $this->addHTML('<div class="col-xs-12">');
                         $this->addHTML('<div class="button-wrap text-center">');
                             $this->addHTML('<a href="" class="button button_theme_primary">Start Now</a>');
-                            $this->addHTML('<a href="" class="button button_theme_outline">Contact Civil</a>');
+                            $this->addHTML('<a href="" class="button button_theme_outline_white">Contact Civil</a>');
                         $this->addHTML('</div>');
                     $this->addHTML('</div>');
                 $this->addHTML('</div>');
@@ -209,7 +215,7 @@ class StaticHomeView extends GI_View{
     }
 
     public function addCharitySection(){
-        $this->addHTML('<div class="section section_type_charity">');
+        $this->addHTML('<div class="section section_type_charity charity">');
             $this->addHTML('<div class="container-fluid">');
                 $this->addHTML('<div class="row">');
                     $this->addHTML('<div class="col-xs-12 col-md-6">');
@@ -223,15 +229,21 @@ class StaticHomeView extends GI_View{
                                 $this->addHTML('<h3 class="charity__title"><b>STEP 1</b> Select your Charity</h3>');
                                 $this->addHTML('<p class="charity__description">Choose the charity you would like funds from your real estate transaction to be directed to</p>');
                             $this->addHTML('</div>');
-                            $this->addHTML('<div class="charity__content-wrap charity__content-wrap_bg_blue">');
+                            $this->addHTML('<div class="charity__content-wrap charity__content-wrap_bg_secondary">');
                                 $this->addHTML('<div class="charity__input-wrap">');
-                                    $this->addHTML('<label class="charity__input-wrap" for="">Choose your Charity</label>');
+                                    $this->addHTML('<label class="charity__input-label" for="">Choose your Charity</label>');
                                     $this->addHTML('<input type="text" class="charity__input" placeholder="Start Typing the Name of your Charity">');
                                 $this->addHTML('</div>');
+                                $this->addHTML('<a href="" class="charity__form-link">see all charities »</a>');
+                                $this->addHTML('<span class="charity__checkbox-wrap">');
+                                    $this->addHTML('<input type="checkbox" class="charity__checkbox-input">');
+                                    $this->addHTML('<label for="" class="charity__checkbox-label">pick later</label>');
+                                $this->addHTML('</span>');
                             $this->addHTML('</div>');
                             $this->addHTML('<div class="charity__content-wrap">');
                                 $this->addHTML('<p class="charity__description">Some of Civil’s featured Charities</p>');
-                                $this->addHTML('<a href="" class="button">Go To Next Step</a>');
+                                $this->addHTML('<img src="resources/media/img/logo/logo_bar.png" alt="'.SITE_TITLE.'" class="charity__logos"> ');
+                                $this->addHTML('<a href="" class="button button_theme_secondary button_has-icon">Go To Next Step <span class="button__icon"></span></a>');
                             $this->addHTML('</div>');
                         $this->addHTML('</div>');
                     $this->addHTML('</div>');
