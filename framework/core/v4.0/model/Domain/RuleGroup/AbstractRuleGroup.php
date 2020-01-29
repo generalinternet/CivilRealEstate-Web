@@ -107,12 +107,7 @@ abstract class AbstractRuleGroup extends GI_Model {
         ));
     }
 
-    public function getViewURL() {
-        $attributes = $this->getViewURLAttributes();
-        return GI_URLUtils::buildURL($attributes);
-    }
-
-    public function getViewURLAttributes() {
+    public function getViewURLAttrs() {
         return array(
             'controller' => 'rule',
             'action' => 'viewRuleGroup',

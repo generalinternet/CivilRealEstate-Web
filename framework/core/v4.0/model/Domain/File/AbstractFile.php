@@ -334,12 +334,19 @@ abstract class AbstractFile extends GI_Model {
     public static function addFileToS3($path, $s3Bucket, $s3Key) {
         $s3Client = S3Connection::getInstance();
         try {
-            $result = $s3Client->putObject(array(
-            'Bucket' => $s3Bucket,
-            'Key' => $s3Key,
-            'SourceFile' => $path,
-            'ACL' => 'authenticated-read'            
-        ));
+            $params = array(
+                'Bucket' => $s3Bucket,
+                'Key' => $s3Key,
+                'SourceFile' => $path,
+                'ACL' => 'authenticated-read'
+            );
+            
+            $mimeType = mime_content_type($path);
+            if(!empty($mimeType)){
+                $params['ContentType'] = $mimeType;
+            }
+            $params['ContentDisposition'] = 'inline';
+            $result = $s3Client->putObject($params);
         } catch (Exception $ex) {
             return false;
         }
@@ -452,15 +459,16 @@ abstract class AbstractFile extends GI_Model {
     /**
      * Saves file from Aws\S3
      * 
-     * @param string $path source file's path
      * @param string $s3Bucket Aws\S3 file bucket
      * @param string $s3Key Aws\S3 key
      * @return string saved local file's path including file name
      */
-    public static function saveFileFromS3($s3Bucket, $s3Key) {
+    public static function saveFileFromS3($s3Bucket, $s3Key, $path = '') {
         $date = new DateTime();
         $dateFolders = $date->format('Y/m_M/d/');
-        $path = 'tempData/user/' . Login::getUserId(true) . '/' . $dateFolders;
+        if (empty($path)) {
+            $path = 'tempData/user/' . Login::getUserId(true) . '/' . $dateFolders;
+        }
         File::createTempDataFolders($path);
         $s3Client = S3Connection::getInstance();
         try {
@@ -559,7 +567,7 @@ abstract class AbstractFile extends GI_Model {
         if ($isImage) {
             $s3Bucket = $this->getProperty('aws_s3_bucket');
             $imageLink = File::getAWSImageThumbURL($width, $height, $s3Bucket, $s3Key);
-            if (empty($imageLink)) {                
+            if (empty($imageLink)) {
                 $path = File::saveFileFromS3($s3Bucket, $s3Key);
                 $imagePath = File::resizeImage($width, $height, $path);
                 $imageS3Key = File::generateS3KeyForThumbnail($width, $height, $s3Key);
@@ -594,15 +602,30 @@ abstract class AbstractFile extends GI_Model {
         return $fileURL;
     }
 
+    protected $overrideURL = NULL;
+    public function setOverrideURL($overrideURL){
+        $this->overrideURL = $overrideURL;
+        return $this;
+    }
+    
     /**
      * Gets File object's URL in case the file is in Aws\S3
      * 
      * @return string URL, NULL if it doesn't exist
      */
     public function getFileS3URL() {
+        if(!empty($this->overrideURL)){
+            return $this->overrideURL;
+        }
         $s3Client = S3Connection::getInstance();
+        if (empty($s3Client)) {
+            return NULL;
+        }
         $s3Bucket = $this->getProperty('aws_s3_bucket');
         $s3Key = $this->getProperty('aws_s3_key');
+        if(empty($s3Bucket) || empty($s3Key)){
+            return NULL;
+        }
         $exists = $s3Client->doesObjectExist($s3Bucket, $s3Key);
         if ($exists) {
             $cmd = $s3Client->getCommand('GetObject', [
@@ -734,6 +757,11 @@ abstract class AbstractFile extends GI_Model {
         return $view;
     }
     
+    /**
+     * @param int $width
+     * @param int $height
+     * @return \AbstractFileSizedView
+     */
     public function getSizedView($width = NULL, $height = NULL){
         $view = new FileSizedView($this);
         if(!is_null($width) && !is_null($height)){

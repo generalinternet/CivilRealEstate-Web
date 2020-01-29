@@ -14,8 +14,7 @@ abstract class AbstractContentFactory extends GI_ModelFactory {
     protected static $indexableTypeRefs = array(
         'content',
         'page',
-        'page_post',
-        'page_df'
+        'page_post'
     );
     
     protected static function buildModelByTypeRef($typeRef, $map) {
@@ -107,7 +106,7 @@ abstract class AbstractContentFactory extends GI_ModelFactory {
                 break;
             //forms module
             case 'base':
-                $typeRefs = array('base');
+                $typeRefs = array('base', 'base');
                 break;
             case 'dynamic_form':
                 $typeRefs = array('dynamic_form');

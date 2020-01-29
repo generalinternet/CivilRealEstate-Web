@@ -94,22 +94,69 @@ abstract class AbstractNotificationController extends GI_Controller {
 
     //AJAX
     public function actionSetSocketId($attributes) {
-        if ((!isset($attributes['ajax']) || !$attributes['ajax'] == 1) || !isset($attributes['socketId'])) {
+        if ((!isset($attributes['ajax']) || !$attributes['ajax'] == 1) || !isset($attributes['socketId']) || !isset($attributes['socketUserId'])) {
             return array('content' => false);
         }
+        $socketNickname = '';
         $socketId = $attributes['socketId'];
+        $socketUserId = $attributes['socketUserId'];
         $userId = Login::getUserId();
-        $loginArray = LoginFactory::search()
-                ->filter('user_id', $userId)
-                ->select();
-        if ($loginArray) {
-            $login = $loginArray[0];
+        $login = Login::getLoginRecord();
+        $joinConvoGroups = array();
+        //use $socketLoggedIn to determine what the previous socketLoggedIn was and if we need to re-submit the information to the socket
+        $socketLoggedIn = false;
+        if(isset($attributes['socketLoggedIn']) && $attributes['socketLoggedIn'] == 1){
+            $socketLoggedIn = true;
+        }
+        if($login){
             $login->setProperty('socket_id', $socketId);
+            $login->setProperty('socket_user_id', $socketUserId);
             if ($login->save()) {
-                return array('content' => true);
+                $user = Login::getUser();
+                if($user && $user->getEmailAddress() != 'system'){
+                    $socketNickname .= $user->getFullName();
+                }
+                if(!$socketLoggedIn){
+                    if(Permission::verifyByRef('super_admin')){
+                        $joinConvoGroups[] = 'support';
+                    }
+                    foreach($joinConvoGroups as $joinConvoGroup){
+                        $data = array(
+                            'convoGroup' => $joinConvoGroup
+                        );
+                        NotificationService::socketEmit('join_convo_group', $data);
+                    }
+                    $socketData = array(
+                        'userId' => $userId,
+                        'nickname' => $socketNickname,
+                        'chatUserType' => $user->getChatUserType()
+                    );
+                    NotificationService::socketEmit('update_socket_data', $socketData);
+                }
+                return array(
+                    'content' => true,
+                    'socketNickname' => $socketNickname,
+                    'userId' => $userId,
+                    'joinConvoGroups' => $joinConvoGroups
+                );
             }
         }
-        return array('content' => false);
+        $tmpUser = UserFactory::buildNewModel();
+        if($socketLoggedIn){
+            NotificationService::socketEmit('leave_convo_group', array(
+                'leaveAllGroups' => 1
+            ));
+            $socketData = array(
+                'userId' => NULL,
+                'nickname' => NULL,
+                'chatUserType' => $tmpUser->getChatUserType()
+            );
+            NotificationService::socketEmit('update_socket_data', $socketData);
+        }
+        return array(
+            'content' => false,
+            'socketNickname' => $socketNickname . ' [' . $socketId . ']'
+        );
     }
 
     //AJAX
@@ -188,6 +235,41 @@ abstract class AbstractNotificationController extends GI_Controller {
         if (!empty($newUrl)) {
             $returnArray['newUrl'] = $newUrl;
         }
+        return $returnArray;
+    }
+    
+    public function actionGetAlertView($attributes){
+        $msg = NULL;
+        if(isset($attributes['msg'])){
+            $msg = $attributes['msg'];
+        }
+        $colour = 'gray';
+        if(isset($attributes['colour'])){
+            $colour = $attributes['colour'];
+        }
+        
+        $finalMsg = $msg;
+        if(isset($attributes['code'])){
+            $code = $attributes['code'];
+            $codeMsg = AlertService::getMessageFromCode($code);
+            if(!empty($codeMsg)){
+                $finalMsg = $codeMsg;
+                if(!empty($msg)){
+                    $finalMsg .= '<p class="sml_text">' . $msg . '</p>';
+                }
+            }
+        }
+        
+        if(empty($finalMsg)){
+            $finalMsg = 'You have been alerted.';
+        }
+        
+        $pendingAlert = new Alert();
+        $pendingAlert->setMessage($finalMsg);
+        $pendingAlert->setColour($colour);
+        
+        $returnArray = GI_Controller::getReturnArray();
+        $returnArray['mainContent'] = $pendingAlert->getAlertHTML();
         return $returnArray;
     }
 

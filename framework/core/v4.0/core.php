@@ -7,40 +7,49 @@ set_include_path($curIncludePath . '/' . FRMWK_CORE_VER);
 //Abstract Service
 require_once 'service/AbstractWidgetService.php';
 require_once 'service/AbstractLogService.php';
+require_once 'service/AbstractEventService.php';
+require_once 'service/AbstractNotificationService.php';
 require_once 'service/AbstractAWSService.php';
-require_once 'service/AbstractKeyService.php';
 require_once 'service/AbstractAlertService.php';
+require_once 'service/AbstractKeyService.php';
+require_once 'service/AbstractSessionService.php';
 
 // Abstract Domain
 require_once 'model/Domain/Tag/AbstractTag.php';
 require_once 'model/Domain/Tag/AbstractTagInventory.php';
-require_once 'model/Domain/AbstractRoleGroup.php';
-require_once 'model/Domain/AbstractRegion.php';
-require_once 'model/Domain/AbstractTax.php';
-require_once 'model/Domain/AbstractTaxRegion.php';
-require_once 'model/Domain/AbstractNotification.php';
-require_once 'model/Domain/AbstractApplicableTax.php';
-require_once 'model/Domain/AbstractPermission.php';
-require_once 'model/Domain/AbstractUser.php';
-require_once 'model/Domain/AbstractLogin.php';
-require_once 'model/Domain/AbstractRole.php';
-require_once 'model/Domain/AbstractCurrency.php';
-require_once 'model/Domain/AbstractUserDetail.php';
-require_once 'model/Domain/AbstractWorkerScriptRunTime.php';
-require_once 'model/Domain/AbstractTimeInterval.php';
-require_once 'model/Domain/AbstractLabourRate.php';
-require_once 'model/Domain/AbstractUserHasLabourRate.php';
-require_once 'model/Domain/AbstractTable.php';
-require_once 'model/Domain/AbstractTableColumn.php';
+require_once 'model/Domain/Tag/AbstractTagFEOSOption.php';
+require_once 'model/Domain/Tag/AbstractTagContactSubcat.php';
+require_once 'model/Domain/Tag/AbstractTagLocation.php';
+require_once 'model/Domain/RoleGroup/AbstractRoleGroup.php';
+require_once 'model/Domain/Region/AbstractRegion.php';
+require_once 'model/Domain/Tax/AbstractTax.php';
+require_once 'model/Domain/TaxRegion/AbstractTaxRegion.php';
+require_once 'model/Domain/Notification/AbstractNotification.php';
+require_once 'model/Domain/ApplicableTax/AbstractApplicableTax.php';
+require_once 'model/Domain/Permission/AbstractPermission.php';
+require_once 'model/Domain/User/AbstractUser.php';
+require_once 'model/Domain/User/AbstractUserUnconfirmed.php';
+require_once 'model/Domain/Login/AbstractLogin.php';
+require_once 'model/Domain/Role/AbstractRole.php';
+require_once 'model/Domain/Currency/AbstractCurrency.php';
+require_once 'model/Domain/UserDetail/AbstractUserDetail.php';
+require_once 'model/Domain/WorkerScriptRunTime/AbstractWorkerScriptRunTime.php';
+require_once 'model/Domain/TimeInterval/AbstractTimeInterval.php';
+require_once 'model/Domain/LabourRate/AbstractLabourRate.php';
+require_once 'model/Domain/UserHasLabourRate/AbstractUserHasLabourRate.php';
+require_once 'model/Domain/Table/AbstractTable.php';
+require_once 'model/Domain/TableColumn/AbstractTableColumn.php';
 require_once 'model/Domain/Settings/AbstractSettings.php';
 require_once 'model/Domain/Settings/AbstractSettingsQB.php';
-require_once 'model/Domain/AbstractPricingRegion.php';
-require_once 'model/Domain/AbstractPricingRegionIncl.php';
+require_once 'model/Domain/Settings/AbstractSettingsNotif.php';
+require_once 'model/Domain/Settings/AbstractSettingsPayment.php';
+require_once 'model/Domain/PricingRegion/AbstractPricingRegion.php';
+require_once 'model/Domain/PricingRegionIncl/AbstractPricingRegionIncl.php';
 require_once 'model/Domain/EcoFee/AbstractEcoFee.php';
 require_once 'model/Domain/EcoFee/AbstractEcoFeeByContainerSize.php';
-require_once 'model/Domain/AbstractFOBShippingType.php';
-require_once 'model/Domain/AbstractTaxCollectionType.php';
-require_once 'model/Domain/AbstractPermissionCategory.php';
+require_once 'model/Domain/FOBShippingType/AbstractFOBShippingType.php';
+require_once 'model/Domain/TaxCollectionType/AbstractTaxCollectionType.php';
+require_once 'model/Domain/PermissionCategory/AbstractPermissionCategory.php';
 require_once 'model/Domain/Note/AbstractNote.php';
 require_once 'model/Domain/Note/AbstractNotePrivate.php';
 require_once 'model/Domain/Note/AbstractNoteSystem.php';
@@ -58,7 +67,16 @@ require_once 'model/Domain/RuleCondition/AbstractRuleConditionMathPP.php';
 require_once 'model/Domain/RuleCondition/AbstractRuleConditionMathPV.php';
 require_once 'model/Domain/Rule/AbstractRule.php';
 require_once 'model/Domain/Document/AbstractDocument.php';
+require_once 'model/Domain/ContextRole/AbstractContextRole.php';
+require_once 'model/Domain/Event/AbstractEvent.php';
+require_once 'model/Domain/EventNotifies/AbstractEventNotifies.php';
 require_once 'model/Domain/Alert/AbstractAlert.php';
+require_once 'model/Domain/Subscription/AbstractSubscription.php';
+require_once 'model/Domain/Subscription/AbstractSubscriptionStripe.php';
+require_once 'model/Domain/UserActionRequired/AbstractUserActionRequired.php';
+require_once 'model/Domain/UserActionRequired/AbstractUserActionRequiredRedirect.php';
+require_once 'model/Domain/InterfacePerspective/AbstractInterfacePerspective.php';
+require_once 'model/Domain/UserLinkToApp/AbstractUserLinkToApp.php';
 
 // Abstract Factory
 require_once 'model/Factory/AbstractTagFactory.php';
@@ -95,12 +113,20 @@ require_once 'model/Factory/AbstractRuleFactory.php';
 require_once 'model/Factory/AbstractPermissionCategoryFactory.php';
 require_once 'model/Factory/AbstractDocumentFactory.php';
 require_once 'model/Factory/AbstractRecentActivityFactory.php';
+require_once 'model/Factory/AbstractEventFactory.php';
+require_once 'model/Factory/AbstractEventNotifiesFactory.php';
+require_once 'model/Factory/AbstractContextRoleFactory.php';
+require_once 'model/Factory/AbstractSubscriptionFactory.php';
+require_once 'model/Factory/AbstractUserActionRequiredFactory.php';
+require_once 'model/Factory/AbstractInterfacePerspectiveFactory.php';
+require_once 'model/Factory/AbstractUserLinkToAppFactory.php';
 
 // Abstract View
 require_once 'view/UITable/AbstractUITableView.php';
 require_once 'view/UITable/AbstractUITableRowView.php';
 require_once 'view/UITable/AbstractUIRolodexView.php';
 require_once 'view/UITable/AbstractUICardView.php';
+require_once 'view/UITable/AbstractUICatalogView.php';
 require_once 'view/dashboard/AbstractDashboardIndexView.php';
 require_once 'view/dashboard/AbstractDashboardWidgetView.php';
 require_once 'view/dashboard/AbstractDashboardChartWidgetView.php';
@@ -117,6 +143,7 @@ require_once 'view/dashboard/widgets/AbstractDashboardRecentActivityTableWidgetV
 require_once 'view/dashboard/widgets/AbstractDashboardMySalesTableWidgetView.php';
 require_once 'view/dashboard/widgets/AbstractDashboardSalesBySalespersonTableWidgetView.php';
 require_once 'view/dashboard/widgets/AbstractDashboardAPARTableWidgetView.php';
+require_once 'view/dashboard/widgets/AbstractDashboardSalesComparisonTableWidgetView.php';
 require_once 'view/dashboard/widgets/OrderValues/AbstractDashboardOrderValuesTableWidgetView.php';
 require_once 'view/dashboard/widgets/OrderValues/AbstractDashboardSalesOrderValuesTableWidgetView.php';
 require_once 'view/dashboard/widgets/OrderValues/AbstractDashboardPurchaseOrderValuesTableWidgetView.php';
@@ -135,11 +162,18 @@ require_once 'view/generic/AbstractGenericEmailView.php';
 require_once 'view/generic/AbstractGenericColourFormView.php';
 require_once 'view/generic/AbstractGenericDeletedDetailView.php';
 require_once 'view/generic/AbstractGenericListBarView.php';
+require_once 'view/generic/AbstractGenericMainWindowView.php';
+require_once 'view/generic/AbstractGenericView.php';
+require_once 'view/generic/AbstractGenericPasswordRuleView.php';
+require_once 'view/generic/Elements/AbstractBirdBeakMenuView.php';
+require_once 'view/generic/Elements/AbstractBirdBeakMenuBtnView.php';
 require_once 'view/user/AbstractUserIndexView.php';
 require_once 'view/user/AbstractUserDetailView.php';
 require_once 'view/user/AbstractUserFormView.php';
 require_once 'view/user/AbstractUserSearchFormView.php';
-require_once 'view/user/AbstractNotificationUITableView.php';
+require_once 'view/user/Notification/AbstractNotificationUITableView.php';
+require_once 'view/user/Notification/AbstractUserNotificationSettingsView.php';
+require_once 'view/user/Notification/AbstractUserNotificationSettingsFormView.php';
 require_once 'view/roleGroup/AbstractRoleGroupFormView.php';
 require_once 'view/roleGroup/AbstractRoleGroupIndexView.php';
 require_once 'view/roleGroup/AbstractRoleGroupDetailView.php';
@@ -223,12 +257,33 @@ require_once 'view/timeInterval/AbstractTimeIntervalDeleteFormView.php';
 
 require_once 'view/settings/AbstractSettingsDetailView.php';
 require_once 'view/settings/AbstractSettingsFormView.php';
+require_once 'view/settings/AbstractSettingsIndexView.php';
 require_once 'view/settings/qb/AbstractSettingsQBDetailView.php';
 require_once 'view/settings/qb/AbstractSettingsQBFormView.php';
 
 require_once 'view/recentActivity/AbstractRecentActivityIndexView.php';
 require_once 'view/recentActivity/AbstractRecentActivitySearchFormView.php';
-//*** End Abstract
+
+require_once 'view/event/AbstractEventNotificationSettingsView.php';
+require_once 'view/event/AbstractEventNotificationFormView.php';
+
+require_once 'view/contextRole/AbstractContextRoleFormView.php';
+
+require_once 'view/subscription/AbstractSubscriptionFormView.php';
+require_once 'view/subscription/AbstractSubscriptionDetailView.php';
+
+require_once 'view/paymentProcessor/AbstractPaymentProcessorCreditCardFormView.php';
+require_once 'view/paymentProcessor/AbstractStripePaymentProcessorCreditCardFormView.php';
+require_once 'view/paymentProcessor/paymentTypes/AbstractCreditCardDetailView.php';
+require_once 'view/paymentProcessor/paymentHistory/AbstractPaymentProcessorPaymentHistoryView.php';
+require_once 'view/paymentProcessor/paymentHistory/AbstractStripePaymentProcessorPaymentHistoryView.php';
+
+// Abstract Utility
+require_once 'model/Utility/Report/AbstractRepGen.php';
+require_once 'model/Utility/PaymentProcessor/AbstractPaymentProcessor.php';
+require_once 'model/Utility/PaymentProcessor/AbstractStripePaymentProcessor.php';
+require_once 'model/Utility/Tag/AbstractTagInstaller.php';
+require_once 'model/Utility/Tag/AbstractLocationTagInstaller.php';
 
 //vCard ICS
 require_once 'model/Utility/VCard/AbstractGI_VCard.php';
@@ -239,7 +294,10 @@ require_once 'model/Utility/ActionResult/AbstractActionResult.php';
 require_once 'model/Utility/ActionResult/AbstractActionResultFactory.php';
 
 require_once 'model/Utility/Calculator/AbstractSubsetSumsCalculator.php';
+require_once 'model/Utility/Event/AbstractEventInstaller.php';
+require_once 'model/Utility/ContextRole/AbstractContextRoleInstaller.php';
 
+//*** End Abstract
 
 //Concrete
 set_include_path('concrete/core/' . FRMWK_SUPER_VER);
@@ -252,14 +310,20 @@ require_once 'model/Factory/Type/TypeModelFactory.php';
 //Concete Service
 require_once 'service/WidgetService.php';
 require_once 'service/LogService.php';
+require_once 'service/EventService.php';
+require_once 'service/NotificationService.php';
 require_once 'service/AWSService.php';
-require_once 'service/KeyService.php';
 require_once 'service/AlertService.php';
+require_once 'service/KeyService.php';
+require_once 'service/SessionService.php';
 
 //Concrete Domain
 require_once 'model/Domain/Core/Currency/Currency.php';
 require_once 'model/Domain/Core/Tag/Tag.php';
 require_once 'model/Domain/Core/Tag/TagInventory.php';
+require_once 'model/Domain/Core/Tag/TagFEOSOption.php';
+require_once 'model/Domain/Core/Tag/TagContactSubcat.php';
+require_once 'model/Domain/Core/Tag/TagLocation.php';
 require_once 'model/Domain/Core/Document/Document.php';
 require_once 'model/Domain/Core/PricingUnit/PricingUnit.php';
 require_once 'model/Domain/Core/PricingUnit/PricingUnitDistance.php';
@@ -272,6 +336,7 @@ require_once 'model/Domain/Core/Notification/Notification.php';
 require_once 'model/Domain/Core/ApplicableTax/ApplicableTax.php';
 require_once 'model/Domain/Core/Permission/Permission.php';
 require_once 'model/Domain/Core/User/User.php';
+require_once 'model/Domain/Core/User/UserUnconfirmed.php';
 require_once 'model/Domain/Core/Login/Login.php';
 require_once 'model/Domain/Core/Role/Role.php';
 require_once 'model/Domain/Core/UserDetail/UserDetail.php';
@@ -283,6 +348,8 @@ require_once 'model/Domain/Core/Table/Table.php';
 require_once 'model/Domain/Core/TableColumn/TableColumn.php';
 require_once 'model/Domain/Core/Settings/Settings.php';
 require_once 'model/Domain/Core/Settings/SettingsQB.php';
+require_once 'model/Domain/Core/Settings/SettingsNotif.php';
+require_once 'model/Domain/Core/Settings/SettingsPayment.php';
 require_once 'model/Domain/Core/PricingRegion/PricingRegion.php';
 require_once 'model/Domain/Core/PricingRegionIncl/PricingRegionIncl.php';
 require_once 'model/Domain/Core/EcoFee/EcoFee.php';
@@ -303,7 +370,16 @@ require_once 'model/Domain/Core/RuleCondition/RuleConditionMathPV.php';
 require_once 'model/Domain/Core/RuleCondition/RuleConditionMathPP.php';
 require_once 'model/Domain/Core/Rule/Rule.php';
 require_once 'model/Domain/Core/PermissionCategory/PermissionCategory.php';
+require_once 'model/Domain/Core/Event/Event.php';
+require_once 'model/Domain/Core/ContextRole/ContextRole.php';
+require_once 'model/Domain/Core/EventNotifies/EventNotifies.php';
 require_once 'model/Domain/Core/Alert/Alert.php';
+require_once 'model/Domain/Core/Subscription/Subscription.php';
+require_once 'model/Domain/Core/Subscription/SubscriptionStripe.php';
+require_once 'model/Domain/Core/UserActionRequired/UserActionRequired.php';
+require_once 'model/Domain/Core/UserActionRequired/UserActionRequiredRedirect.php';
+require_once 'model/Domain/Core/InterfacePerspective/InterfacePerspective.php';
+require_once 'model/Domain/Core/UserLinkToApp/UserLinkToApp.php';
 
 //Concrete Factory
 require_once 'model/Factory/TagFactory.php';
@@ -340,6 +416,13 @@ require_once 'model/Factory/RuleConditionFactory.php';
 require_once 'model/Factory/RuleFactory.php';
 require_once 'model/Factory/PermissionCategoryFactory.php';
 require_once 'model/Factory/RecentActivityFactory.php';
+require_once 'model/Factory/EventFactory.php';
+require_once 'model/Factory/EventNotifiesFactory.php';
+require_once 'model/Factory/ContextRoleFactory.php';
+require_once 'model/Factory/SubscriptionFactory.php';
+require_once 'model/Factory/UserActionRequiredFactory.php';
+require_once 'model/Factory/InterfacePerspectiveFactory.php';
+require_once 'model/Factory/UserLinkToAppFactory.php';
 
 //Concrete View
 require_once 'view/dashboard/dashboard_indexView.php';
@@ -356,6 +439,7 @@ require_once 'view/dashboard/widgets/dashboard_recentActivityTableWidgetView.php
 require_once 'view/dashboard/widgets/dashboard_mySalesTableWidgetView.php';
 require_once 'view/dashboard/widgets/dashboard_salesBySalespersonTableWidgetView.php';
 require_once 'view/dashboard/widgets/dashboard_APARTableWidgetView.php';
+require_once 'view/dashboard/widgets/dashboard_salesComparisonTableWidgetView.php';
 require_once 'view/dashboard/widgets/OrderValues/dashboard_salesOrderValuesTableWidgetView.php';
 require_once 'view/dashboard/widgets/OrderValues/dashboard_purchaseOrderValuesTableWidgetView.php';
 require_once 'view/admin/admin_indexView.php';
@@ -373,6 +457,7 @@ require_once 'view/UITable/UITableView.php';
 require_once 'view/UITable/UITableRowView.php';
 require_once 'view/UITable/UIRolodexView.php';
 require_once 'view/UITable/UICardView.php';
+require_once 'view/UITable/UICatalogView.php';
 //login views
 require_once 'view/login/login_indexView.php';
 require_once 'view/login/login_registerView.php';
@@ -397,7 +482,9 @@ require_once 'view/user/user_indexView.php';
 require_once 'view/user/user_detailView.php';
 require_once 'view/user/user_formView.php';
 require_once 'view/user/user_searchFormView.php';
-require_once 'view/user/notification_uiTableView.php';
+require_once 'view/user/Notification/notification_uiTableView.php';
+require_once 'view/user/Notification/user_notificationSettingsView.php';
+require_once 'view/user/Notification/user_notificationSettingsFormView.php';
 //role views
 require_once 'view/role/role_detailView.php';
 require_once 'view/role/role_formView.php';
@@ -405,6 +492,8 @@ require_once 'view/role/role_formView.php';
 require_once 'view/roleGroup/roleGroup_formView.php';
 require_once 'view/roleGroup/roleGroup_indexView.php';
 require_once 'view/roleGroup/roleGroup_detailView.php';
+//settings
+require_once 'view/settings/settings_indexView.php';
 //permission views
 require_once 'view/permission/permission_indexView.php';
 require_once 'view/permission/permission_detailView.php';
@@ -420,6 +509,11 @@ require_once 'view/generic/generic_emailView.php';
 require_once 'view/generic/generic_colourFormView.php';
 require_once 'view/generic/generic_deletedDetailView.php';
 require_once 'view/generic/generic_listBarView.php';
+require_once 'view/generic/generic_mainWindowView.php';
+require_once 'view/generic/generic_view.php';
+require_once 'view/generic/generic_passwordRuleView.php';
+require_once 'view/generic/Elements/BirdBeakMenuView.php';
+require_once 'view/generic/Elements/BirdBeakMenuBtnView.php';
 
 //labour rate views
 require_once 'view/labourRate/labourRate_formView.php';
@@ -486,9 +580,26 @@ require_once 'view/settings/qb/settings_qbFormView.php';
 require_once 'view/recentActivity/recentActivity_indexView.php';
 require_once 'view/recentActivity/recentActivity_searchFormView.php';
 
+require_once 'view/event/EventNotificationSettingsView.php';
+require_once 'view/event/EventNotificationFormView.php';
+
+require_once 'view/contextRole/contextRole_formView.php';
+
+require_once 'view/subscription/subscription_formView.php';
+require_once 'view/subscription/subscription_detailView.php';
+
+require_once 'view/paymentProcessor/stripePaymentProcessor_creditCardFormView.php';
+require_once 'view/paymentProcessor/paymentTypes/creditCard_detailView.php';
+require_once 'view/paymentProcessor/paymentHistory/stripePaymentProcessor_paymentHistoryView.php';
+
+require_once 'view/test/test_formView.php';
+
 //** Outputs
 require_once 'model/Domain/Output/OutputPDF.php';
 require_once 'view/layout/pdfLayoutView.php';
+
+// Concrete Utility
+require_once 'model/Utility/PaymentProcessor/StripePaymentProcessor.php';
 
 //vCard ICS
 require_once 'model/Utility/VCard/GI_VCard.php';
@@ -499,6 +610,9 @@ require_once 'model/Utility/ActionResult/ActionResult.php';
 require_once 'model/Utility/ActionResult/ActionResultFactory.php';
 
 require_once 'model/Utility/Calculator/SubsetSumsCalculator.php';
+require_once 'model/Utility/Event/EventInstaller.php';
+require_once 'model/Utility/ContextRole/ContextRoleInstaller.php';
+require_once 'model/Utility/Tag/LocationTagInstaller.php';
 
 set_include_path('');
 //Non-routed Controllers

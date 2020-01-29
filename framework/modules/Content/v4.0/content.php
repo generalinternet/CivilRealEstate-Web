@@ -23,11 +23,14 @@ require_once 'model/Domain/Content/ContentFileCol/AbstractContentFileColImage.ph
 require_once 'model/Domain/ContentAvailableChildType/AbstractContentAvailableChildType.php';
 require_once 'model/Domain/ContentInContent/AbstractContentInContent.php';
 require_once 'model/Domain/Content/AbstractContentRef.php';
+require_once 'model/Domain/ContentEditor/AbstractContentEditor.php';
+require_once 'model/Domain/Tag/AbstractTagContent.php';
 
 // Abstract Factory
 require_once 'model/Factory/AbstractContentFactory.php';
 require_once 'model/Factory/AbstractContentAvailableChildTypeFactory.php';
 require_once 'model/Factory/AbstractContentInContentFactory.php';
+require_once 'model/Factory/AbstractContentEditorFactory.php';
 
 // Abstract View
 require_once 'view/Content/AbstractContentFormView.php';
@@ -52,6 +55,8 @@ require_once 'view/AbstractContentIndexView.php';
 require_once 'view/AbstractContentSearchFormView.php';
 require_once 'view/Content/AbstractContentRefDetailView.php';
 require_once 'view/Content/AbstractContentRefFormView.php';
+
+require_once 'view/AbstractContentManageEditorsFormView.php';
 //*** End Abstract
 
 //### Concrete
@@ -74,6 +79,8 @@ require_once 'model/Domain/Content/ContentFileCol/ContentFileColGallery.php';
 require_once 'model/Domain/Content/ContentFileCol/ContentFileColImage.php';
 require_once 'model/Domain/ContentAvailableChildType/ContentAvailableChildType.php';
 require_once 'model/Domain/ContentInContent/ContentInContent.php';
+require_once 'model/Domain/ContentEditor/ContentEditor.php';
+require_once 'model/Domain/Tag/TagContent.php';
 
 require_once 'model/Domain/Content/ContentRef.php';
 
@@ -81,6 +88,7 @@ require_once 'model/Domain/Content/ContentRef.php';
 require_once 'model/Factory/ContentFactory.php';
 require_once 'model/Factory/ContentAvailableChildTypeFactory.php';
 require_once 'model/Factory/ContentInContentFactory.php';
+require_once 'model/Factory/ContentEditorFactory.php';
 
 //Concrete View
 require_once 'view/content/content_formView.php';
@@ -106,5 +114,6 @@ require_once 'view/content/content_refDetailView.php';
 
 require_once 'view/content_indexView.php';
 require_once 'view/content_searchFormView.php';
+require_once 'view/content_manageEditorsFormView.php';
 set_include_path($curIncludePath);
 //### End Concrete

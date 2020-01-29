@@ -4,13 +4,14 @@
  *
  * @author General Internet
  * @copyright  2017 General Internet
- * @version    2.0.4
+ * @version    4.0.0
  */
 abstract class GI_MenuView extends GI_View {
 
     protected $menu = array();
     protected $strictLinkCheck = false;
     protected $menuBuilt = false;
+    protected $curMenuRef = NULL;
 
     public function __construct() {
         parent::__construct();
@@ -23,6 +24,10 @@ abstract class GI_MenuView extends GI_View {
      */
     public function setStrictLinkCheck($strictLinkCheck){
         $this->strictLinkCheck = $strictLinkCheck;
+    }
+    
+    public function setCurMenuRef($curMenuRef){
+        $this->curMenuRef = $curMenuRef;
     }
 
     protected function filterMenuItem($array) {
@@ -56,6 +61,11 @@ abstract class GI_MenuView extends GI_View {
         foreach($subMenuItems as $subMenuItem){
             if(isset($subMenuItem['ref'])){
                 $subMenuClass .= ' ' . $this->checkSubMenuLinks($this->menu[$subMenuItem['ref']]);
+                if($subMenuItem['ref'] == $this->curMenuRef){
+                    $subMenuClass .= ' current';
+                }
+            } elseif(isset($subMenuItem['itemRef']) && $subMenuItem['itemRef'] == $this->curMenuRef){
+                $subMenuClass .= ' current';
             }
             if(isset($subMenuItem['link'])){
                 $subMenuClass .= ' ' . $this->checkLink($subMenuItem['link']);
@@ -97,7 +107,7 @@ abstract class GI_MenuView extends GI_View {
             $item['link'] = $link;
         }
         $item = array_merge($item, $this->filterMenuItem($other));
-        array_push($this->menu[$ref], $item);
+        $this->menu[$ref][] = $item;
     }
 
     protected function getMenuItemWrap($item) {
@@ -119,7 +129,14 @@ abstract class GI_MenuView extends GI_View {
             if (!empty($item['ref'])) {
                 $checkSubMenuClass = $this->checkSubMenuLinks($this->menu[$item['ref']]);
                 $linkClass .= ' sub_menu ' . $checkSubMenuClass;
-                $anchorClass .= ' sub_menu ' . $checkSubMenuClass;                
+                $anchorClass .= ' sub_menu ' . $checkSubMenuClass;
+                if($item['ref'] == $this->curMenuRef){
+                    $linkClass .= ' current';
+                    $anchorClass .= ' current';
+                }
+            } elseif(isset($item['itemRef']) && $item['itemRef'] == $this->curMenuRef){
+                $linkClass .= ' current';
+                $anchorClass .= ' current';
             }
             $start = '';
             $end = '';
@@ -155,11 +172,13 @@ abstract class GI_MenuView extends GI_View {
         $wrap = $this->getMenuItemWrap($item);
         $label = $this->getMenuItemLabel($item);
         if ($wrap && $label) {
+            $dataAttr = NULL;
             $itemLabel = $wrap['start'] . $label . $wrap['end'];
             if (!empty($item['ref'])) {
                 $subMenu = $this->getMenu($item['ref']);
+                $dataAttr = 'data-menu-ref="' . $item['ref'] . '"';
             }
-            $html = '<li class="' . $wrap['linkClass'] . '">';
+            $html = '<li class="' . $wrap['linkClass'] . '" ' . $dataAttr . '>';
             $html .= $itemLabel;
             if (isset($subMenu)){
                 $html .= $subMenu;

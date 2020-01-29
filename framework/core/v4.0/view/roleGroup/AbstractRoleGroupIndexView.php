@@ -29,7 +29,7 @@ abstract class AbstractRoleGroupIndexView extends ListWindowView {
                 'action' => 'addGroup'
             );
             $addURL = GI_URLUtils::buildURL($addURLArray);
-            $this->addHTML('<a href="' . $addURL . '" title="' . $addTitle . '" class="custom_btn" >' . GI_StringUtils::getIcon('add') . '<span class="btn_text">' . $addTitle . '</span></a>');
+            $this->addHTML('<a href="' . $addURL . '" title="' . $addTitle . '" class="custom_btn open_modal_form" >' . GI_StringUtils::getIcon('add') . '<span class="btn_text">' . $addTitle . '</span></a>');
         }
     }
     

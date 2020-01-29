@@ -3,7 +3,7 @@
  * Description of GI_Controller
  *
  * @author General Internet
- * @copyright  2017 General Internet
+ * @copyright  2019 General Internet
  * @version    4.0.1
  */
 abstract class GI_Controller {
@@ -18,8 +18,13 @@ abstract class GI_Controller {
         if(!is_null($view)){
             $returnArray['mainContent'] = $view->getHTMLView();
             $returnArray['pageProperties'] = $view->getPageProperties();
-            if (!empty($view->getModalClass())) {
-                $returnArray['modalClass'] = $view->getModalClass();
+            $modalClass = $view->getModalClass();
+            if (!empty($modalClass)) {
+                $returnArray['modalClass'] = $modalClass;
+            }
+            $curMenuRef = $view->getCurLayoutMenuRef();
+            if (!empty($curMenuRef)) {
+                $returnArray['curMenuRef'] = $curMenuRef;
             }
             $cssFilePaths = $view->getCSSFilePaths();
             $jsFilePaths = $view->getJSFilePaths();
@@ -229,5 +234,138 @@ abstract class GI_Controller {
         }
         return true;
     }
-    
+
+    public function viewContextNotificationSettings($eventType, GI_Model $subjectModel, $windowTitle = 'Notification Settings', $viewWrapId = 'main_inner_window_view_wrap') {
+        $sampleEvent = EventFactory::buildNewModel($eventType);
+        $view = new EventNotificationSettingsView($sampleEvent, $subjectModel);
+        $view->setWindowTitle($windowTitle);
+        if (!empty($viewWrapId)) {
+            $view->setViewWrapId($viewWrapId);
+        }
+        $returnArray = GI_Controller::getReturnArray($view);
+        return $returnArray;
+    }
+
+    public function editContextNotificationSettings($attributes, $subjectModel) {
+        if (empty($subjectModel) || !isset($attributes['eventId'])) {
+            GI_URLUtils::redirectToError(3000);
+        }
+        $event = EventFactory::getModelById($attributes['eventId']);
+        if (empty($event)) {
+            GI_URLUtils::redirectToError(3000);
+        }
+        $event->setSubjectModel($subjectModel);
+        $form = new GI_Form('event_notifications');
+        $view = new EventNotificationFormView($form, $event);
+        $view->buildForm();
+        $success = 0;
+        $newUrl = NULL;
+        if ($event->handleNotificationFormSubmission($form)) {
+            $success = 1;
+            $newUrl = 'refresh';
+        }
+        $returnArray = GI_Controller::getReturnArray($view);
+        $returnArray['success'] = $success;
+        if (!empty($newUrl)) {
+            $returnArray['newUrl'] = $newUrl;
+        }
+        return $returnArray;
+    }
+
+    public function addContextRole($attributes, $subjectModel) {
+        if (empty($subjectModel)) {
+            GI_URLUtils::redirectToError(3000);
+        }
+        $contextRole = ContextRoleFactory::buildNewModel();
+        $form = new GI_Form('project_role');
+        $view = $contextRole->getFormView($form);
+        $view->setContextTitle('Project');
+        $view->buildForm();
+        $success = 0;
+        $newUrl = NULL;
+        if ($contextRole->handleFormSubmission($form, $subjectModel)) {
+            $success = 1;
+            $newUrl = 'refresh';
+        }
+        $returnArray = GI_Controller::getReturnArray($view);
+        $returnArray['success'] = $success;
+        if (!empty($newUrl)) {
+            $returnArray['newUrl'] = $newUrl;
+        }
+        return $returnArray;
+    }
+
+    public function editContextRole($attributes, $subjectModel, $contextTitle = '') {
+        if (empty($subjectModel)) {
+            GI_URLUtils::redirectToError(3000);
+        }
+        if (!isset($attributes['id'])) {
+            GI_URLUtils::redirectToError(3000);
+        }
+        $contextRole = ContextRoleFactory::getModelById($attributes['id']);
+        if (empty($contextRole)) {
+            GI_URLUtils::redirectToError(3000);
+        }
+        if (!empty($subjectModel->getId()) && empty($contextRole->getProperty('item_id'))) {
+            $updatedContextRole = ContextRoleFactory::buildNewModel();
+            $updatedContextRole->setPropertiesFromSourceModel($contextRole);
+            $updatedContextRole->setProperty('item_id', $subjectModel->getId());
+            $contextRole = $updatedContextRole;
+        }
+        $form = new GI_Form('context_role');
+        $view = $contextRole->getFormView($form);
+        $view->setContextTitle($contextTitle);
+        $view->buildForm();
+        $success = 0;
+        $newUrl = NULL;
+        if ($contextRole->handleFormSubmission($form, $subjectModel)) {
+            $success = 1;
+            $newUrl = 'refresh';
+        }
+        $returnArray = GI_Controller::getReturnArray($view);
+        $returnArray['success'] = $success;
+        if (!empty($newUrl)) {
+            $returnArray['newUrl'] = $newUrl;
+        }
+        return $returnArray;
+    }
+
+    public function actionDeleteContextRole($attributes) {
+        if (!isset($attributes['id'])) {
+            GI_URLUtils::redirectToError(3000);
+        }
+        $contextRole = ContextRoleFactory::getModelById($attributes['id']);
+        if (empty($contextRole) || !$contextRole->isDeleteable()) {
+            GI_URLUtils::redirectToError(3000);
+        }
+        if (isset($attributes['itemId'])) {
+            $itemId = $attributes['itemId'];
+            $contextRoleItemId = $contextRole->getProperty('item_id');
+            if (!empty($itemId) && empty($contextRoleItemId) || empty($itemId) && !empty($contextRoleItemId) || $itemId != $contextRoleItemId) {
+                GI_URLUtils::redirectToError(3000);
+            }
+        }
+
+        $form = new GI_Form('delete_context_role');
+        $view = new GenericAcceptCancelFormView($form);
+        $view->setHeaderText('Delete ' . $contextRole->getTitle());
+        $view->setMessageText('Are you sure you want to delete ' . $contextRole->getTitle() . '?');
+        $view->setSubmitButtonLabel('Delete');
+        $view->buildForm();
+        $success = 0;
+        $newUrl = NULL;
+        if ($form->wasSubmitted() && $form->validate()) {
+            if ($contextRole->softDelete()) {
+                $success = 1;
+                $newUrl = 'refresh';
+            }
+        }
+        $returnArray = GI_Controller::getReturnArray($view);
+        $returnArray['success'] = $success;
+        if (!empty($newUrl)) {
+            $returnArray['newUrl'] = $newUrl;
+        }
+        return $returnArray;
+    }
+
 }

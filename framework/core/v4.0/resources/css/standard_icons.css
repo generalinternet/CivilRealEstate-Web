@@ -1,10 +1,7 @@
 .icon{
     background: url('images/standard_icons.png?v=2.6') no-repeat;
     background-size: 900px 196px;
-    display:-moz-inline-stack;
-    display:inline-block;
-    zoom:1;
-    *display:inline;
+    display: inline-block;
     width: 13px;
     height: 13px;
     background-position: 13px 13px;

@@ -16,11 +16,6 @@ abstract class AbstractContentTextCode extends AbstractContentText{
         return $contentView;
     }
     
-    public function getViewTitle($plural = true) {
-        $title = 'Code';
-        return $title;
-    }
-    
     public function getTitleTag() {
         return 'h6';
     }

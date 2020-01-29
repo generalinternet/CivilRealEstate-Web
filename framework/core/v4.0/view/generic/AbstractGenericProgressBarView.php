@@ -224,59 +224,120 @@ abstract class AbstractGenericProgressBarView extends GI_View {
             $curDateTime = GI_Time::getDateTime();
             $percentage = $this->getPercentage();
             $timeTrackerId = $this->timeTrackerId;
-            if(!isset($_SESSION['timeTrackerIds'][$timeTrackerId])){
-                $_SESSION['timeTrackerIds'][$timeTrackerId] = array(
+            $sessionTimeTrackerArray = SessionService::getValue(array(
+                        'timeTrackerIds',
+                        $timeTrackerId
+            ));
+            if (empty($sessionTimeTrackerArray)) {
+                SessionService::setValue(array(
+                    'timeTrackerIds',
+                    $timeTrackerId
+                        ), array(
                     'startTime' => $curDateTime,
                     'lastTime' => $curDateTime,
                     'lastPercentage' => $percentage,
                     'perTrackTime' => NULL,
                     'endTime' => NULL
-                );
-            } elseif($this->getPercentage() == 100){
-                if(!isset($_SESSION['timeTrackerIds'][$timeTrackerId]['endTime'])){
-                    $_SESSION['timeTrackerIds'][$timeTrackerId]['endTime'] = $curDateTime;
+                ));
+            } elseif ($this->getPercentage() == 100) {
+                $endTime = SessionService::getValue(array(
+                            'timeTrackerIds',
+                            $timeTrackerId,
+                            'endTime'
+                ));
+                if (empty($endTime)) {
+                    SessionService::setValue(array(
+                        'timeTrackerIds',
+                        $timeTrackerId,
+                        'endTime'
+                            ), $curDateTime);
                 }
             } else {
-                $lastTime = $_SESSION['timeTrackerIds'][$timeTrackerId]['lastTime'];
+                $lastTime = SessionService::getValue(array(
+                            'timeTrackerIds',
+                            $timeTrackerId,
+                            'lastTime',
+                ));
                 $perTrackTime = GI_Time::getSecondsBetween($lastTime, $curDateTime);
-                $_SESSION['timeTrackerIds'][$timeTrackerId]['perTrackTime'] = $perTrackTime;
+                SessionService::setValue(array(
+                    'timeTrackerIds',
+                    $timeTrackerId,
+                    'perTrackTime'
+                        ), $perTrackTime);
             }
         }
     }
-    
-    protected function trackTime(){
-        if(!is_null($this->timeTrackerId)){
+
+    protected function trackTime() {
+        if (!is_null($this->timeTrackerId)) {
             $curDateTime = GI_Time::getDateTime();
             $percentage = $this->getPercentage();
             $timeTrackerId = $this->timeTrackerId;
-            if(!isset($_SESSION['timeTrackerIds'][$timeTrackerId])){
+
+            $sessionValues = SessionService::getValue(array(
+                        'timeTrackerIds',
+                        $timeTrackerId,
+            ));
+            if (empty($sessionValues)) {
                 $this->verifyTrackTime();
             } else {
-                $lastTime = $_SESSION['timeTrackerIds'][$timeTrackerId]['lastTime'];
-                $perTrackTime = GI_Time::getSecondsBetween($lastTime, $curDateTime);
-                $_SESSION['timeTrackerIds'][$timeTrackerId]['lastTime'] = $curDateTime;
-                $_SESSION['timeTrackerIds'][$timeTrackerId]['perTrackTime'] = $perTrackTime;
-                $_SESSION['timeTrackerIds'][$timeTrackerId]['lastPercentage'] = $percentage;
+                $startTime = $this->getStartTime();
+                $sinceStart = GI_Time::getSecondsBetween($startTime, $curDateTime);
+                $perTrackTime = $sinceStart / $percentage;
+
+                SessionService::setValue(array(
+                    'timeTrackerIds',
+                    $timeTrackerId,
+                    'lastTime'
+                        ), $curDateTime);
+                SessionService::setValue(array(
+                    'timeTrackerIds',
+                    $timeTrackerId,
+                    'perTrackTime',
+                        ), $perTrackTime);
+                SessionService::setValue(array(
+                    'timeTrackerIds',
+                    $timeTrackerId,
+                    'lastPercentage',
+                        ), $percentage);
             }
         }
     }
-    
-    protected function getStartTime(){
+
+    protected function getStartTime() {
         $timeTrackerId = $this->timeTrackerId;
-        if(isset($_SESSION['timeTrackerIds'][$timeTrackerId]['startTime'])){
-            return GI_Time::formatDateTimeForDisplay($_SESSION['timeTrackerIds'][$timeTrackerId]['startTime']);
+        $startTime = SessionService::getValue(array(
+            'timeTrackerIds',
+            $timeTrackerId,
+            'startTime'
+        ));
+        if (!empty($startTime)) {
+            return GI_Time::formatDateTimeForDisplay($startTime);
         }
         return NULL;
     }
     
     protected function getEstimatedTimeRemaining(){
         $timeTrackerId = $this->timeTrackerId;
-        if(isset($_SESSION['timeTrackerIds'][$timeTrackerId]['endTime'])){
+        $endTime = SessionService::getValue(array(
+                    'timeTrackerIds',
+                    $timeTrackerId,
+                    'endTime'
+        ));
+        if (!empty($endTime)) {
             return NULL;
         }
-        if(isset($_SESSION['timeTrackerIds'][$timeTrackerId]['perTrackTime'])){
-            $perTrackTime = $_SESSION['timeTrackerIds'][$timeTrackerId]['perTrackTime'];
-            $lastPercentage = $_SESSION['timeTrackerIds'][$timeTrackerId]['lastPercentage'];
+        $perTrackTime = SessionService::getValue(array(
+            'timeTrackerIds',
+            $timeTrackerId,
+            'perTrackTime',
+        ));
+        if (!empty($perTrackTime)) {
+            $lastPercentage = SessionService::getValue(array(
+                'timeTrackerIds',
+                $timeTrackerId,
+                'lastPercentage',
+            ));
             $curPercentage = $this->getPercentage();
             $percentageBlock = $curPercentage - $lastPercentage;
             $percentageLeft = 100 - $curPercentage;
@@ -293,21 +354,36 @@ abstract class AbstractGenericProgressBarView extends GI_View {
         }
         return '<i>unknown</i>';
     }
-    
-    protected function getEndTime(){
+
+    protected function getEndTime() {
         $timeTrackerId = $this->timeTrackerId;
-        if(isset($_SESSION['timeTrackerIds'][$timeTrackerId]['endTime'])){
-            return GI_Time::formatDateTimeForDisplay($_SESSION['timeTrackerIds'][$timeTrackerId]['endTime']);
+        $endTime = SessionService::getValue(array(
+            'timeTrackerIds',
+            $timeTrackerId,
+            'endTime'
+        ));
+        if (!empty($endTime)) {
+            return GI_Time::formatDateTimeForDisplay($endTime);
         }
         return NULL;
     }
     
     protected function getTimeTaken(){
         $timeTrackerId = $this->timeTrackerId;
-        if(!isset($_SESSION['timeTrackerIds'][$timeTrackerId]['endTime'])){
+        $endTime = SessionService::getValue(array(
+            'timeTrackerIds',
+            $timeTrackerId,
+            'endTime'
+        ));
+        if (empty($endTime)) {
             return NULL;
         }
-        return GI_Time::formatTimeSince($_SESSION['timeTrackerIds'][$timeTrackerId]['startTime'], $_SESSION['timeTrackerIds'][$timeTrackerId]['endTime']);
+        $startTime = SessionService::getValue(array(
+            'timeTrackerIds',
+            $timeTrackerId,
+            'startTime'
+        ));
+        return GI_Time::formatTimeSince($startTime, $endTime);
     }
     
     protected function addTimeString(){

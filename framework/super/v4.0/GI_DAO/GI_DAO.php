@@ -1011,7 +1011,11 @@ abstract class GI_DAO extends GI_Object {
     
     public static function genUniqueQueryId() {
         $newQueryId = 'gi_' . mt_rand(5000, 100000);
-        while (isset($_SESSION['queryIds'][$newQueryId])) {
+        $keys = array(
+            'queryIds',
+            $newQueryId
+        );
+        while(!empty(SessionService::getValue($keys))) {
             $newQueryId = static::genUniqueQueryId();
         }
 
@@ -1020,39 +1024,54 @@ abstract class GI_DAO extends GI_Object {
 
     public static function saveSessionQuery($searchParams = NULL, $groupByOrderBy = NULL, $queryValues = NULL) {
         $newQueryId = static::genUniqueQueryId();
-        $_SESSION['queryIds'][$newQueryId] = array(
+        $value = array(
             'searchParams' => $searchParams,
             'groupByOrderBy' => $groupByOrderBy,
             'queryValues' => $queryValues
         );
+        $keys = array(
+            'queryIds',
+            $newQueryId,
+        );
+        SessionService::setValue($keys, $value);
         return $newQueryId;
     }
 
     public static function updateSessionQuery($queryId, $searchParams = NULL, $groupByOrderBy = NULL, $queryValues = NULL) {
-        $_SESSION['queryIds'][$queryId] = array(
+        $keys = array(
+            'queryIds',
+            $queryId,
+        );
+        $value = array(
             'searchParams' => $searchParams,
             'groupByOrderBy' => $groupByOrderBy,
             'queryValues' => $queryValues
         );
+        SessionService::setValue($keys, $value);
     }
 
     public static function getSessionQuery($queryId, &$searchParams = NULL, &$groupByOrderBy = NULL, &$queryValues = NULL) {
-        if (!isset($_SESSION['queryIds'][$queryId])) {
+        $sessionQuery = SessionService::getValue(array(
+                    'queryIds',
+                    $queryId,
+        ));
+        if (empty($sessionQuery)) {
             return false;
         }
-        $sessionQuery = $_SESSION['queryIds'][$queryId];
         $searchParams = $sessionQuery['searchParams'];
         $groupByOrderBy = $sessionQuery['groupByOrderBy'];
         $queryValues = $sessionQuery['queryValues'];
+
         return true;
     }
 
     public static function getSessionQueryValue($queryId, $value) {
-        if (!isset($_SESSION['queryIds'][$queryId])) {
-            return NULL;
-        }
-        $queryValues = $_SESSION['queryIds'][$queryId]['queryValues'];
-        if (!isset($queryValues[$value])) {
+        $queryValues = SessionService::getValue(array(
+            'queryIds',
+            $queryId,
+            'queryValues'
+        ));
+        if (empty($queryValues) || !isset($queryValues[$value])) {
             return NULL;
         }
         return $queryValues[$value];

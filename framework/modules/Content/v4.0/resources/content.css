@@ -71,18 +71,12 @@ form > .content_form_block_wrap{
 .content_detail_view h1 .thin{
     font-size: 0.8em;
     margin-left: 0.5em;
-    display:-moz-inline-stack;
-    display:inline-block;
-    zoom:1;
-    *display:inline;
+    display: inline-block;
 }
 
 .content_ref{
     vertical-align: middle;
-    display:-moz-inline-stack;
-    display:inline-block;
-    zoom:1;
-    *display:inline;
+    display: inline-block;
 }
 
 .content_form_block_wrap.content_ref{
@@ -118,10 +112,7 @@ form > .content_form_block_wrap{
 .content_slider_nav .content_slider_change_slide, .content_gallery .sized_img_wrap{
     margin-right: 1em;
     margin-bottom: 1em;
-    display:-moz-inline-stack;
-    display:inline-block;
-    zoom:1;
-    *display:inline;
+    display: inline-block;
 }
 
 .content_slider_nav .content_slider_change_slide:last-child{
@@ -159,8 +150,12 @@ h3.content_title{
     font-weight: 700;
 }
 
-.content_detail_view ol li:before{
-    content: counter(inst) '.';
+.content_detail_view ol{
+    counter-reset: ol;
+}
+.content_detail_view ol > li:before{
+    counter-increment: ol;
+    content: counter(ol) '.';
     font-size: 0.8em;
     font-weight: 700;
 }

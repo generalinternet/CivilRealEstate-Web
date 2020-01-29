@@ -3,10 +3,10 @@
  * Description of AbstractLoginStillHereView
  *
  * @author General Internet
- * @copyright  2016 General Internet
- * @version    2.0
+ * @copyright  2019 General Internet
+ * @version    4.0.0
  */
-class AbstractLoginStillHereView extends GI_View {
+class AbstractLoginStillHereView extends MainWindowView {
     protected $form;
 
     public function __construct($form) {
@@ -14,32 +14,17 @@ class AbstractLoginStillHereView extends GI_View {
         
         parent::__construct();
         $this->buildForm();
-    }
-
-    protected function openViewWrap(){
-        $this->form->addHTML('<div class="content_padding">');
-        return $this->form;
-    }
-    
-    protected function closeViewWrap(){
-        $this->form->addHTML('</div>');
-        return $this->form;
+        $this->addSiteTitle(Lang::getString('are_you_still_there'));
+        $this->setWindowTitle(Lang::getString('are_you_still_there'));
     }
     
     public function buildForm() {
-        $this->openViewWrap();
-        $this->form->addHTML('<h1>Are you still there?</h1>');
         $this->form->addHTML('<p>You will be logged out in 5 minutes.</p>');
-        $this->form->addHTML('<span class="submit_btn">I’m still here</span>');
-        $this->closeViewWrap();
-    }
-
-    public function buildView() {           
-        $this->addHTML($this->form->getForm());
+        $this->form->addHTML('<span class="submit_btn" tabindex="0">I’m still here</span>');
     }
     
-    public function beforeReturningView() {
-        $this->buildView();
+    protected function addViewBodyContent(){
+        $this->addHTML($this->form->getForm());
     }
     
 }

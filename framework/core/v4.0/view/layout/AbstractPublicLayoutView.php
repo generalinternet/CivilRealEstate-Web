@@ -12,7 +12,7 @@ abstract class AbstractPublicLayoutView extends AbstractLayoutView {
     protected $menuView = NULL;
     /** @var User */
     protected $currentUser = NULL;
-    /** @var GI_View */
+    /** @var AbstractFileAvatarView */
     protected $userAvatarView = NULL;
     
     protected $addGoogleMap = true;
@@ -114,17 +114,26 @@ abstract class AbstractPublicLayoutView extends AbstractLayoutView {
         return $this;
     }
     
+    protected function addDefaultCSS() {
+        parent::addDefaultCSS();
+        if (dbConnection::isModuleInstalled('contact')) {
+            $this->addCSS('framework/modules/Contact/' . MODULE_CONTACT_VER . '/resources/contacts.css');
+        }
+    }
+    
     protected function addDefaultJS(){
         parent::addDefaultJS();
         
         $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/forms.js');
+        $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/core.js');
         $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/public_layout.js');
         $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/gi_modal.js');
         
         /* Google Map */
-        if (!empty(GOOGLE_API_KEY) && $this->addGoogleMap) {
+        $googleApiKey = ProjectConfig::getGoogleAPIKey();
+        if (!empty($googleApiKey) && $this->addGoogleMap) {
             $this->addJS('resources/js/custom_google_map.js');
-            $this->addJS('https://maps.googleapis.com/maps/api/js?key=' . GOOGLE_API_KEY.'&callback=googleMapInit', false);
+            $this->addJS('https://maps.googleapis.com/maps/api/js?key=' . $googleApiKey.'&callback=googleMapInit', false);
         }
     }
     
@@ -161,40 +170,49 @@ abstract class AbstractPublicLayoutView extends AbstractLayoutView {
         return $this;
     }
     
+    protected function addUserBar(){
+        $this->addHTML('<div id="user_bar">');
+        $this->addAccountMenu();
+        $this->addHTML('</div>');
+        return $this;
+    }
+    
     protected function addAccountMenu() {
         $this->addHTML('<div class="my_account_menu">');
         if (!empty($this->currentUser)) {
-            $userLink = GI_URLUtils::buildURL(array(
-                'controller' => 'user',
-                'action' => 'view',
-                'id' => Login::getUserId()
-            ));
+            $contactOrg = $this->currentUser->getContactOrg();
+            if (!empty($contactOrg)) {
+                $userLink = GI_URLUtils::buildURL(array(
+                    'controller' => 'contactprofile',
+                    'action' => 'view',
+                    'id' => $contactOrg->getId(),
+                    'tab' => 'my_settings'
+                ));
+            } else {
+                $userLink = GI_URLUtils::buildURL(array(
+                    'controller' => 'user',
+                    'action' => 'view',
+                    'id' => $this->currentUser->getId()
+                ));
+            }
             $this->addHTML('<a href="' . $userLink . '">');
             if ($this->userAvatarView) {
+                $this->userAvatarView->setSize(24, 24);
                 $this->addHTML($this->userAvatarView->getHTMLView());
             } else {
-                $this->addHTML('<span class="avatar_placeholder"><span class="icon avatar"></span></span>');
+                $this->addHTML($this->currentUser->getUserAvatarHTML());
+            }
+            $this->addHTML('<span class="user_name">' . $this->currentUser->getFullName() . '</span>');
+            $this->addHTML('</a>');
+
+            if (Permission::verifyByRef('view_dashboard')) {
+                $dashboardLink = GI_URLUtils::buildURL(array(
+                    'controller' => 'dashboard',
+                    'action' => 'index',
+                ));
+                $this->addHTML('<a href="' . $dashboardLink . '">Admin</a>');
             }
             
-            $this->addHTML('<span class="user_name">' . $this->currentUser->getFullName() . '</span>');
-//            $this->addHTML('<span class="user_email">' . $this->currentUser->getProperty('email') . '</span>');
-            
-//            $notificationCount = $this->currentUser->getNotificationCount();
-//            $notifyClass = '';
-//            if($notificationCount == 0){
-//                $notifyClass = 'hide_on_load';
-//            }
-//            $this->addHTML('<span class="notify_count ' . $notifyClass . '">' . $notificationCount . '</span>');
-            
-            $this->addHTML('</a>');
-            
-            $this->addHTML('<a href="' . $userLink . '">My Account</a>');
-            
-            $dashboardLink = GI_URLUtils::buildURL(array(
-                'controller' => 'dashboard',
-                'action' => 'index',
-            ));
-            $this->addHTML('<a href="' . $dashboardLink . '">Admin</a>');
             $logoutURL = GI_URLUtils::buildURL(array(
                 'controller' => 'login',
                 'action' => 'logout',
@@ -238,7 +256,8 @@ abstract class AbstractPublicLayoutView extends AbstractLayoutView {
                 ->openFooterTag()
                 ->addFooterContent()
                 ->closeFooterTag()
-            ->closePageDiv()   
+            ->closePageDiv()
+            ->addChatBar()
             ->addFooter();
         echo $this->html;
     }

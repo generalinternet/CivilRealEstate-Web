@@ -16,22 +16,24 @@ abstract class AbstractAlertService extends GI_Service {
     }
     
     public static function addAlert(AbstractAlert $alert) {
-        if(!isset($_SESSION['pending_alerts'])){
-            $_SESSION['pending_alerts'] = array();
-        }
-        $alertId = $alert->getId();
-        $_SESSION['pending_alerts'][$alertId] = array(
+        SessionService::setValue(array(
+            'pending_alerts',
+            $alert->getId(),
+        ), array(
             'colour' => $alert->getColour(),
             'message' => $alert->getMessage()
-        );
+        ));
         return true;
     }
     
     public static function getNextAlertId(){
         if(is_null(static::$lastAlertId)){
             $largestAlertId = 0;
-            if(isset($_SESSION['pending_alerts']) && !empty($_SESSION['pending_alerts'])){
-                $largestAlertId = max(array_keys($_SESSION['pending_alerts']));
+            $pendingAlerts = SessionService::getValue(array(
+                'pending_alerts'
+            ));
+            if (!empty($pendingAlerts)) {
+                $largestAlertId = max(array_keys($pendingAlerts));
             }
             static::$lastAlertId = $largestAlertId;
         } else {
@@ -41,10 +43,10 @@ abstract class AbstractAlertService extends GI_Service {
     }
     
     public static function removeAlert($id){
-        if(isset($_SESSION['pending_alerts']) && isset($_SESSION['pending_alerts'][$id])){
-            unset($_SESSION['pending_alerts'][$id]);
-            return true;
-        }
+        SessionService::unsetValue(array(
+            'pending_alerts',
+            $id,
+        ));
         return false;
     }
     
@@ -53,28 +55,32 @@ abstract class AbstractAlertService extends GI_Service {
      * @return \AbstractAlert
      */
     public static function getAlert($id){
-        if(isset($_SESSION['pending_alerts']) && isset($_SESSION['pending_alerts'][$id])){
-            $alertInfo = $_SESSION['pending_alerts'][$id];
+        $alertInfo = SessionService::getValue(array(
+                    'pending_alerts',
+                    $id
+        ));
+        if (!empty($alertInfo)) {
             $alert = new Alert($alertInfo['message'], $alertInfo['colour']);
             $alert->setId($id);
             return $alert;
         }
         return NULL;
     }
-    
-    public static function getPendingAlerts(){
+
+    public static function getPendingAlerts() {
         $pendingAlerts = array();
-        if(isset($_SESSION['pending_alerts'])){
-            foreach($_SESSION['pending_alerts'] as $id => $info){
+        $pendingAlertIds = SessionService::getValue('pending_alerts');
+        if (!empty($pendingAlertIds)) {
+            foreach ($pendingAlertIds as $id => $info) {
                 $pendingAlert = static::getAlert($id);
-                if($pendingAlert){
+                if ($pendingAlert) {
                     $pendingAlerts[$id] = $pendingAlert;
                 }
             }
         }
         return $pendingAlerts;
     }
-    
+
     public static function getMessageFromCode($code){
         $msg = '';
         switch($code){

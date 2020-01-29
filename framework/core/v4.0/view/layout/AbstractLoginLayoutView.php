@@ -13,10 +13,12 @@ abstract class AbstractLoginLayoutView extends AbstractLayoutView {
     protected function addDefaultJS(){
         parent::addDefaultJS();
         $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/forms.js');
+        $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/core.js');
         $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/layout.js');
     }
     
     public function display() {
+        $this->addBodyClass('login_layout');
         $this->addHeader()
                 ->openContentWrapDiv()
 //                ->addMenuBtn()
@@ -44,7 +46,7 @@ abstract class AbstractLoginLayoutView extends AbstractLayoutView {
 //    }
     
     protected function openLoginBoxDiv(){
-        $this->addHTML('<div id="login_box" class="content_padding">');
+        $this->addHTML('<div id="login_box">');
         return $this;
     }
     

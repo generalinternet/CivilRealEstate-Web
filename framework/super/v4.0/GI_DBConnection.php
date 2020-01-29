@@ -140,6 +140,16 @@ abstract class GI_DBConnection {
             'tables' => array(
                 'qna_question'
             )
+        ),
+        'realEstate' => array(
+            'tables' => array(
+                're_listing'
+            )
+        ),
+        'chat' => array(
+            'tables' => array(
+                'chat_user'
+            )
         )
     );
     

@@ -3,7 +3,7 @@
 //Local
 $localDB = array(
     'host' => 'localhost:3306',
-    'db' => 'civil_bos',
+    'db' => 'civil_real_estate_bos',
     'user' => 'root',
     'pass' => 'root'
 );

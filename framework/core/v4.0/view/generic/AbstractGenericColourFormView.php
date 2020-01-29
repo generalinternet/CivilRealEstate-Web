@@ -50,7 +50,7 @@ abstract class AbstractColourFormView extends GI_View {
     }
     
     protected function addSubmitBtn(){
-        $this->form->addHTML('<span class="submit_btn" >Save</span>');
+        $this->form->addHTML('<span class="submit_btn" tabindex="0" >Save</span>');
     }
     
     protected function addCancelBtn(){

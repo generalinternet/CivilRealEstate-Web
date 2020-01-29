@@ -77,6 +77,11 @@ abstract class AbstractLayoutView extends GI_View {
             $this->addCSS('resources/external/js/syntaxhighlighter/themes/' . ProjectConfig::getSyntaxHighlighterStyle() . '.css');
         }
         
+        //CHAT
+        if(ProjectConfig::isChatEnabled() && dbConnection::isModuleInstalled('chat')){
+            $this->addCSS('framework/modules/Chat/' . MODULE_CHAT_VER. '/resources/css/chat.css');
+        }
+        
         $this->addCSS('framework/core/' . FRMWK_CORE_VER. '/resources/css/default.min.css');
         $this->addCSS('framework/core/' . FRMWK_CORE_VER. '/resources/css/forms.css');
         $this->addCSS('framework/core/' . FRMWK_CORE_VER. '/resources/css/form_view.css');
@@ -85,6 +90,7 @@ abstract class AbstractLayoutView extends GI_View {
         $this->addCSS('framework/core/' . FRMWK_CORE_VER. '/resources/css/columns.min.css');
         $this->addCSS('framework/core/' . FRMWK_CORE_VER. '/resources/css/wysiwyg.min.css');
         $this->addCSS('framework/core/' . FRMWK_CORE_VER. '/resources/css/gi_ui.css');
+        $this->addCSS('framework/core/' . FRMWK_CORE_VER. '/resources/css/core.css');
         $this->addLayoutCSS();
     }
     
@@ -138,12 +144,31 @@ abstract class AbstractLayoutView extends GI_View {
             $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/wizard/wizard.js');
         }
         
+        //SOCKET
+        if(ProjectConfig::openSocket()){
+            $this->addJS('resources/external/js/socket.io-2.1.1.js');
+            $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/socket/socket.js');
+            if(ProjectConfig::enableBrowserNotifications()){
+                $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/socket/socket.notify.js');
+            }
+            //CHAT
+            if(ProjectConfig::isChatEnabled() && dbConnection::isModuleInstalled('chat')){
+                $this->addJS('resources/external/js/html2canvas.min.js');
+                $this->addJS('framework/modules/Chat/' . MODULE_CHAT_VER. '/resources/js/chat.js');
+                $this->addJS('resources/external/js/anchorme.min.js');
+            }
+
+        }
+        
         //File uploading
         if(ProjectConfig::fileUploads()){
             $this->addJS('resources/external/js/pluploader/plupload.full.min.js');
             $this->addJS('resources/external/js/pluploader/jquery.ui.plupload/jquery.ui.plupload.min.js');
             $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/file_system.js');
         }
+        
+        //TIME FORMATING
+        $this->addJS('resources/external/js/moment.min.js');
     }
     
     public function addAlerts(){
@@ -271,4 +296,14 @@ abstract class AbstractLayoutView extends GI_View {
     protected function getMenuTextWithSVGIcon($icon, $title, $classNames = 'left_icon') {
         return $this->getTextWithSVGIcon($icon, $title, $this->iconWidthMenu, $this->iconHeightMenu, $classNames);
     }
+    
+    protected function addChatBar(){
+        if(ProjectConfig::isChatEnabled()){
+            $chatBar = new ChatBarView();
+            $chatBar->setDefaultConvoGroup('support');
+            $this->addHTML($chatBar->getHTMLView());
+        }
+        return $this;
+    }
+    
 }

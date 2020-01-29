@@ -22,15 +22,23 @@ abstract class AbstractRoleController extends GI_Controller {
         $roleModel->setRoleGroup($roleGroup);
         $view = $roleModel->getFormView($form, $userPermissions, $roleGroupNamesArray, $maxRoleGroupNames, $roleGroup);
         
-        $updatedRoleModel = $roleModel->handleFormSubmission($form, $roleGroup);
-        
+        $updatedRoleModel = $roleModel->handleFormSubmission($form, $roleGroup);        
+        $success = 0;
+        $newURL = '';
         if (!empty($updatedRoleModel)) {
-            $roleId = $updatedRoleModel->getProperty('id');
-            GI_URLUtils::redirect(array(
-                'controller'=>'role',
-                'action'=>'view',
-                'roleId'=>$roleId
-            ));
+            $updatedRoleModelId = $updatedRoleModel->getId();
+            $success = 1;
+            $newURLAttrs = array(
+                'controller' => 'role',
+                'action' => 'view',
+                'roleId' => $updatedRoleModelId,
+                'targetId' => 'main_window'
+            );
+            if(GI_URLUtils::isAJAX()){
+                $newURL = GI_URLUtils::buildURL($newURLAttrs);
+            } else {
+                GI_URLUtils::redirect($newURLAttrs);
+            }
         }
         
         $breadcrumbs = $roleGroup->getBreadcrumbs();
@@ -45,6 +53,10 @@ abstract class AbstractRoleController extends GI_Controller {
         
         $returnArray = GI_Controller::getReturnArray($view);
         $returnArray['breadcrumbs'] = $breadcrumbs;
+        $returnArray['success'] = $success;
+        if(!empty($newURL)){
+            $returnArray['newUrl'] = $newURL;
+        }
         return $returnArray;
     }
 
@@ -68,13 +80,23 @@ abstract class AbstractRoleController extends GI_Controller {
         $view = $roleModel->getFormView($form, $userPermissions, $roleGroupNames, $maxRoleGroupRankNames);
         
         $updatedRoleModel = $roleModel->handleFormSubmission($form);
+        
+        $success = 0;
+        $newURL = '';
         if (!empty($updatedRoleModel)) {
-            $updatedRoleModelId = $updatedRoleModel->getProperty('id');
-            GI_URLUtils::redirect(array(
-                'controller'=>'role',
-                'action'=>'view',
-                'roleId'=>$updatedRoleModelId
-            ));
+            $updatedRoleModelId = $updatedRoleModel->getId();
+            $success = 1;
+            $newURLAttrs = array(
+                'controller' => 'role',
+                'action' => 'view',
+                'roleId' => $updatedRoleModelId,
+                'targetId' => 'main_window'
+            );
+            if(GI_URLUtils::isAJAX()){
+                $newURL = GI_URLUtils::buildURL($newURLAttrs);
+            } else {
+                GI_URLUtils::redirect($newURLAttrs);
+            }
         }
         
         $roleGroup = $roleModel->getRoleGroup();
@@ -97,6 +119,10 @@ abstract class AbstractRoleController extends GI_Controller {
         
         $returnArray = GI_Controller::getReturnArray($view);
         $returnArray['breadcrumbs'] = $breadcrumbs;
+        $returnArray['success'] = $success;
+        if(!empty($newURL)){
+            $returnArray['newUrl'] = $newURL;
+        }
         return $returnArray;
     }
 
@@ -355,6 +381,13 @@ abstract class AbstractRoleController extends GI_Controller {
         if(!empty($newURL)){
             $returnArray['newUrl'] = $newURL;
         }
+        if(GI_URLUtils::isAJAX() && $success){
+            $curId = $roleGroupUpdated->getId();
+            $returnArray['jqueryCallbackAction'] = 'reloadInElementByTargetId("list_bar", '.$curId.');historyPushState("reload", "'.$newURL.'", "main_window");';
+        } else {
+            //Set the list bar with index view
+            $returnArray['listBarURL'] = $roleGroup->getListBarURL();
+        }
         return $returnArray;
     }
 
@@ -391,6 +424,74 @@ abstract class AbstractRoleController extends GI_Controller {
             $roleGroup->softDelete();
         }
         return $this->actionIndex($attributes);
+    }
+    
+        public function actionAutocompRole($attributes) {
+        if ((!isset($attributes['ajax']) || !$attributes['ajax'] == 1)) {
+            $returnArray = GI_Controller::getReturnArray();
+            return $returnArray;
+        }
+        if (isset($attributes['curVal'])) {
+            $curVal = $attributes['curVal'];
+            $curVals = explode(',', $curVal);
+
+            $results = array(
+                'label' => array(),
+                'value' => array(),
+                'autoResult' => array()
+            );
+            foreach($curVals as $RoleId){
+                $role = RoleFactory::getModelById($RoleId);
+                if($role){
+                    $acResult = $role->getAutocompResult();
+
+                    foreach($acResult as $key => $val){
+                        if(!isset($results[$key])){
+                            $results[$key] = array();
+                        }
+                        $results[$key][] = $val;
+                    }
+                }
+            }
+            return $results;
+        } else {
+            if(isset($_REQUEST['term'])){
+                $term = $_REQUEST['term'];
+            } else {
+                $term = '';
+            }
+
+            $search = RoleFactory::search()
+                    ->setItemsPerPage(ProjectConfig::getAutocompleteItemLimit());
+            
+            $termCols = array(
+                'title',
+            );
+            $search->filterTermsLike($termCols, $term)
+                    ->orderByLikeScore($termCols, $term);
+            $search->groupBy('id');
+            
+            $roles = $search->select();
+
+            $results = array();
+
+            foreach($roles as $role){
+                /* @var $role AbstractContextRole */
+                $roleInfo = $role->getAutocompResult($term);
+                $results[] = $roleInfo;
+            }
+            $itemsPerPage = $search->getItemsPerPage();
+            $count = $search->getCount();
+            if (!empty($itemsPerPage) && $count > $itemsPerPage) {
+                $results[] = array(
+                    'preventDefault' => 1,
+                    'liClass' => 'more_results',
+                    'autoResult' => '&hellip;'
+                );
+            }
+
+            return $results;
+        }
     }
 
 }

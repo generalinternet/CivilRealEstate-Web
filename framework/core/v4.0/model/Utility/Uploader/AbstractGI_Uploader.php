@@ -4,7 +4,7 @@
  *
  * @author General Internet
  * @copyright  2017 General Internet
- * @version    4.0.3
+ * @version    4.0.4
  */
 abstract class AbstractGI_Uploader extends GI_View{
     
@@ -36,12 +36,22 @@ abstract class AbstractGI_Uploader extends GI_View{
     /** @var GI_Form */
     protected $form = NULL;
     protected $scriptBuilt = false;
+    protected $showBtns = true;
+    protected $disabledMsg = NULL;
     
     public function __construct($uploaderName) {
         $this->setUploaderName($uploaderName);
         $this->saveUploader($this);
         $this->setContainerId($this->getUploaderName() . '_container');
         parent::__construct();
+        if(!Login::isLoggedIn()){
+            $this->setEnabled(false);
+            $loginLink = GI_URLUtils::buildURL(array(
+                'controller' => 'login',
+                'action' => 'index',
+            ));
+            $this->setDisabledMsg('Please log in to upload files. <a href="' . $loginLink . '" title="Log In">Log In</a>');
+        }
     }
     
     public function setUploaderName($uploaderName){
@@ -136,6 +146,9 @@ abstract class AbstractGI_Uploader extends GI_View{
     }
     
     public function getScript(){
+        if(!Login::isLoggedIn()){
+            return NULL;
+        }
         $this->buildV4Script();
         return $this->scriptString;
     }
@@ -179,6 +192,11 @@ abstract class AbstractGI_Uploader extends GI_View{
         return $this;
     }
     
+    public function setDisabledMsg($disabledMsg){
+        $this->disabledMsg = $disabledMsg;
+        return $this;
+    }
+    
     public function setFileView($fileView){
         $this->fileView = $fileView;
         return $this;
@@ -195,6 +213,11 @@ abstract class AbstractGI_Uploader extends GI_View{
     
     public function setDropzone($dropzone){
         $this->dropzone = $dropzone;
+        return $this;
+    }
+    
+    public function setShowBtns($showBtns){
+        $this->showBtns = $showBtns;
         return $this;
     }
     
@@ -222,6 +245,7 @@ abstract class AbstractGI_Uploader extends GI_View{
                 array('acl' => 'authenticated-read'),
                 array('starts-with', '$key', ''),
                 array('starts-with', '$Content-Type', ''),
+                array('starts-with', '$Content-Disposition', ''),
                 array('starts-with', '$name', ''),
                 array('starts-with', '$Filename', ''),
             )
@@ -262,6 +286,8 @@ abstract class AbstractGI_Uploader extends GI_View{
                 array('starts-with', '$key', ''),
                 array('starts-with', '$name', ''), 
                 array('starts-with', '$Filename', ''),
+                array('starts-with', '$Content-Type', ''),
+                array('starts-with', '$Content-Disposition', ''),
                 array('x-amz-credential' => $xAmzCred),
                 array('x-amz-algorithm' => $xAmzAlgo),
                 array('X-amz-date' => $isoDate)
@@ -320,6 +346,9 @@ abstract class AbstractGI_Uploader extends GI_View{
     }
     
     protected function addBtns(){
+        if(!$this->showBtns){
+            return;
+        }
         $this->addHTML('<div class="wrap_btns">');
             $this->addBrowseBtn();
             //$this->addLinkBtn();
@@ -381,13 +410,19 @@ abstract class AbstractGI_Uploader extends GI_View{
     }
     
     protected function addDropZone(){
+        $this->addHTML($this->getDropZone());
+    }
+    
+    protected function getDropZone(){
+        $html = '';
         if($this->dropzone){
             $dropzoneClass = 'dropzone';
             if (!$this->enabled) {
                 $dropzoneClass .= ' disabled';
             }
-            $this->addHTML('<div class="' . $dropzoneClass . '"><p>Files Here</p></div>');
+            $html = '<div class="' . $dropzoneClass . '"><p>Files Here</p></div>';
         }
+        return $html;
     }
     
     /**
@@ -428,7 +463,15 @@ abstract class AbstractGI_Uploader extends GI_View{
     }
     
     protected function addFilesArea(){
+        $this->addHTML($this->getFilesArea());
+    }
+    
+    public function getFilesArea(){
         $filesAreaClass = 'files_area';
+        if (!empty($this->fileView)) {
+            $filesAreaClass .= ' ' . $this->fileView . '_area';
+        }
+        
         if (!$this->enabled) {
             $filesAreaClass .= ' disabled';
         }
@@ -441,7 +484,7 @@ abstract class AbstractGI_Uploader extends GI_View{
             $filesAreaClass .= ' edit_disabled';
         }
         
-        $this->addHTML('<div class="' . $filesAreaClass . '">');
+       $html = '<div class="' . $filesAreaClass . '">';
         $idsAsKey = false;
         if(!empty($this->form)){
             $idsAsKey = true;
@@ -455,19 +498,24 @@ abstract class AbstractGI_Uploader extends GI_View{
                     $fileView = $file->getView($this->getFileView());
                 }
                 if($fileView){
-                    $this->addHTML($fileView->getHTMLView());
+                    $html .= $fileView->getHTMLView();
                 }
             }
         }
         
         $this->addDropZone();
 
-        $this->addHTML('</div>');
+        $html .= '</div>';
+        return $html;
     }
     
     protected function addVerifyMessage(){
         if ($this->enabled) {
-            $this->addHTML('<div class="uploading_files"><p>Your browser doesn\'t have HTML5, Silverlight or Flash support.</p></div>');
+            $this->addHTML('<div class="uploading_files">');
+            $this->addHTML('<p>Your browser doesn\'t have HTML5, Silverlight or Flash support.</p>');
+            $this->addHTML('</div>');
+        } elseif(!empty($this->disabledMsg)){
+            $this->addHTML('<p>' . $this->disabledMsg . '</p>');
         }
     }
 

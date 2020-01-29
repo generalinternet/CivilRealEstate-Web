@@ -8,13 +8,9 @@
  */
 abstract class AbstractContentInContent extends GI_Model {
     
-    /**
-     * @var Content 
-     */
+    /** @var AbstractContent */
     protected $parentContent = NULL;
-    /**
-     * @var Content 
-     */
+    /** @var AbstractContent */
     protected $childContent = NULL;
     
     public function softDelete() {
@@ -29,10 +25,7 @@ abstract class AbstractContentInContent extends GI_Model {
         return parent::softDelete();
     }
     
-    /**
-     * 
-     * @return Content
-     */
+    /** @return AbstractContent */
     public function getParentContent(){
         if(is_null($this->parentContent)){
             $this->parentContent = ContentFactory::getModelById($this->getProperty('p_content_id'));
@@ -41,16 +34,25 @@ abstract class AbstractContentInContent extends GI_Model {
         return $this->parentContent;
     }
     
-    /**
-     * 
-     * @return Content
-     */
+    /** @return AbstractContent */
     public function getChildContent(){
         if(is_null($this->childContent)){
             $this->childContent = ContentFactory::getModelById($this->getProperty('c_content_id'));
         }
         
         return $this->childContent;
+    }
+    
+    public function isOnlyChild(){
+        $search = ContentInContentFactory::search()
+                ->filter('p_content_id', $this->getProperty('p_content_id'))
+                ->filterNotEqualTo('c_content_id', $this->getProperty('c_content_id'));
+        $siblingCount = $search->count();
+        
+        if(!empty($siblingCount)){
+            return false;
+        }
+        return true;
     }
     
 }

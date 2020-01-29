@@ -203,6 +203,9 @@ abstract class AbstractActionResult {
                 if (isset($redirectArray['newUrlTargetId'])) {
                     $returnArray['newUrlTargetId'] = $redirectArray['newUrlTargetId'];
                 }
+                if (isset($redirectArray['newUrlRedirect'])) {
+                    $returnArray['newUrlRedirect'] = $redirectArray['newUrlRedirect'];
+                }
                 if (isset($redirectArray['jqueryAction'])) {
                     $returnArray['jqueryAction'] = $redirectArray['jqueryAction'];
                 }
@@ -218,10 +221,11 @@ abstract class AbstractActionResult {
             }
         } else {
             $tabbed = GI_URLUtils::getAttribute('tabbed');
+            $catalog = GI_URLUtils::getAttribute('catalog');
             if (GI_URLUtils::isAJAX() && $tabbed != 1 && $uiTableView) {
                 $onlyRows = GI_URLUtils::getAttribute('onlyRows');
                 $fullView = GI_URLUtils::getAttribute('fullView');
-                if ($onlyRows == 1) {
+                if ($onlyRows == 1 || $catalog == 1) {
                     $returnArray['uiTableRows'] = $uiTableView->getRows();
                 } elseif ($fullView == 1) {
                     // In case of showing the whole view by ajax
@@ -239,6 +243,7 @@ abstract class AbstractActionResult {
                 }
             }
         }
+        $returnArray['sourceURL'] = GI_URLUtils::buildURL(GI_URLUtils::getAttributes());
         return $returnArray;
     }
     

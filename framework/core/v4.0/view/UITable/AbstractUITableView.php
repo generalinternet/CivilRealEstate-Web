@@ -22,6 +22,7 @@ abstract class AbstractUITableView extends GI_View {
     protected $getRowsCalled = false;
     protected $tableWrapId = '';
     protected $tableClass = array();
+    protected $tableWrapClass = array();
     protected $rowsAreSelectable = false;
     protected $tableDataURLProps = NULL;
     protected $noModelMessageLocked = false;
@@ -180,7 +181,14 @@ abstract class AbstractUITableView extends GI_View {
     
     public function addTableClass($class) {
         if (!in_array($class, $this->tableClass)) {
-            array_push($this->tableClass, $class);
+            $this->tableClass[] = $class;
+        }
+        return $this;
+    }
+    
+    public function addTableWrapClass($class) {
+        if (!in_array($class, $this->tableWrapClass)) {
+            $this->tableWrapClass[] = $class;
         }
         return $this;
     }
@@ -208,6 +216,11 @@ abstract class AbstractUITableView extends GI_View {
         return implode(' ', $this->tableClass);
     }
     
+    protected function getTableWrapClass(){
+        $this->addTableWrapClass('ui_table_wrap');
+        return implode(' ', $this->tableWrapClass);
+    }
+    
     protected function openTableWrap(){
         $tableWrapIdAttr = '';
         if(!empty($this->tableWrapId)){
@@ -218,7 +231,7 @@ abstract class AbstractUITableView extends GI_View {
         if(!empty($this->tableDataURLProps)){
             $tableDataURLAttr = 'data-init-load="' . GI_URLUtils::buildURL($this->tableDataURLProps) . '"';
         }
-        $this->addHTML('<div ' . $tableWrapIdAttr . ' class="ui_table_wrap" ' . $tableDataURLAttr . '>');
+        $this->addHTML('<div ' . $tableWrapIdAttr . ' class="' . $this->getTableWrapClass() . '" ' . $tableDataURLAttr . '>');
         return $this;
     }
     
@@ -281,7 +294,11 @@ abstract class AbstractUITableView extends GI_View {
     }
     
     protected function addNoModelMessage(){
-        $this->addHTML('<p class="no_model_message">' . $this->noModelMessage . '</p>');
+        $this->addHTML('<div class="no_model_message_wrap" id="' . $this->listBodyId . '" >');
+        if(!empty($this->noModelMessage)){
+            $this->addHTML('<p class="no_model_message">' . $this->noModelMessage . '</p>');
+        }
+        $this->addHTML('</div>');
     }
 
     protected function buildTableHeader() {
@@ -358,6 +375,9 @@ abstract class AbstractUITableView extends GI_View {
         if($seconds < 300 && $model->getProperty('last_mod_by') == Login::getUserId()){
             $rowClass .= ' new';
         }
+        if(method_exists($model, 'getUITableRowClass')){
+            $rowClass .= ' ' . $model->getUITableRowClass();
+        }
         return $rowClass;
     }
     
@@ -404,13 +424,15 @@ abstract class AbstractUITableView extends GI_View {
             }
         }
         
-        $this->openModelCell($cssClass, $cellHoverTitle);
+        $headerTitle = GI_Sanitize::htmlAttribute($uiTableCol->getHeaderTitle());
+        
+        $this->openModelCell($cssClass, $cellHoverTitle, $headerTitle);
         $this->addHTML($val);
         $this->closeModelCell();
     }
     
-    protected function openModelCell($cssClass, $cellHoverTitle){
-        $this->addHTML('<td class="' . $cssClass . '" title="' . $cellHoverTitle . '">');
+    protected function openModelCell($cssClass, $cellHoverTitle, $headerTitle){
+        $this->addHTML('<td class="' . $cssClass . '" title="' . $cellHoverTitle . '" data-label="' . $headerTitle . '">');
         return $this;
     }
     

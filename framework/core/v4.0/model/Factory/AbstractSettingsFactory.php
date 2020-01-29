@@ -15,6 +15,14 @@ abstract class AbstractSettingsFactory extends GI_ModelFactory {
             case 'qb':
                 $model = new SettingsQB($map);
                 break;
+            case 'notification':
+            case 'notification_global':
+                $model = new SettingsNotif($map);
+                break;
+            case 'payment':
+            case 'payment_stripe':
+                $model = new SettingsPayment($map);
+                break;
             default:
                 $model = new Settings($map);
                 break;
@@ -33,10 +41,19 @@ abstract class AbstractSettingsFactory extends GI_ModelFactory {
                 $typeRefs = array('settings');
                 break;
             case 'notification':
-                $typeRefs = array('notification');
+                $typeRefs = array('notification', 'notification');
+                break;
+            case 'notification_global':
+                $typeRefs = array('notification', 'notification_global');
                 break;
             case 'qb':
                 $typeRefs = array('qb');
+                break;
+            case 'payment':
+                $typeRefs = array('payment', 'payment');
+                break;
+            case 'payment_stripe':
+                $typeRefs = array('payment', 'payment_stripe');
                 break;
             default:
                 $typeRefs = array();

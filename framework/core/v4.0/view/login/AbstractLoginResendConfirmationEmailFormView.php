@@ -6,7 +6,7 @@
  * @copyright  2016 General Internet
  * @version    2.0.0
  */
-abstract class AbstractLoginResendConfirmationEmailFormView extends GI_View {
+abstract class AbstractLoginResendConfirmationEmailFormView extends MainWindowView {
 
     protected $form;
     protected $formBuilt = false;
@@ -18,6 +18,8 @@ abstract class AbstractLoginResendConfirmationEmailFormView extends GI_View {
         parent::__construct();
         $this->form = $form;
         $this->buildForm();
+        $this->addSiteTitle(Lang::getString('resend_email_confirmation'));
+        $this->setWindowTitle(Lang::getString('resend_email_confirmation'));
     }
     
     public function setAddWrapper($addWrapper){
@@ -28,6 +30,10 @@ abstract class AbstractLoginResendConfirmationEmailFormView extends GI_View {
     public function setAjax($ajax){
         $this->ajax = $ajax;
         return $this;
+    }
+    
+    protected function addViewBodyContent(){
+        $this->addHTML($this->form->getForm());
     }
 
     public function buildForm() {
@@ -50,34 +56,13 @@ abstract class AbstractLoginResendConfirmationEmailFormView extends GI_View {
     protected function addEmailAddressField() {
         $this->form->addField('email_address', 'email', array(
             'required' => 'true',
-            'displayName' => 'Email',
-            'placeHolder' => 'Email'
+            'displayName' => Lang::getString('email'),
+            'placeHolder' => Lang::getString('email_address')
         ));
     }
 
     protected function addSubmitButton() {
-        $this->form->addHTML('<span class="submit_btn" title="Send Confirmation Email">Send</span>');
-    }
-    
-    protected function openViewWrap(){
-        $this->addHTML('<div class="content_padding">');
-        return $this;
-    }
-    
-    protected function closeViewWrap(){
-        $this->addHTML('</div>');
-        return $this;
-    }
-    
-    public function buildView() {
-        if($this->ajax || $this->addWrapper){
-            $this->openViewWrap()
-                    ->addHTML('<h1>Send Confirmation Email</h1>');
-        }
-        $this->addHTML($this->form->getForm());
-        if($this->ajax || $this->addWrapper){
-            $this->closeViewWrap();
-        }
+        $this->form->addHTML('<span class="submit_btn" title="Send Confirmation Email" tabindex="0">' . Lang::getString('send') . '</span>');
     }
     
 }

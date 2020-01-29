@@ -269,6 +269,9 @@ class GI_Email{
             }
             
             $mandrill = new Mandrill(ProjectConfig::getMandrillAPIKey());
+            if(DEV_MODE){
+                curl_setopt($mandrill->ch, CURLOPT_SSL_VERIFYPEER, 0);
+            }
             $message = array(
                 'html' => $this->body,
                 'subject' => $this->getSubject(),

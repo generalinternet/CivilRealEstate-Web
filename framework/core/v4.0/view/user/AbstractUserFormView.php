@@ -3,10 +3,10 @@
  * Description of AbstractUserFormView
  *
  * @author General Internet
- * @copyright  2016 General Internet
- * @version    2.0.2
+ * @copyright  2019 General Internet
+ * @version    4.0.1
  */
-abstract class AbstractUserFormView extends GI_View {
+abstract class AbstractUserFormView extends MainWindowView {
     
     /** @var GI_Form */
     protected $form;
@@ -25,6 +25,7 @@ abstract class AbstractUserFormView extends GI_View {
     protected $fileUploader = NULL;
     protected $showPasswordFields = true;
     protected $showContactCatField = true;
+    protected $defaultContactCatRef = NULL;
     
     public function __construct(GI_Form $form, AbstractUser $user) {
         parent::__construct();
@@ -33,6 +34,30 @@ abstract class AbstractUserFormView extends GI_View {
         $this->languages = Lang::getLanguages();
         $this->setUser($user);
         $this->roleSelectionTitle = Lang::getString('role');
+        
+        $listBarURL = NULL;
+        $profileView = false;
+        $profile = GI_URLUtils::getAttribute('profile');
+        if($profile && $profile == 1){
+            $profileView = true;
+        }
+        if($profileView){
+            $notification = NotificationFactory::buildNewModel();
+            if($notification){
+                $listBarURL = $notification->getListBarURL();
+            }
+        } else {
+            $listBarURL = $user->getListBarURL();
+        }
+        if(!empty($listBarURL)){
+            $this->setListBarURL($listBarURL);
+        }
+        //Set window area title
+        $title = Lang::getString('add_user');
+        if(!$this->newUser){
+            $title = Lang::getString('edit_user');
+        }
+        $this->setWindowTitle('<span class="inline_block">' . $title . '</span>');
     }
     
     public function setAvatarUploader(AbstractGI_Uploader $avatarUploader){
@@ -72,6 +97,11 @@ abstract class AbstractUserFormView extends GI_View {
         return $this;
     }
     
+    public function setDefaultContactCatRef($defaultContactCatRef){
+        $this->defaultContactCatRef = $defaultContactCatRef;
+        return $this;
+    }
+    
     public function buildForm() {
         if (!$this->formBuilt) {
             $this->openFormBody();
@@ -87,7 +117,7 @@ abstract class AbstractUserFormView extends GI_View {
             if($this->newUser){
                 $btnTitle = Lang::getString('add_user');
             }
-            $this->form->addHTML('<span class="submit_btn" title="' . $btnTitle . '">' . $btnTitle . '</span>');
+            $this->form->addHTML('<span class="submit_btn" title="' . $btnTitle . '" tabindex="0">' . $btnTitle . '</span>');
         }
     }
 
@@ -132,7 +162,7 @@ abstract class AbstractUserFormView extends GI_View {
         $fieldSettings = GI_Form::overWriteSettings(array(
             'required' => true,
             'value' => $this->user->getProperty('email'),
-            'displayName' => Lang::getString('email'),
+            'displayName' => Lang::getString('login_email'),
             'placeHolder' => Lang::getString('email_address'),
         ), $overWriteSettings);
         $this->form->addField('r_email', 'email', $fieldSettings);
@@ -287,6 +317,9 @@ abstract class AbstractUserFormView extends GI_View {
         } else {
             $categoryValue = 'internal';
         }
+        if(!empty($this->defaultContactCatRef)){
+            $categoryValue = $this->defaultContactCatRef;
+        }
         if ($this->showContactCatField) {
             $fieldSettings = GI_Form::overWriteSettings(array(
                         'displayName' => 'Category',
@@ -303,20 +336,33 @@ abstract class AbstractUserFormView extends GI_View {
         }
     }
 
-    protected function openViewWrap(){
-        $this->addHTML('<div class="content_padding">');
-        return $this;
-    }
+//    protected function openViewWrap(){
+//        $this->addHTML('<div class="content_padding">');
+//        return $this;
+//    }
+//    
+//    protected function closeViewWrap(){
+//        $this->addHTML('</div>');
+//        return $this;
+//    }
+//    
+//    public function buildView() {
+//        $this->openViewWrap();
+//            $this->buildViewHeader();
+//            $this->openViewBody();
+//        $this->addHTML('<div class="columns halves">');
+//        $this->addHTML('<div class="column">');
+//        $this->addHTML($this->form->getForm());
+//        $this->addHTML('</div>');
+//        $this->addHTML('<div class="column">');
+//        $this->addUploaders();
+//        $this->addHTML('</div>');
+//        $this->addHTML('</div>');
+//            $this->closeViewBody();
+//        $this->closeViewWrap();
+//    }
     
-    protected function closeViewWrap(){
-        $this->addHTML('</div>');
-        return $this;
-    }
-    
-    public function buildView() {
-        $this->openViewWrap();
-            $this->buildViewHeader();
-            $this->openViewBody();
+    protected function addViewBodyContent(){
         $this->addHTML('<div class="columns halves">');
         $this->addHTML('<div class="column">');
         $this->addHTML($this->form->getForm());
@@ -325,47 +371,40 @@ abstract class AbstractUserFormView extends GI_View {
         $this->addUploaders();
         $this->addHTML('</div>');
         $this->addHTML('</div>');
-            $this->closeViewBody();
-        $this->closeViewWrap();
     }
     
-    protected function buildViewHeader(){
-        $this->addSiteTitle(Lang::getString('users'));
-        $formTitle = Lang::getString('add_user');
-        if(!$this->newUser){
-            $formTitle = Lang::getString('edit_user');
-        }
-        $this->addSiteTitle($formTitle);
-        
-        $this->openViewHeader();
-        $this->addHTML('<h1 class="main_head">' . $formTitle . '</h1>');
-        $this->closeViewHeader();
-    }
-    
-    protected function openViewHeader($class = ''){
-        $this->addHTML('<div class="view_header'.$class.'">');
-        return $this;
-    }
-    
-    protected function closeViewHeader(){
-        $this->addHTML('</div>');
-        return $this;
-    }
-    
-    protected function addContactInfoFields(){
-        $this->addEmailField();
-        $this->addPhoneField();
-    }
-    
-    protected function openViewBody($class = ''){
-        $this->addHTML('<div class="main_body'.$class.'">');
-        return $this;
-    }
-    
-    protected function closeViewBody(){
-        $this->addHTML('</div>');
-        return $this;
-    }
+//    protected function buildViewHeader(){
+//        $this->addSiteTitle(Lang::getString('users'));
+//        $formTitle = Lang::getString('add_user');
+//        if(!$this->newUser){
+//            $formTitle = Lang::getString('edit_user');
+//        }
+//        $this->addSiteTitle($formTitle);
+//        
+//        $this->openViewHeader();
+//        $this->addHTML('<h1 class="main_head">' . $formTitle . '</h1>');
+//        $this->closeViewHeader();
+//    }
+//    
+//    protected function openViewHeader($class = ''){
+//        $this->addHTML('<div class="view_header'.$class.'">');
+//        return $this;
+//    }
+//    
+//    protected function closeViewHeader(){
+//        $this->addHTML('</div>');
+//        return $this;
+//    }
+//    
+//    protected function openViewBody($class = ''){
+//        $this->addHTML('<div class="main_body'.$class.'">');
+//        return $this;
+//    }
+//    
+//    protected function closeViewBody(){
+//        $this->addHTML('</div>');
+//        return $this;
+//    }
     
     protected function openFormBody($class ='') {
         $this->form->addHTML('<div class="form_body'.$class.'">');
@@ -375,23 +414,26 @@ abstract class AbstractUserFormView extends GI_View {
         $this->form->addHTML('</div><!--.form_body-->');
     }
     
+    protected function addContactInfoFields(){
+        $this->addEmailField();
+        $this->addPhoneField();
+    }
+    
     protected function buildFormBody() {
         $this->openHideDuringOTP();
-        
+
         if (dbConnection::isModuleInstalled('contact') && empty($this->user->getProperty('id'))) {
             $this->addContactCatField();
         }
-        
+
         $this->addNameFields();
-        
+
         $this->addContactInfoFields();
-        
+
         $this->addAdditionalFields();
-        
+
         $this->addRoleAndLanguageFields();
-        
-        
-        
+
         $this->addPasswordFields();
         
         $this->closeHideDuringOTP();

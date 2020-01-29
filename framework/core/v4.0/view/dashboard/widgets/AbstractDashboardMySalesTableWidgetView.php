@@ -4,7 +4,7 @@
  *
  * @author General Internet
  * @copyright  2019 General Internet
- * @version    4.0.0
+ * @version    4.0.1
  */
 abstract class AbstractDashboardMySalesTableWidgetView extends AbstractDashboardWidgetView {
     
@@ -27,6 +27,10 @@ abstract class AbstractDashboardMySalesTableWidgetView extends AbstractDashboard
     }
 
     public function buildBodyContent() {
+        if (empty($this->report)) {
+            $this->addHTML('<p>Data Unavailable</p>');
+            return;
+        }
         $user = Login::getUser();
         if (empty($user)) {
             $this->addHTML('<p>No sales data is available for the current user.</p>');

@@ -16,14 +16,6 @@ abstract class AbstractContentFileColGallery extends AbstractContentFileCol{
         return $contentView;
     }
     
-    public function getViewTitle($plural = true) {
-        $title = 'Gallery';
-        if ($plural) {
-            $title = 'Galleries';
-        }
-        return $title;
-    }
-    
     protected function getUploader(GI_Form $form = NULL){
         $uploader = parent::getUploader($form);
         if(!$uploader){

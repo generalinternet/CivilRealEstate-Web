@@ -17,6 +17,7 @@ abstract class AbstractContent extends GI_Model {
     protected $tags = NULL;
     protected $tagLimit = 0;
     protected $childCount = NULL;
+    protected $childCountByRef = array();
     
     /**
      * @return \ContentDetailView
@@ -33,21 +34,6 @@ abstract class AbstractContent extends GI_Model {
             'id' => $this->getId()
         );
         return $attrs;
-    }
-    
-    /**
-     * @return string
-     */
-    public function getViewURL() {
-        return GI_URLUtils::buildURL($this->getViewURLAttrs());
-    }
-    
-    public function getPublicDetailViewURL() {
-        return GI_URLUtils::buildURL(array(
-            'controller' => 'static',
-            'action' => 'opportunities',
-            'ref' => $this->getRef(),
-        ));
     }
     
     public function getEditURLAttrs(){
@@ -96,13 +82,16 @@ abstract class AbstractContent extends GI_Model {
         ));
     }
     
-    /**
-     * @param boolean $plural
-     * @return string
-     */
-    public function getViewTitle($plural = true) {
-        $title = 'Content';
-        return $title;
+    public function getPrintURLAttrs(){
+        return NULL;
+    }
+    
+    public function getPrintURL(){
+        $printURLAttrs = $this->getPrintURLAttrs();
+        if(!empty($printURLAttrs)){
+            return GI_URLUtils::buildURL($printURLAttrs);
+        }
+        return NULL;
     }
     
     /**
@@ -227,6 +216,10 @@ abstract class AbstractContent extends GI_Model {
                         return false;
                     }
                     
+                    if(!empty($this->parentContent)){
+                        ContentInContentFactory::insertIntoParent($this, $this->parentContent);
+                    }
+                    
                     $parentNum = filter_input(INPUT_POST, $this->getFieldName('parent_number'));
                     if(is_null($parentNum)){
                         return $this->handleChildFormSubmission($form);
@@ -246,6 +239,9 @@ abstract class AbstractContent extends GI_Model {
         $this->setProperty('title', $title);
 
         $this->setPropertyIfPostIsset('title_tag', $this->getFieldName('title_tag'));
+        if(empty($this->getProperty('title_tag'))){
+            $this->setProperty('title_tag', 'h2');
+        }
 
         $htmlClass = filter_input(INPUT_POST, $this->getFieldName('html_class'));
         if(!is_null($htmlClass)){
@@ -297,7 +293,12 @@ abstract class AbstractContent extends GI_Model {
                 ->select();
         $existingLinks = array();
         foreach($existingLinkResult as $existingLink){
-            $existingLinks[$existingLink->getProperty('c_content_id')] = $existingLink;
+            $childContentId = $existingLink->getProperty('c_content_id');
+            if(isset($existingLinks[$childContentId])){
+                $existingLink->softDelete();
+            } else {
+                $existingLinks[$childContentId] = $existingLink;
+            }
         }
         
         $pos = 0;
@@ -311,9 +312,8 @@ abstract class AbstractContent extends GI_Model {
                 $childLink = $existingLinks[$childId];
                 unset($existingLinks[$childId]);
             } else {
-                $childLink = ContentInContentFactory::buildNewModel();
-                $childLink->setProperty('p_content_id', $parentId);
-                $childLink->setProperty('c_content_id', $childId);
+                ContentInContentFactory::insertIntoParent($child, $this, $pos);
+                $childLink = ContentInContentFactory::getByParentAndChild($this, $child);
             }
             
             $childLink->setProperty('pos', $pos);
@@ -474,7 +474,8 @@ abstract class AbstractContent extends GI_Model {
                         $childContent = ContentFactory::getModelById($childId);
                     }
                     $childContent->setContentNumber($childNum)
-                            ->setParentNumber($this->getContentNumber());
+                            ->setParentNumber($this->getContentNumber())
+                            ->setParentContent($this);
                     $innerContent[] = $childContent;
                 }
             }
@@ -502,6 +503,7 @@ abstract class AbstractContent extends GI_Model {
                 for($i=0; $i<$minChildren; $i++){
                     $childContent = ContentFactory::buildNewModel($availableType->getProperty('c_content_ref'));
                     $childContent->setParentNumber($this->getContentNumber());
+                    $childContent->setParentContent($this);
                     $innerContent[] = $childContent;
                 }
             }
@@ -529,6 +531,12 @@ abstract class AbstractContent extends GI_Model {
         return $dataSearch;
     }
     
+    public static function addEditorTableJoinToDataSearch(GI_DataSearch $dataSearch){
+        $contentTable = $dataSearch->prefixTableName('content');
+        $dataSearch->leftJoin('content_editor', 'content_id', $contentTable, 'id', 'EDITOR');
+        return $dataSearch;
+    }
+    
     /**
      * @param GI_Form $form
      * @param GI_DataSearch $dataSearch
@@ -550,6 +558,7 @@ abstract class AbstractContent extends GI_Model {
      * @return boolean
      */
     protected static function filterSearchForm(GI_DataSearch $dataSearch, GI_Form $form = NULL){
+        parent::filterSearchForm($dataSearch, $form);
         $searchType = $dataSearch->getSearchValue('search_type');
         if (empty($searchType) || $searchType === 'basic') {
             //Basic Search
@@ -676,6 +685,9 @@ abstract class AbstractContent extends GI_Model {
     }
     
     public function getIsViewable() {
+        if($this->isUserEditor()){
+            return true;
+        }
         if($this->getProperty('uid') == Login::getUserId() || Permission::verifyByRef('view_content')){
             return true;
         }
@@ -683,6 +695,9 @@ abstract class AbstractContent extends GI_Model {
     }
     
     public function getIsEditable() {
+        if($this->isUserEditor()){
+            return true;
+        }
         if($this->getProperty('uid') == Login::getUserId() || Permission::verifyByRef('edit_content')){
             return true;
         }
@@ -691,6 +706,28 @@ abstract class AbstractContent extends GI_Model {
     
     public function getIsDeleteable(){
         if($this->getProperty('uid') == Login::getUserId() || Permission::verifyByRef('delete_content')){
+            return true;
+        }
+        return false;
+    }
+    
+    public function isUserEditor(AbstractUser $user = NULL){
+        if(empty($user)){
+            $user = Login::getUser();
+        }
+        
+        if(!$user){
+            return false;
+        }
+        $contentEditor = ContentEditorFactory::getByContentAndEditor($this, $user);
+        if($contentEditor){
+            return true;
+        }
+        return false;
+    }
+    
+    public function canManageEditors(){
+        if(Permission::verifyByRef('manage_content_editors')){
             return true;
         }
         return false;
@@ -713,23 +750,9 @@ abstract class AbstractContent extends GI_Model {
         return $this->parentContent;
     }
     
-    /** @return AbstractTag */
-    public function getTags(){
-        if(is_null($this->tags)){
-            $this->tags = TagFactory::getByModel($this);
-        }
-        return $this->tags;
-    }
-    
-    public function getTagIds(){
-        $tags = $this->getTags();
-        $tagIds = array();
-        if($tags){
-            foreach($tags as $tag){
-                $tagIds[] = $tag->getId();
-            }
-        }
-        return $tagIds;
+    public function setParentContent(AbstractContent $parentContent){
+        $this->parentContent = $parentContent;
+        return $this;
     }
     
     public function getTagLimit(){
@@ -740,19 +763,42 @@ abstract class AbstractContent extends GI_Model {
         return false;
     }
     
-    public function getChildCount(){
-        if(is_null($this->childCount)){
-            $search = ContentFactory::search();
-            $contentTable = $search->prefixTableName('content');
-            $search->join('content_in_content', 'c_content_id', $contentTable, 'id', 'LINK');
-            $search->filter('LINK.p_content_id', $this->getId());
-            
-            $this->childCount = $search->count();
+    public function getChildCount($typeRef = NULL){
+        if(is_null($typeRef) && !is_null($this->childCount)){
+            return $this->childCount;
+        } elseif(isset($this->childCountByRef[$typeRef]) && !is_null($this->childCountByRef[$typeRef])){
+            return $this->childCountByRef[$typeRef];
         }
-        return $this->childCount;
+        $search = ContentFactory::search();
+        $contentTable = $search->prefixTableName('content');
+        $search->join('content_in_content', 'c_content_id', $contentTable, 'id', 'LINK');
+        $search->filter('LINK.p_content_id', $this->getId());
+        if(!empty($typeRef)){
+            $search->filterByTypeRef($typeRef);
+        }
+        $count = $search->count();
+        if(is_null($typeRef)){
+            $this->childCount = $count;
+        } else {
+            $this->childCountByRef[$typeRef] = $count;
+        }
+        return $count;
     }
     
-    public function getListBarURL(){
+    /** @return AbstractContent */
+    public function getChildrenByType($typeRef){
+        $search = ContentFactory::search();
+        $contentTable = $search->prefixTableName('content');
+        $search->join('content_in_content', 'c_content_id', $contentTable, 'id', 'LINK');
+        $search->filter('LINK.p_content_id', $this->getId())
+                ->filterByTypeRef($typeRef)
+                ->orderBy('LINK.pos', 'ASC')
+                ->setSortAscending(true);
+
+        return $search->select();
+    }
+    
+    public function getListBarURLAttrs(){
         $urlAttrs = array(
             'controller' => 'content',
             'action' => 'index',
@@ -761,7 +807,7 @@ abstract class AbstractContent extends GI_Model {
         if($this->getId()){
             $urlAttrs['curId'] = $this->getId();
         }
-        return GI_URLUtils::buildURL($urlAttrs);
+        return $urlAttrs;
     }
     
     public function getAutocompResult($term = NULL){
@@ -785,6 +831,71 @@ abstract class AbstractContent extends GI_Model {
         $columns = array('title',
             'ref');
         return $columns;
+    }
+    
+    public function getLoadFormCallbackAction(){
+        return NULL;
+    }
+    
+    public function getPostDeleteRedirectProps() {
+        $parentContent = $this->getParentContent();
+        if($parentContent){
+            $redirectProps = $parentContent->getViewURLAttrs();
+        } else {
+            $redirectProps = $this->getListBarURLAttrs();
+        }
+        return $redirectProps;
+    }
+    
+    public function getFormTitle(){
+        return $this->getTypeTitle();
+    }
+    
+    public function getAJAXFormReturnArray($attributes = array()){
+        $onlyBodyContent = false;
+        if(isset($attributes['onlyBodyContent']) && $attributes['onlyBodyContent'] == 1){
+            $onlyBodyContent = true;
+        }
+        
+        $redirectURL = NULL;
+        $returnArray = array();
+        if(isset($attributes['editInId']) && isset($attributes['targetWrapId'])){
+            $view = $this->getView();
+            $view->setDisplayAsChild(true);
+            $returnArray['jqueryAction'] = 'refreshContentParentElement("' . $attributes['targetWrapId'] . '");';
+        } else {
+            $loadContent = $this;
+            if($this->redirectToParent()){
+                $parentContent = $this->getParentContent();
+                if($parentContent){
+                    $loadContent = $parentContent;
+                }
+            }
+            $view = $loadContent->getView();
+            $newURLProps = $loadContent->getViewURLAttrs();
+            $redirectURL = GI_URLUtils::buildURL($newURLProps);
+        }
+        
+        
+        $contentId = $this->getId();
+        $returnArray['success'] = 1;
+        $returnArray['autocompId'] = $contentId;
+        if (isset($attributes['refresh']) && $attributes['refresh'] = 1) {
+            $returnArray['newUrl'] = 'refresh';
+        }
+        
+        $callBackAction = $view->getUploaderScripts();
+        if(!empty($redirectURL)){
+            $callBackAction .= 'reloadInElementByTargetId("list_bar", '.$contentId.');loadInElementByTargetId("'.$redirectURL.'", "main_window", true);';
+        }
+
+        $callBackAction .= $this->getLoadFormCallbackAction();
+
+        if(!empty($callBackAction)){
+            $returnArray['jqueryCallbackAction'] = $callBackAction;
+        }
+        
+        return $returnArray;
     }
     
 }

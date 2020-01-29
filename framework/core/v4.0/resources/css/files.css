@@ -1,10 +1,7 @@
 .file_placeholder{
     width: 88px;
     height: 70px;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     outline: 1px dashed #000;
     margin-right: 1em;
     margin-bottom: 1em;
@@ -15,10 +12,7 @@
 .file_thumb{
     width: 88px;
     height: 70px;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     position: relative;
     background: #4d89eb;
     /*overflow: hidden;*/
@@ -136,10 +130,7 @@
 }
 
 .file_thumb .ext .ext_icon, .file_thumb .ext .ext_title{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: middle;
 }
 
@@ -432,10 +423,7 @@ form .file_thumb.temp:before{
 }
 
 .file_wrap{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
 }
 
 .file_thumb iframe{
@@ -506,10 +494,7 @@ form .file_thumb.temp:before{
 }
 
 .sized_img_wrap{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     position: relative;
     vertical-align: top;
     overflow: hidden;
@@ -529,58 +514,72 @@ form .file_thumb.temp:before{
 }
 
 /*************/
-.file_thumb.small, .file_placeholder.small{
+.file_thumb.small,
+.file_placeholder.small,
+.small_thumbnail_area .file_thumb,
+.small_thumbnail_area .file_placeholder{
     width: 39px;
     height: 30px;
     vertical-align: middle;
 }
 
-.file_thumb.small .filename{
+.file_thumb.small .filename,
+.small_thumbnail_area .file_thumb .filename{
     display: none;
 }
 
-.file_thumb.small .ext{
+.file_thumb.small .ext,
+.small_thumbnail_area .file_thumb .ext{
     font-size: 0.7em;
     padding: 3px;
     word-wrap: normal;
     line-height: 1em;
 }
 
-.file_thumb.small .ext:before{
+.file_thumb.small .ext:before,
+.small_thumbnail_area .file_thumb .ext:before{
     
 }
 
-.file_thumb.small .corner{
+.file_thumb.small .corner,
+.small_thumbnail_area .file_thumb .corner{
     width: 9px;
     height: 18px;
 }
 
-.file_thumb.small .corner:before{
+.file_thumb.small .corner:before,
+.small_thumbnail_area .file_thumb .corner:before{
     width: 9px;
     height: 9px;
 }
 
-.file_thumb.small .corner:after{
+.file_thumb.small .corner:after,
+.small_thumbnail_area .file_thumb .corner:after{
     background-position: -136px -4px;
 }
 
-.file_thumb.small.pdf .corner:after{
+.file_thumb.small.pdf .corner:after,
+.small_thumbnail_area .file_thumb.pdf .corner:after{
     background-position: -201px -4px;
 }
 
-.file_thumb.small.psd .corner:after{
+.file_thumb.small.psd .corner:after,
+.small_thumbnail_area .file_thumb.psd .corner:after{
     background-position: -149px -4px;
 }
 
-.file_thumb.small.ai .corner:after{
+.file_thumb.small.ai .corner:after,
+.small_thumbnail_area .file_thumb.ai .corner:after{
     background-position: -162px -4px;
 }
 
-.file_thumb.small.indd .corner:after{
+.file_thumb.small.indd .corner:after,
+.small_thumbnail_area .file_thumb.indd .corner:after{
     background-position: -175px -4px;
 }
 
-.file_thumb.small.ae .corner:after{
+.file_thumb.small.ae .corner:after,
+.small_thumbnail_area .file_thumb.ae .corner:after{
     background-position: -188px -4px;
 }
 
@@ -593,10 +592,7 @@ form .file_thumb.temp:before{
 }
 /************/
 .folder_title{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: middle;
     font-weight: 700;
     line-height: 2em;
@@ -605,10 +601,7 @@ form .file_thumb.temp:before{
     background-image: url('images/file_icons.png?v=2.0');
     background-size: 214px 112px;
     background-repeat: no-repeat;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: middle;
     width: 26px;
     height: 20px;

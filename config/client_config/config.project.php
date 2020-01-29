@@ -34,7 +34,7 @@ if(DEV_MODE){
 }
     
 /** @const should be unique per project to avoid conflicts */
-define('APP_REF', 'civil');
+define('APP_REF', 'civil-real-estate');
 
 define('SESSION_NAME', APP_REF);
 

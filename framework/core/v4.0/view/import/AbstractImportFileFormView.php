@@ -67,7 +67,7 @@ abstract class AbstractImportFileFormView extends GI_View {
         $this->openViewWrap();
         $this->buildForm();
         $this->form->setBtnText('');
-        $this->form->addHTML('<div class="center_btns wrap_btns"><span class="submit_btn" title="Import" >Import</span></div>');
+        $this->form->addHTML('<div class="center_btns wrap_btns"><span class="submit_btn" title="Import" tabindex="0" >Import</span></div>');
         $formHTML = $this->form->getForm();
         $this->addHTML($formHTML);
         $this->closeViewWrap();

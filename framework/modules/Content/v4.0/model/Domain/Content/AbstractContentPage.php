@@ -16,14 +16,6 @@ abstract class AbstractContentPage extends AbstractContent{
         return $contentView;
     }
     
-    public function getViewTitle($plural = true) {
-        $title = 'Page';
-        if ($plural) {
-            $title .= 's';
-        }
-        return $title;
-    }
-    
     /**
      * @param \GI_Form $form
      * @param boolean $buildForm

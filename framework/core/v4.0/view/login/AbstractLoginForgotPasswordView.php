@@ -6,7 +6,7 @@
  * @copyright  2016 General Internet
  * @version    2.0
  */
-class AbstractLoginForgotPasswordView extends GI_View {
+class AbstractLoginForgotPasswordView extends MainWindowView {
     
     /**
      * @var GI_Form
@@ -21,6 +21,8 @@ class AbstractLoginForgotPasswordView extends GI_View {
         
         parent::__construct();
         $this->buildForm();
+        $this->addSiteTitle(Lang::getString('reset_password'));
+        $this->setWindowTitle(Lang::getString('reset_password'));
     }
     
     public function setThanks($thanks){
@@ -68,31 +70,12 @@ class AbstractLoginForgotPasswordView extends GI_View {
         $this->form->addField('rEmail', 'email', $defaultFieldSettings);
     }
     
-    protected function addLoginLink(){
-        if($this->addLoginLink){
-            $loginURL = GI_URLUtils::buildURL(array(
-                'controller' => 'login',
-                'action' => 'index'
-            ));
-            if($this->thanks){
-                $this->addHTML('<a href="'.$loginURL.'" title="' . Lang::getString('log_in') . '" class="other_btn">' . Lang::getString('log_in') . '</a>');
-            } else {
-                $this->form->addHTML('<a href="'.$loginURL.'" title="' . Lang::getString('log_in') . '" >' . Lang::getString('log_in') . '</a>');
-            }
-        }
-    }
-    
     protected function addLoginActions(){
-        if($this->addLoginLink){
-            $this->form->addHTML('<div class="login_actions">');
-            $this->addLoginLink();
-            $this->form->addHTML('<p>Enter your email and you will receive a link to reset your password.</p>');
-            $this->form->addHTML('</div>');
-        }
+        $this->form->addHTML('<p>Enter your email and you will receive a link to reset your password.</p>');
     }
     
     protected function addSubmitBtn(){
-        $this->form->addHTML('<span class="submit_btn">'.Lang::getString('reset_password').'</span>');
+        $this->form->addHTML('<span class="submit_btn" tabindex="0">'.Lang::getString('reset_password').'</span>');
     }
     
     protected function addResetMessage(){
@@ -111,18 +94,29 @@ class AbstractLoginForgotPasswordView extends GI_View {
     protected function addForm(){
         if($this->thanks){
             $this->addResetMessage();
-            $this->addLoginLink();
         } else {
             $this->addHTML($this->form->getForm());
         }
     }
     
-    public function buildView() {
+    protected function addViewBodyContent(){
         $this->addForm();
+        $this->addLoginLink();
     }
     
-    public function beforeReturningView() {
-        $this->buildView();
+    protected function addLoginLink(){
+        if(!$this->addLoginLink){
+            return;
+        }
+        $loginURL = GI_URLUtils::buildURL(array(
+            'controller' => 'login',
+            'action' => 'index'
+        ));
+        if($this->thanks){
+            $this->addHTML('<a href="' . $loginURL . '" title="' . Lang::getString('log_in') . '" class="other_btn login_action_btn" >' . Lang::getString('log_in') . '</a></p>');
+        } else {
+            $this->addHTML('<p>Remembered your password? <a href="' . $loginURL . '" title="' . Lang::getString('log_in') . '" class="login_action_btn">' . Lang::getString('log_in') . '</a></p>');
+        }
     }
 
 }

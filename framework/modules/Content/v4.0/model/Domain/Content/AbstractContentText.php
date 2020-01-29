@@ -18,14 +18,6 @@ abstract class AbstractContentText extends AbstractContent{
         return $contentView;
     }
     
-    public function getViewTitle($plural = true) {
-        $title = 'Text';
-        if ($plural) {
-            $title .= 's';
-        }
-        return $title;
-    }
-    
     /**
      * @param \GI_Form $form
      * @param boolean $buildForm

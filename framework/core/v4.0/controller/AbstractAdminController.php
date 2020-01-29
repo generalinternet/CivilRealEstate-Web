@@ -393,6 +393,46 @@ abstract class AbstractAdminController extends GI_Controller {
         return $returnArray;
     }
 
-
+    public function actionSettingsIndex($attributes) {
+        if (!Permission::verifyByRef('view_settings')) {
+            GI_URLUtils::redirectToAccessDenied();
+        }
+        if (isset($attributes['tab'])) {
+            $currentTabKey = $attributes['tab'];
+        } else {
+            $currentTabKey = 'general';
+        }
+        $view = new SettingsIndexView();
+        $view->setCurrentTab($currentTabKey);
+        LogService::logActivity(GI_URLUtils::buildURL($attributes), 'Settings', 'visible', 'view');
+        $returnArray = GI_Controller::getReturnArray($view);
+        $returnArray['breadcrumbs'] = array(
+            array(
+                'label' => 'Admin',
+                'link' => '',
+            ),
+            array(
+                'label' => 'Settings',
+                'link' => GI_URLUtils::buildURL($attributes),
+            ),
+        );
+        return $returnArray;
+    }
+    
+    public function actionSubscriptionIndex($attributes) {
+        //TODO
+    }
+    
+    public function actionEditSubscription($attributes) {
+        //TODO
+    }
+    
+    public function actionAddSubscription($attributes) {
+        //TODO
+    }
+    
+    public function actionViewSubscription($attributes) {
+        //TODO
+    }
 
 }

@@ -29,14 +29,14 @@ abstract class AbstractNote extends GI_Model {
     }
     
     /** @return string */
-    public function getViewURL() {
+    public function getViewURLAttrs() {
         $id = $this->getId();
-        $url = GI_URLUtils::buildURL(array(
+        $attrs = array(
             'controller' => 'note',
             'action' => 'view',
             'id' => $id
-        ));
-        return $url;
+        );
+        return $attrs;
     }
     
     /** @return string */

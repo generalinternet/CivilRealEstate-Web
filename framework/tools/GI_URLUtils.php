@@ -12,14 +12,9 @@ class GI_URLUtils {
     protected static $parsedURLStrings = array();
     
     public static function buildURL($attributes, $includeBase = false, $forceUnclean = false) {
-        if (empty($attributes) ||  !isset($attributes['controller']) || !isset($attributes['action'])) {
+        if (empty($attributes) ||  !isset($attributes['controller']) ||  !isset($attributes['action'])) {
             return NULL;
         }
-        /**TEST**/
-        if(!ApplicationConfig::isPublic($attributes['controller'], $attributes['action']) || static::isAJAX()){
-            $forceUnclean = true;
-        }
-        /**TEST : end**/
         
         $baseURL = ProjectConfig::getProjectBase();
         
@@ -37,7 +32,7 @@ class GI_URLUtils {
         } else {
             if ($controller === 'static') {
                 $url .= '/' . $action;
-            } elseif ($controller !== GI_ProjectConfig::getDefaultConroller() || $action !== GI_ProjectConfig::getDefaultAction()) {
+            } elseif ($controller !== GI_ProjectConfig::getDefaultController() || $action !== GI_ProjectConfig::getDefaultAction()) {
                 $url .= '/' . $controller . '/' . $action;
             } else {
                 $includeBase = true;
@@ -74,7 +69,7 @@ class GI_URLUtils {
 
         if ($controller === 'static') {
             $url .= '/' . $action;
-        } elseif ($controller !== GI_ProjectConfig::getDefaultConroller() || $action !== GI_ProjectConfig::getDefaultAction()) {
+        } elseif ($controller !== GI_ProjectConfig::getDefaultController() || $action !== GI_ProjectConfig::getDefaultAction()) {
             $url .= '/' . $controller . '/' . $action;
         } else {
             $includeBase = true;
@@ -118,7 +113,7 @@ class GI_URLUtils {
             }
 
             if(empty($attributes['controller']) || empty($attributes['action'])) {
-                $attributes['controller'] = GI_ProjectConfig::getDefaultConroller();
+                $attributes['controller'] = GI_ProjectConfig::getDefaultController();
                 $attributes['action'] = GI_ProjectConfig::getDefaultAction();
             }
             static::$attributes = $attributes;
@@ -150,9 +145,15 @@ class GI_URLUtils {
     }
     
     public static function redirect($attributes) {
+        EventService::processEvents();
         $url = static::buildURL($attributes);
         Header('Location: ' . $url);
-        die();
+        exit();
+    }
+    
+    public static function redirectToURL($url){
+        Header('Location: ' . $url);
+        exit();
     }
     
     public static function redirectToError($code = NULL, $message = NULL, $returnURL = NULL){
@@ -189,26 +190,25 @@ class GI_URLUtils {
 
 
     public static function getLastAttributes() {
-        if (isset($_SESSION['last_attributes'])) {
-            $lastAttributes = $_SESSION['last_attributes'];
-        } else {
-            $lastAttributes = NULL;
-        }
-        if ($lastAttributes) {
+        $lastAttributes = SessionService::getValue('last_attributes');
+        if (!empty($lastAttributes)) {
             return $lastAttributes;
-        } else {
-            return NULL;
         }
+        return NULL;
     }
-    
+
     public static function setLastAttributes($attributes) {
         if (isset($attributes['ajax']) && $attributes['ajax'] == 1) {
             unset($attributes['ajax']);
         }
-        $_SESSION['last_attributes'] = $attributes;
+        if(empty($attributes)){
+            SessionService::unsetValue('last_attributes');
+        } else {
+            SessionService::setValue('last_attributes', $attributes);
+        }
     }
-    
-    public static function redirectToAccessDenied(){
+
+    public static function redirectToAccessDenied() {
         $attributes = array(
             'controller' => 'permission',
             'action' => 'denied'
@@ -230,7 +230,7 @@ class GI_URLUtils {
     public static function getController(){
         $controller = filter_input(INPUT_GET, 'controller');
         if(empty($controller)){
-            $controller = GI_ProjectConfig::getDefaultConroller();
+            $controller = GI_ProjectConfig::getDefaultController();
         }
         return $controller;
     }
@@ -245,7 +245,7 @@ class GI_URLUtils {
     
     public static function refresh(){
         Header('Refresh: 0');
-        die();
+        exit();
     }
     
     /**

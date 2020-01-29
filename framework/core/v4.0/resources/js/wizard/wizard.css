@@ -52,10 +52,7 @@
 }
 
 .wiz_step_timeline .go_to_wiz_step{
-    display:-moz-inline-stack;
-    display:inline-block;
-    zoom:1;
-    *display:inline;
+    display: inline-block;
     cursor: pointer;
     color: #808080;
     font-weight: 700;
@@ -83,10 +80,7 @@
 
 .wiz_step_timeline .go_to_wiz_step:after{
     content: '\2014\203A';
-    display:-moz-inline-stack;
-    display:inline-block;
-    zoom:1;
-    *display:inline;
+    display: inline-block;
     margin-left: 1em;
 }
 

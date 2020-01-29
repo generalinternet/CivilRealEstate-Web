@@ -58,7 +58,7 @@ abstract class AbstractRoleGroupDetailView extends MainWindowView {
             foreach ($roles as $role) {
                 $viewRoleURL = $role->getViewURL();
                 $title = $role->getProperty('title');
-                $this->addHTML('<div class="role_block"><a href="'.$viewRoleURL.'" class="content_block" title="View Role">'.$title.'</a></div>');
+                $this->addHTML('<div class="role_block"><a href="'.$viewRoleURL.'" class="content_block ajax_link" title="View Role">'.$title.'</a></div>');
             }
             $this->addHTML('</div>');
         } else {

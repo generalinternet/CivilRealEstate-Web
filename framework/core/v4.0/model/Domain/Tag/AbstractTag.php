@@ -4,10 +4,19 @@
  * Description of AbstractTag
  *
  * @author General Internet
- * @copyright  2017 General Internet
- * @version    2.0.2
+ * @copyright  2020 General Internet
+ * @version    4.0.1
  */
 abstract class AbstractTag extends GI_Model {
+
+    /** @var AbstractTag[] */
+    protected $parentTags = array();
+    
+    protected $installDefinition = array();
+    
+    public function getInstallDefinition() {
+        return $this->installDefinition;
+    }
 
     public function getDetailView() {
         $detailView = new TagDetailView($this);
@@ -23,6 +32,14 @@ abstract class AbstractTag extends GI_Model {
         $typesArray = TagFactory::getTypesArray($this->getTypeRef());
         return $typesArray;
     }
+    
+    /**
+     * Used by TagInstaller
+     * @param Mixed[] $definition
+     */
+    public function setInstallDefinition($definition) {
+        $this->installDefinition = $definition;
+    }
 
     public function handleFormSubmission(GI_Form $form) {
         if ($form->wasSubmitted() && $form->validate()) {
@@ -36,7 +53,6 @@ abstract class AbstractTag extends GI_Model {
                 $position = filter_input(INPUT_POST, 'position');
                 if (empty($thisModelId)) {
                     $existingTagArray = TagFactory::search()
-                            //   ->filterTypeByRef('tag', $targetTypeRef)
                             ->filterByTypeRef($targetTypeRef)
                             ->filter('ref', $ref)
                             ->select();
@@ -48,7 +64,15 @@ abstract class AbstractTag extends GI_Model {
                 $this->setProperty('tag.ref', $ref);
                 $this->setProperty('tag.colour', $colour);
                 $this->setProperty('tag.pos', $position);
-                return $this->save();
+                $saved = $this->save();
+                if($saved){
+                    $pTagIds = filter_input(INPUT_POST, 'p_tag_ids');
+                    if(!empty($pTagIds)){
+                        $parentTags = TagFactory::getByIds($pTagIds);
+                        TagFactory::adjustParentTags($this, $parentTags);
+                    }
+                    return true;
+                }
             } else {
                 $newTagModel = TagFactory::buildNewModel($targetTypeRef);
                 return $newTagModel->handleFormSubmission($form);
@@ -173,6 +197,19 @@ abstract class AbstractTag extends GI_Model {
     public function getPosition() {
         return $this->getProperty('pos');
     }
+    
+    public function getUICardView() {
+        $cardView = new UICardView($this);
+        $cardView->setTitle($this->getTitle());
+//        $cardView->setSummary($this->getEmailAddress());
+//        $cardView->setSubtitle($this->getRolesTitleString());
+//        $cardView->setAvatarHTML($this->getColourHTML());
+        $cardView->setAddTab(true);
+        $cardView->setTabColour('#' . $this->getColour());
+        $cardView->setTabTitle('&nbsp;');
+        $cardView->setTopRight($this->getEditButtonHTML());
+        return $cardView;
+    }
 
     public function getAutocompResult($term = NULL, $valueColumn = 'id') {
         $title = $this->getProperty('title');
@@ -222,6 +259,58 @@ abstract class AbstractTag extends GI_Model {
             return true;
         }
         return false;
+    }
+    
+    public function getParentTags(){
+        if(!$this->getId()){
+            return;
+        }
+        if(empty($this->parentTags)){
+            $this->parentTags = TagFactory::getParentTags($this);
+        }
+        return $this->parentTags;
+    }
+    
+    public function getPTagString(){
+        if(!$this->getId()){
+            return;
+        }
+        $search = TagFactory::getParentTagSearch($this);
+        $search->setSelectColumns(array(
+            'id'
+        ));
+        $results = $search->select();
+        $ids = array_column($results, 'id');
+        $string = implode(',', $ids);
+        return $string;
+    }
+    
+    public function getListBarURLAttrs() {
+        $attrs = array(
+            'controller' => 'tag',
+            'action' => 'index',
+            'type' => $this->getTypeRef()
+        );
+        return $attrs;
+    }
+
+    public function softDelete() {
+        $parentTags = $this->getParentTags();
+        if (!empty($parentTags)) {
+            foreach ($parentTags as $parentTag) {
+                if (!TagFactory::unlinkChildFromParent($this, $parentTag)) {
+                    return false;
+                }
+            }
+        }
+        return parent::softDelete();
+    }
+    
+    public function save() {
+        if(empty($this->getProperty('id')) && empty($this->getProperty('colour'))){
+            $this->setProperty('colour', GI_Colour::getRandomColour());
+        }
+        return parent::save();
     }
 
 }

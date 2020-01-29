@@ -4,17 +4,13 @@
  *
  * @author General Internet
  * @copyright  2017 General Internet
- * @version    2.0.1
+ * @version    4.0.0
  */
-abstract class AbstractTagFormView extends GI_View {
+abstract class AbstractTagFormView extends MainWindowView {
     
-    /**
-     * @var GI_Form
-     */
+    /** @var GI_Form */
     protected $form;
-    /**
-     * @var AbstractTag
-     */
+    /** @var AbstractTag */
     protected $tag;
     protected $formBuilt = false;
     
@@ -22,6 +18,12 @@ abstract class AbstractTagFormView extends GI_View {
         parent::__construct();
         $this->form = $form;
         $this->tag = $tag;
+        $this->setListBarURL($tag->getListBarURL());
+        $action = 'Edit';
+        if (empty($this->tag->getId())) {
+            $action = 'Add';
+        }
+        $this->setWindowTitle($action . ' ' . $this->tag->getViewTitle());
     }
 
     public function buildForm() {
@@ -34,11 +36,7 @@ abstract class AbstractTagFormView extends GI_View {
     }
 
     protected function buildFormHeader() {
-        $action = 'Edit';
-        if (empty($this->tag->getProperty('id'))) {
-            $action = 'Add';
-        }
-        $this->form->addHTML('<h1>'.$action.' '.$this->tag->getViewTitle().'</h1>');
+        
     }
 
     protected function buildFormBody() {
@@ -51,6 +49,7 @@ abstract class AbstractTagFormView extends GI_View {
         $this->addPositionField();
         $this->form->addHTML('</div>')
                 ->addHTML('</div>');
+        $this->addParentsField();
     }
 
     protected function addTitleField() {
@@ -73,28 +72,34 @@ abstract class AbstractTagFormView extends GI_View {
             'displayName'=>'Position',
         ));
     }
+    
+    protected function addParentsField() {
+        $url = GI_URLUtils::buildURL(array(
+            'controller' => 'tag',
+            'action' => 'autocompTag',
+            'ajax' => 1,
+            'type' => $this->tag->getTypeRef(),
+            'valueColumn' => 'id',
+            'autocompField' => 'p_tag_ids',
+            'notIds' => $this->tag->getId()
+        ));
+        $this->form->addField('p_tag_ids', 'autocomplete', array(
+            'value' => $this->tag->getPTagString(),
+            'displayName' => 'Parent Tags',
+            'autocompURL' => $url,
+            'autocompMultiple' => true
+        ));
+    }
 
     protected function buildFormFooter() {
-        $this->form->addHTML('<span class="submit_btn" data-form-id="' . $this->form->getFormId() . '">Submit</span>');
-    }
-
-    protected function openViewWrap() {
-        $this->addHTML('<div class="content_padding">');
+        $this->form->addHTML('<span class="submit_btn" data-form-id="' . $this->form->getFormId() . '" tabindex="0">Submit</span>');
     }
     
-    protected function closeViewWrap(){
-        $this->addHTML('</div>');
-    }
-    
-    public function buildView() {
-        $this->openViewWrap();
+    public function addViewBodyContent() {
+        $this->openPaddingWrap();
         $this->buildForm();
         $this->addHTML($this->form->getForm());
-        $this->closeViewWrap();
-    }
-    
-    public function beforeReturningView() {
-        $this->buildView();
+        $this->closePaddingWrap();
     }
     
 }

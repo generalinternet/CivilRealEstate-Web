@@ -5,7 +5,7 @@
  *
  * @author General Internet
  * @copyright  2017 General Internet
- * @version    3.0.12
+ * @version    4.0.0
  */
 class GI_DataSearch extends GI_DataSearchFilterable{
     
@@ -42,6 +42,12 @@ class GI_DataSearch extends GI_DataSearchFilterable{
      */
     protected static $isFranchisedStatus = array();
     protected $autoSortDirection = 'DESC';
+    protected $selectColumns = array('*');
+    /** @var GI_DataSearch */
+    protected $fromSubquery = NULL;
+    protected $fromSubqueryAlias = NULL;
+    protected $returnRaw = false;
+    protected $tagTableJoins = 0;
     
     public function __construct($tableName = NULL) {
         if($tableName){
@@ -100,62 +106,153 @@ class GI_DataSearch extends GI_DataSearchFilterable{
         return $this;
     }
     
-    protected function makeSessionQuery(){
-        $queryId = $this->getQueryId();
-        if(!isset($_SESSION['queryIds'][$queryId]['searchValues'])){
-            $_SESSION['queryIds'][$queryId]['searchValues'] = array(
-                'queryId' => $queryId
-            );
-        }
+    public function setSelectColumns($selectColumns){
+        $this->selectColumns = $selectColumns;
+        $this->setReturnRaw(true);
         return $this;
     }
     
-    public function setSearchValue($key, $value){
+    public function getSelectColumns(){
+        return $this->selectColumns;
+    }
+    
+    public function setFromSubquery(GI_DataSearch $fromSubquery, $fromSubqueryAlias = 'SUBQUERY'){
+        $this->fromSubquery = $fromSubquery;
+        $this->fromSubqueryAlias = $fromSubqueryAlias;
+        return $this;
+    }
+    
+    /** @return GI_DataSearch */
+    public function getFromSubquery(){
+        return $this->fromSubquery;
+    }
+    
+    public function getFromSubqueryAlias(){
+        return $this->fromSubqueryAlias;
+    }
+    
+    public function setReturnRaw($returnRaw){
+        $this->returnRaw = $returnRaw;
+        return $this;
+    }
+    
+    protected function makeSessionQuery() {
+        $queryId = $this->getQueryId();
+        $searchValues = SessionService::getValue(array(
+                    'queryIds',
+                    $queryId,
+                    'searchValues'
+        ));
+        if (empty($searchValues)) {
+            SessionService::setValue(array(
+                'queryIds',
+                $queryId,
+                'searchValues'
+                    ), array(
+                        'queryId'=>$queryId,
+                    ));
+        }
+        return $this;
+    }
+
+    public function setSearchValue($key, $value, $doNotClear = false){
         $queryId = $this->getQueryId();
         $this->makeSessionQuery();
-        $_SESSION['queryIds'][$queryId]['searchValues'][$key] = $value;
+        SessionService::setValue(array(
+            'queryIds',
+            $queryId,
+            'searchValues',
+            $key
+        ), $value);
+        if($doNotClear){
+            $keepSearchValueArray = array(
+                'queryIds',
+                $queryId,
+                'keepSearchValues'
+            );
+            $keepSearchValues = SessionService::getValue($keepSearchValueArray);
+            $keepSearchValues[] = $key;
+            SessionService::setValue($keepSearchValueArray, $keepSearchValues);
+        }
         return $this;
     }
     
     public function getSearchValue($key){
         $queryId = $this->getQueryId();
-        if(isset($_SESSION['queryIds'][$queryId]['searchValues'][$key])){
-            return $_SESSION['queryIds'][$queryId]['searchValues'][$key];
-        }
-        return NULL;
+        $value = SessionService::getValue(array(
+            'queryIds',
+            $queryId,
+            'searchValues',
+            $key,
+        ));
+        return $value;
     }
     
     public function getSearchValues(){
         $queryId = $this->getQueryId();
-        if(isset($_SESSION['queryIds'][$queryId]['searchValues'])){
-            return $_SESSION['queryIds'][$queryId]['searchValues'];
+        $value = SessionService::getValue(array(
+            'queryIds',
+            $queryId,
+            'searchValues',
+        ));
+        if (!empty($value)) {
+            return $value;
         }
         return array();
     }
     
-    public function clearSearchValues(){
+    public function clearSearchValues($forceClear = false){
         $queryId = $this->getQueryId();
-        if(isset($_SESSION['queryIds'][$queryId]['searchValues'])){
-            unset($_SESSION['queryIds'][$queryId]['searchValues']);
+        //TODO - REMOVE
+//        if(isset($_SESSION['queryIds'][$queryId]['searchValues'])){
+//            unset($_SESSION['queryIds'][$queryId]['searchValues']);
+//        }
+        $keepSearchValues = array();
+        if(!$forceClear){
+            $keepSearchValueKeys = SessionService::getValue(array(
+                'queryIds',
+                $queryId,
+                'keepSearchValues'
+            ));
+            foreach($keepSearchValueKeys as $key){
+                $keepSearchValues[$key] = $this->getSearchValue($key);
+            }
+        }
+        SessionService::unsetValue(array(
+            'queryIds',
+            $queryId,
+            'searchValues',
+        ));
+        foreach($keepSearchValues as $key => $value){
+            $this->setSearchValue($key, $value, true);
         }
     }
     
     public static function genUniqueQueryId($attemptCount = 0){
         $newQueryId = 'gi_' . mt_rand(5000, 100000);
         $maxAttempts = 10;
-        if(isset($_SESSION['queryIds'][$newQueryId])){
-            if($attemptCount < $maxAttempts){
+
+        $sessionValue = SessionService::getValue(array(
+                    'queryIds',
+                    $newQueryId
+        ));
+        if (!empty($sessionValue)) {
+            if ($attemptCount < $maxAttempts) {
                 $attemptCount++;
                 $newQueryId = static::genUniqueQueryId($attemptCount);
             } else {
-                unset($_SESSION['queryIds']);
-                $_SESSION['queryIds'] = array();
+                SessionService::unsetValue('queryIds');
+                SessionService::setValue('queryIds', array());
             }
         }
-        $_SESSION['queryIds'][$newQueryId] = array();
+        SessionService::setValue(array(
+            'queryIds',
+            $newQueryId,
+                ), array());
+
         return $newQueryId;
     }
-    
+
     /**
      * Sets the primary table for the final search
      * 
@@ -311,6 +408,7 @@ class GI_DataSearch extends GI_DataSearchFilterable{
      */
     public function ignoreStatus($tableName){
         $this->statusFilters[] = $tableName;
+        $this->ignoreFranchise($tableName);
         return $this;
     }
     
@@ -617,7 +715,10 @@ class GI_DataSearch extends GI_DataSearchFilterable{
     
     public function groupBy($column){
         $this->autoJoinWithColumn($column);
-        $this->groupBys[] = $this->prepareColumnName($column);
+        $preparedColumnName = $this->prepareColumnName($column);
+        if(!in_array($preparedColumnName, $this->groupBys)){
+            $this->groupBys[] = $preparedColumnName;
+        }
         return $this;
     }
     
@@ -776,8 +877,12 @@ class GI_DataSearch extends GI_DataSearchFilterable{
     public function prepareColumnName($column){
         $prefixedTableName = $this->prefixTableName($this->getTableName());
         $leaveRaw = false;
-        if(strpos($column, '(') !== false){
+        if (strpos($column, '(') !== false || strpos($column, 'NOT EXISTS') !== false) {
             $leaveRaw = true;
+        }
+        if (strpos($column, '|.') !== false) {
+            $leaveRaw = true;
+            $column = str_replace('|.', '', $column);
         }
         if (!$leaveRaw && strpos($column, '.') !== false) {
             $tableName = static::getTableNameFromColumn($column);
@@ -793,8 +898,11 @@ class GI_DataSearch extends GI_DataSearchFilterable{
             $tableName = $prefixedTableName;
             $columnName = $column;
         }
-        
-        $cleanColumnName = $this->escapeString($columnName);
+        if($leaveRaw){
+            $cleanColumnName = $columnName;
+        } else {
+            $cleanColumnName = $this->escapeString($columnName);
+        }
         
         if($leaveRaw || !count($this->joins)){
             return $cleanColumnName;
@@ -825,7 +933,10 @@ class GI_DataSearch extends GI_DataSearchFilterable{
         }
         $dbType = $this->getDBType();
         /* @var $tableDAO GI_DAO */
-        $tableDAO = new $defaultDAOClass($tableName, $dbType);
+        $paramsArray = array(
+            'dbType' => $dbType
+        );
+        $tableDAO = new $defaultDAOClass($tableName, $paramsArray);
         $preparedValue = $tableDAO->prepareValue($value, $columnName);
         return $preparedValue;
     }
@@ -865,7 +976,11 @@ class GI_DataSearch extends GI_DataSearchFilterable{
         
         $this->count();
         
-        if($this->factoryCreated()){
+        if($this->returnRaw){
+            $dbConnect = dbConnection::getInstance($this->getDBType());
+            $req = $dbConnect->query($selectString);
+            return $req->fetch_all(MYSQLI_ASSOC);
+        } elseif($this->factoryCreated()){
             $factoryClass = $this->factoryClass;
             return $factoryClass::getByDataSearch($this, $idsAsKey);
         } else {
@@ -876,8 +991,9 @@ class GI_DataSearch extends GI_DataSearchFilterable{
     }
     
     public function getSelectString(){
-        $prefixedTableName = $this->prefixTableName($this->getTableName());
-        $selectString = 'SELECT `' . $prefixedTableName . '`.* FROM `' . $prefixedTableName . '` ';
+        $selectString = 'SELECT ';
+        $selectString .= $this->buildColumnString();
+        $selectString .= $this->buildFromString();
         $selectString .= $this->buildJoinString();
         $selectString .= $this->buildWhereString();
         $selectString .= $this->buildGroupByString();
@@ -887,20 +1003,21 @@ class GI_DataSearch extends GI_DataSearchFilterable{
         return $selectString;
     }
     
-    public function count(){
+    public function count($includeLimit = false){
         $this->addAutoFilters();
         
-        $prefixedTableName = $this->prefixTableName($this->getTableName());
-        $countString = 'SELECT COUNT(`' . $prefixedTableName . '`.id) AS row_count FROM `' . $prefixedTableName . '` ';
+        $countString = 'SELECT ';
+        $countString .= $this->buildColumnString();
+        $countString .= $this->buildFromString();
         $countString .= $this->buildJoinString();
         $countString .= $this->buildWhereString();
         $countString .= $this->buildGroupByString();
         $countString .= $this->buildHavingString();
-        
-        if(!empty($this->groupBys)){
-            $countString = 'SELECT COUNT(*) AS row_count FROM (' . $countString . ') AS A';
+        $countString .= $this->buildOrderByString();
+        if($includeLimit){
+            $countString .= $this->buildLimitString();
         }
-        
+        $countString = 'SELECT COUNT(*) AS row_count FROM (' . $countString . ') AS A';
         $this->countString = $countString;
         
         $this->setLastQuery($countString);
@@ -911,8 +1028,8 @@ class GI_DataSearch extends GI_DataSearchFilterable{
             return $this->getCount();
         } else {
             $defaultDAOClass = ApplicationConfig::getProperty('defaultDAOClass');
-            $count = $defaultDAOClass::getCountByDataSearch($this);
-            return $count;
+            $this->count = $defaultDAOClass::getCountByDataSearch($this);
+            return $this->count;
         }
     }
     
@@ -922,7 +1039,6 @@ class GI_DataSearch extends GI_DataSearchFilterable{
         }
         $this->addAutoFilters();
         
-        $prefixedTableName = $this->prefixTableName($this->getTableName());
         $sumColumnString = '';
         foreach($columns as $sumAs => $column){
             if(!empty($sumColumnString)){
@@ -936,13 +1052,13 @@ class GI_DataSearch extends GI_DataSearchFilterable{
             $sumColumnString .= 'SUM(' . $sumColumn . ') AS ' . $sumAs;
         }
         
-        $sumString = 'SELECT ' . $sumColumnString . ' FROM `' . $prefixedTableName . '` ';
+        $sumString = 'SELECT ' . $sumColumnString . ' ';
+        $sumString .= $this->buildFromString();
         $sumString .= $this->buildJoinString();
         $sumString .= $this->buildWhereString();
         $sumString .= $this->buildGroupByString();
         $sumString .= $this->buildHavingString();
         $this->sumString = $sumString;
-        
         $this->setLastQuery($sumString);
         
         if($this->factoryCreated()){
@@ -955,6 +1071,46 @@ class GI_DataSearch extends GI_DataSearchFilterable{
         }
     }
     
+    protected function buildColumnString(){
+        $selectColumns = $this->getSelectColumns();        
+        $columnString = '';
+        $generateAlias = true;
+        //check if the selectColumns array is associative
+        if(count(array_filter(array_keys($selectColumns), 'is_string')) > 0){
+            $generateAlias = false;
+        }
+        foreach($selectColumns as $columnAlias => $selectColumn){
+            if(!empty($columnString)){
+                $columnString .= ',';
+            }
+            $columnString .= $this->prepareColumnName($selectColumn);
+            if(strpos($selectColumn, '.*') === false && $selectColumn !== '*'){
+                if($generateAlias){
+                    $columnAlias = $selectColumn;
+                }
+                $columnString .= ' AS "' . $columnAlias . '"';
+            }
+        }
+        $columnString .= ' ';
+        
+        return $columnString;
+    }
+    
+    protected function buildFromString(){
+        $prefixedTableName = $this->prefixTableName($this->getTableName());
+        $fromString = 'FROM ';
+        $fromSubquery = $this->getFromSubquery();
+        $fromSubqueryAlias = $this->getFromSubqueryAlias();
+        if($fromSubquery){
+            $fromString .= '(';
+            $fromString .= $fromSubquery->getSelectString();
+            $fromString .= ') AS ' . $fromSubqueryAlias . ' ';
+        } else {
+            $fromString .= '`' . $prefixedTableName . '` ';
+        }
+        return $fromString;
+    }
+    
     protected function buildJoinString(){
         $joinString = '';
         foreach ($this->joins as $join){
@@ -965,7 +1121,11 @@ class GI_DataSearch extends GI_DataSearchFilterable{
     
     protected function buildWhereString(){
         $whereString = 'WHERE ';
-        $whereString .= $this->mainGroup->buildGroupString();
+        $whereStringContents = $this->mainGroup->buildGroupString();
+        if(empty($whereStringContents)){
+            return;
+        }
+        $whereString .= $whereStringContents;
         return $whereString;
     }
     
@@ -1082,6 +1242,9 @@ class GI_DataSearch extends GI_DataSearchFilterable{
             if($this->factoryCreated()){
                 $factoryClass = $this->factoryClass;
                 $thisTable = $this->getTableName();
+                if (strpos($autoJoinTable, '|') !== false) {
+                    return NULL;
+                }
                 $withTable = $this->prefixTableName($thisTable);
                 $autoJoinTable = GI_StringUtils::removeTicks($autoJoinTable);
                 if($autoJoinTable == $withTable){
@@ -1160,8 +1323,161 @@ class GI_DataSearch extends GI_DataSearchFilterable{
                 $typeId = $typeDAO->getProperty('id');
                 return $typeId;
             }
+        } else {
+            $defaultDAOClass = ApplicationConfig::getProperty('defaultDAOClass');
+            $typeTableName = $tableName . '_type';
+        
+            $dbType = $this->getDBType();
+            $typeDAO = $defaultDAOClass::getTypeDAOByRef($typeTableName, $typeRef, $dbType);
+            if (!empty($typeDAO)) {
+                $typeId = $typeDAO->getProperty('id');
+                return $typeId;
+            }
         }
         return NULL;
+    }
+    
+    public function massUpdate($properties, &$resultString = '', $runQuery = false, $forceRun = false){
+        if(!Permission::verifyByRef('super_admin') && !$forceRun){
+            $resultString = '<span class="red">You do not have permission to run this query.</span>';
+            return false;
+        }
+        
+        $this->addAutoFilters();
+        
+        $selectString = $this->getSelectString();
+        $this->searchString = $selectString;
+        
+        if(!$runQuery){
+            $count = $this->count(true);
+        }
+        
+        $tableName = $this->getTableName();
+        
+        $defaultDAOClass = ApplicationConfig::getProperty('defaultDAOClass');
+        
+        $dbType = $this->getDBType();
+        $tmpDAO = new $defaultDAOClass($tableName, $dbType);
+        if(!$tmpDAO){
+            $resultString = '<span class="red">Could not create DAO for [' . $tableName . '].</span>';
+        }
+        
+        $finalQuery = 'UPDATE ' . $this->prefixTableName($tableName) . ' AS UTBL, ';
+        $finalQuery .= '(' . $selectString . ') AS FTBL ';
+        $setQuery = 'SET ';
+        foreach($properties as $key => $val){
+            if (strpos($key, '.') !== false) {
+                $resultString = '<span class="red">Invalid property key [' . $key . '].</span>';
+                return false;
+            }
+            if($setQuery != 'SET '){
+                $setQuery .= ', ';
+            }
+            $preppedVal = $tmpDAO->prepareValue($val, $key, true);
+            $setQuery .= 'UTBL.' . $key . ' = ' . $preppedVal . ' ';
+        }
+        $finalQuery .= $setQuery . ' ';
+        $finalQuery .= 'WHERE UTBL.id = FTBL.id';
+        
+        $rowTerm = 'rows';
+        if($runQuery){
+            $dbConnection = dbConnection::getInstance($dbType);
+            try {
+                $result = $dbConnection->query($finalQuery);
+                $affectedCount = $dbConnection->affected_rows;
+                if($affectedCount == 1){
+                    $rowTerm = 'row';
+                }
+                $resultString = '<p><b>' . $affectedCount . ' ' . $rowTerm . '</b> affected.</p>';
+            } catch (mysqli_sql_exception $ex) {
+                if (DEV_MODE) {
+                    print_r($ex->getMessage());
+                    die();
+                }
+                return false;
+            }
+        } else {
+            if($count == 1){
+                $rowTerm = 'row';
+            }
+            $resultString = '<p>This query will affect <b>' . $count . ' ' . $rowTerm . '</b>.</p>';
+            $resultString .= GI_StringUtils::formatQuery($finalQuery);
+        }
+        
+        return true;
+    }
+    
+    public function filterByTagId($tagId, $contextRef = NULL, $joinType = 'inner'){
+        $tableName = $this->getTableName();
+        $prefixedTableName = $this->prefixTableName($tableName);
+        $linkTableAlias = 'AUTO_ILTT';
+        if($this->tagTableJoins > 0){
+            $linkTableAlias = 'AUTO_ILTT_' . $this->tagTableJoins;
+        }
+        
+        $childTagIds = TagFactory::getTagIdChildTree($tagId);
+        $tagIds = array_merge(array((int) $tagId), $childTagIds);
+        
+        //track the current connector for the WHERE statements connection string
+        $curConnector = $this->curConnector;
+        
+        if(!$this->isJoinedWithTable($linkTableAlias)){
+            $this->andIf();
+            $linkJoin = $this->createJoin('item_link_to_tag', 'item_id', $prefixedTableName, 'id', $linkTableAlias, $joinType)
+                    ->filter($linkTableAlias . '.status', 1)
+                    ->filter($linkTableAlias . '.table_name', $tableName)
+                    ->filterIn($linkTableAlias . '.tag_id', $tagIds);
+            
+            if(empty($contextRef)){
+                $linkJoin->filterNull($linkTableAlias . '.context_ref');
+            } else {
+                $linkJoin->filter($linkTableAlias . '.context_ref', $contextRef);
+            }
+            
+            $this->ignoreStatus($linkTableAlias);
+        }
+        
+        $this->tagTableJoins++;
+
+        $this->curConnector = $curConnector;
+        $this->filter($linkTableAlias . '.status', 1);
+        $this->groupBy('id');
+        return $this;
+    }
+    
+    public function filterByTag(AbstractTag $tag, $contextRef = NULL){
+        return $this->filterByTagId($tag->getId(), $contextRef);
+    }
+    
+    public function filterByTagRef($tagRef, $tagTypeRef, $contextRef = NULL){
+        $tag = TagFactory::getModelByRefAndTypeRef($tagRef, $tagTypeRef);
+        if(!$tag){
+            return $this;
+        }
+        return $this->filterByTag($tag, $contextRef);
+    }
+    
+    public function filterByTagIds($tagIds, $contextRef = NULL, $joinType = 'inner', $matchAll = true){
+        if(empty($tagIds)){
+            return $this;
+        }
+        $curConnector = $this->curConnector;
+        if(count($tagIds) > 1){
+            $this->filterGroup();
+            if($matchAll){
+                $this->andIf();
+            } else {
+                $this->orIf();
+            }
+        }
+        foreach($tagIds as $tagId){
+            $this->filterByTagId($tagId, $contextRef, $joinType);
+        }
+        if(count($tagIds) > 1){
+            $this->closeGroup();
+        }
+        $this->curConnector = $curConnector;
+        return $this;
     }
     
 }

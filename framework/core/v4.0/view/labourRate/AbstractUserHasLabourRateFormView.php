@@ -95,7 +95,7 @@ abstract class AbstractUserHasLabourRateFormView extends GI_View {
     }
     
     protected function addSubmitBtn(){
-        $this->form->addHTML('<span class="submit_btn" title="Submit">Submit</span>');
+        $this->form->addHTML('<span class="submit_btn" title="Submit" tabindex="0">Submit</span>');
     }
     
     public function buildForm(){

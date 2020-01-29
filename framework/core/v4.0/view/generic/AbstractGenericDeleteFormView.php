@@ -51,7 +51,7 @@ abstract class AbstractDeleteFormView extends GI_View {
     }
     
     protected function addSubmitBtn(){
-        $this->form->addHTML('<span class="submit_btn" title="Delete" >Delete</span>');
+        $this->form->addHTML('<span class="submit_btn" title="Delete" tabindex="0" >Delete</span>');
     }
     
     protected function addCancelBtn(){

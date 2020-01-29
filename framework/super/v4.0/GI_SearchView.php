@@ -199,10 +199,10 @@ abstract class GI_SearchView extends GI_View {
     protected function addBtns(){
         $this->form->addHTML('<div class="search_btns">');
             if ($this->useBasicSearch) {
-                $this->form->addHTML('<span class="btn other_btn toggle_search_type_btn open_basic_search_block"><span class="icon_wrap"><span class="icon swap"></span></span><span class="btn_text">Basic</span></span>');
+                $this->form->addHTML('<span class="btn other_btn toggle_search_type_btn open_basic_search_block" tabindex="0"><span class="icon_wrap"><span class="icon swap"></span></span><span class="btn_text">Basic</span></span>');
             }
             $this->form->addHTML('<span class="btn other_btn close_search_box gray"><span class="icon_wrap"><span class="icon eks"></span></span><span class="btn_text">Close</span></span>');
-            $this->form->addHTML('<span class="btn submit_btn"><span class="icon_wrap"><span class="icon search"></span></span><span class="btn_text">Search</span></span>');
+            $this->form->addHTML('<span class="btn submit_btn" tabindex="0"><span class="icon_wrap"><span class="icon search"></span></span><span class="btn_text">Search</span></span>');
         $this->form->addHTML('</div>');
     }
     
@@ -274,13 +274,46 @@ abstract class GI_SearchView extends GI_View {
     protected function addBasicFormBtns(){
         $this->form->addHTML('<div class="search_btns">');
             if (!$this->hideAdvancedSearch) {
-                $this->form->addHTML('<span class="btn other_btn toggle_search_type_btn open_advanced_search_block"><span class="icon_wrap"><span class="icon swap"></span></span><span class="btn_text">Advanced</span></span>');
+                $this->form->addHTML('<span class="btn other_btn toggle_search_type_btn open_advanced_search_block" tabindex="0"><span class="icon_wrap"><span class="icon swap"></span></span><span class="btn_text">Advanced</span></span>');
             }
             
             $this->form->addHTML('<span class="btn other_btn close_search_box gray"><span class="icon_wrap"><span class="icon eks"></span></span><span class="btn_text">Close</span></span>');
             
-            $this->form->addHTML('<span class="btn submit_btn"><span class="icon_wrap"><span class="icon search"></span></span><span class="btn_text">Search</span></span>');
+            $this->form->addHTML('<span class="btn submit_btn" tabindex="0"><span class="icon_wrap"><span class="icon search"></span></span><span class="btn_text">Search</span></span>');
         $this->form->addHTML('</div>');
+    }
+    
+    protected function addTagField($overWriteSettings = array(), $overWriteAutocompProps = array()){
+        $autocompProps = array(
+            'controller' => 'tag',
+            'action' => 'autocompTag',
+            'type' => 'tag',
+            'ajax' => 1
+        );
+        foreach ($overWriteAutocompProps as $prop => $val) {
+            $autocompProps[$prop] = $val;
+        }
+        $autocompURL = GI_URLUtils::buildURL($autocompProps);
+        
+        $tagIds = $this->getQueryValue('tag_ids');
+        $value = NULL;
+        if(!empty($tagIds)){
+            $value = implode(',', $tagIds);
+        }
+        
+        $fieldSettings = GI_Form::overWriteSettings(array(
+            'displayName' => 'Search by Tag(s)',
+            'placeHolder' => 'search for tag(s)',
+            'value' => $value,
+            'autocompURL' => $autocompURL,
+            'autocompMultiple' => true
+        ), $overWriteSettings);
+        $fieldName = 'search_tag_ids';
+        
+        if(isset($overWriteSettings['fieldName'])){
+            $fieldName = $overWriteSettings['fieldName'];
+        }
+        $this->form->addField($fieldName, 'autocomplete', $fieldSettings);
     }
             
     public function getShadowBoxURL(){

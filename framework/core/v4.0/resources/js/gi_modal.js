@@ -66,11 +66,13 @@ function giModalOpen(content, submitUrl, modalClass, callback) {
             $('textarea').trigger('autosize.resize');
             createJSignatures();
 //            $(window).trigger('resize');
-            if($('#gi_modal input').length || $('#gi_modal textarea').length){
-                var focusField = $('#gi_modal').find('input,textarea,select').filter(':visible:first');
-                if(!focusField.is('.autofocus_off') && !focusField.closest('.autofocus_off').length){
-                    var focusFieldVal = focusField.val();
-                    focusField.focus().val('').val(focusFieldVal);
+            if($(window).width() > 640){
+                if($('#gi_modal input').length || $('#gi_modal textarea').length){
+                    var focusField = $('#gi_modal').find('input:not(.gi_field_date):not(.selectric-input),textarea').filter(':visible:first');
+                    if(!focusField.is('.autofocus_off') && !focusField.closest('.autofocus_off').length){
+                        var focusFieldVal = focusField.val();
+                        focusField.focus().val('').val(focusFieldVal);
+                    }
                 }
             }
         });
@@ -149,21 +151,28 @@ function giModalCenter(modal){
 
 function giModalAutoTitle(giModal){
     if(!giModal.find('.auto_title').length){
-        var titleElm = giModal.find('.main_head, h1').eq(0);
-        var titleElmClass = titleElm.attr('class');
-        var title = '';
+        let titleElm = giModal.find('.main_head, h1').eq(0);
+        let titleElmClass = titleElm.attr('class');
+        let title = '';
         if(titleElm.length){
             title = titleElm.html();
         }
-        var titleClass = '';
+        let titleClass = '';
         if (titleElmClass === undefined) {
             titleClass = 'auto_title';
         } else {
             titleClass = titleElmClass + ' auto_title';
         }
         
+        let titleVH = titleElm.closest('.view_header');
         titleElm.remove();
-        var titleString = '<div class="content_padding gi_modal_no_pad"><h2 class="' + titleClass + '">' + title + '</h2><span class="custom_btn close_gi_modal" title="Close"><span class="icon_wrap"><span class="icon primary remove_sml"></span></span></span></div>';
+        if(titleVH.length){
+            let titleVHBtns = titleVH.find('.right_btns');
+            if(!titleVHBtns.length || titleVHBtns.html() == ''){
+                titleVH.hide();
+            }
+        }
+        let titleString = '<div class="content_padding gi_modal_no_pad"><h2 class="' + titleClass + '">' + title + '</h2><span class="custom_btn close_gi_modal" title="Close"><span class="icon_wrap"><span class="icon primary remove_sml"></span></span></span></div>';
         giModal.prepend(titleString);
     }
     if(!giModalCloseEnabled){
@@ -187,7 +196,11 @@ function giModalConfirm(title, message, yesBtnLabel, yesCallback, noBtnLabel, no
     }
     
     var giModalString = '<div class="content_padding gi_modal_no_pad"><h2>' + title + '</h2><span class="custom_btn close_gi_modal" title="Close"><span class="icon_wrap"><span class="icon primary remove_sml"></span></span></span></div><div class="content_padding">';
-    giModalString += '<p>' + message + '</p>';
+    if(message.indexOf('<') !== -1){
+        giModalString += message;
+    } else {
+        giModalString += '<p>' + message + '</p>';
+    }
     giModalString += '<div class="wrap_btns">';
     if(yesBtnLabel == undefined || yesBtnLabel == ''){
         yesBtnLabel = 'Ok';
@@ -216,7 +229,7 @@ function giModalConfirm(title, message, yesBtnLabel, yesCallback, noBtnLabel, no
 }
 
 function giModalOpenAjaxContent(submitUrl, modalClass, callback){
-    jQuery.post(submitUrl, function (data) {
+    jQuery.post(prepareGIModalURL(submitUrl), function (data) {
         //var parsedData = JSON.parse(data);
         var showContent = true;
         if(data.jqueryAction) {
@@ -243,13 +256,15 @@ function giModalOpenAjaxContent(submitUrl, modalClass, callback){
         } else if(showContent){
             //Error
             console.log(data);
-            var errorCode = 2500;
-            var errorURL = 'index.php?controller=static&action=error&errorCode=' + errorCode + '&ajax=1';
-            jQuery.post(errorURL, function (data) {
-                giModalOpen(data.mainContent);
-            });
+            loadErrorInElement(null, 2500, 'modal');
         }
     });
+}
+
+function prepareGIModalURL(url){
+    url = replaceUrlParam(url, 'ajax', 1);
+    url = replaceUrlParam(url, 'modal', 1);
+    return url;
 }
 
 function giModalOpenForm(button, event, modalClass, callback){
@@ -259,7 +274,7 @@ function giModalOpenForm(button, event, modalClass, callback){
     if(url == undefined){
         url = button.data('url');
     }
-    var submitUrl = url + '&ajax=1';
+    var submitUrl = url;
     giModalOpenAjaxContent(submitUrl, modalClass, callback);
     
 }
@@ -300,8 +315,8 @@ function changeModalClass(modalClass, modal){
     modal.removeClass('full_sized');
     modal.addClass(modalClass);
 }
-
-$(document).on('click tap', '#gi_modal_bg, .close_gi_modal', function () {
+//#gi_modal_bg, 
+$(document).on('click tap', '.close_gi_modal', function () {
     if(giModalCloseEnabled){
         var modal = $(this).closest('.gi_modal.opened');
         if(!modal.length){
@@ -322,6 +337,10 @@ $(document).on('formSubmitted', '#gi_modal form', function(e){
 });
 
 $(document).on('submit', '#gi_modal form', function (e) {
+    let preventAjaxSubmit = false;
+    if(e.isDefaultPrevented()){
+        preventAjaxSubmit = true;
+    }
     if($(this).attr('target') == '_blank'){
         return true;
     }
@@ -330,6 +349,9 @@ $(document).on('submit', '#gi_modal form', function (e) {
 //    var newWindow = window.open('', '_blank');
     var modalSubmitFormEvent = jQuery.Event('modalSubmitForm');
     $(this).trigger(modalSubmitFormEvent);
+    if(preventAjaxSubmit){
+        modalSubmitFormEvent.preventDefault();
+    }
     if(!modalSubmitFormEvent.isDefaultPrevented()){
         var submitUrl = $('#gi_modal').data('url');
         var form = $(this);
@@ -345,17 +367,14 @@ $(document).on('submit', '#gi_modal form', function (e) {
         } else {
             elmStartLoading(form.closest('.nested_form_wrap'));
         }
-console.log('submitUrl gi_modal:'+submitUrl);        
         jQuery.ajax({
             type: 'POST',
-            url: submitUrl,
+            url: prepareGIModalURL(submitUrl),
             data: formData,
             contentType: false,
             processData: false,
 //            async: false,
-            success: function (data) { 
-console.log(data);                  
-                
+            success: function (data) {
                 var modalClass = data.modalClass;
                 if (data.success) {
                     if(data.newUrl){
@@ -444,9 +463,7 @@ console.log(data);
                     newContentLoaded();
                     $('#gi_modal').trigger('ajaxContentLoaded');
                     form.trigger('modalSubmitFormFail');
-                    console.log(data);
                 }
-
                 if(data.jqueryAction) {
                     eval(data.jqueryAction);
                 }

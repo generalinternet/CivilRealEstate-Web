@@ -833,18 +833,20 @@ abstract class AbstractFolderFactory extends GI_ModelFactory {
             $userId = $user->getProperty('id');
         }
         if ($userId == $currentUserId) {
-            if (isset($_SESSION['folders']['my_files'])) {
-                $value = $_SESSION['folders'];
-                if ($value['my_files'] === '1') {
-                    return true;
-                }
+            $value = SessionService::getValue(array(
+                'folders',
+                'my_files'
+            ));
+            if (!empty($value) && $value === '1') {
+                return true;
             }
         } else if ($userId == $rootUserId) {
-            if (isset($_SESSION['folders']['my_files_root_user'])) {
-                $value = $_SESSION['folders'];
-                if ($value['my_files_root_user'] === '1') {
-                    return true;
-                }
+            $value = SessionService::getValue(array(
+                'folders',
+                'my_files_root_user'
+            ));
+            if (!empty($value) && $value === '1') {
+                return true;
             }
         }
         $rootFolderArray = static::search()
@@ -861,17 +863,29 @@ abstract class AbstractFolderFactory extends GI_ModelFactory {
             $rootFolder->setProperty('user_id', $userId);
             if ($rootFolder->save()) {
                 if ($userId == $currentUserId) {
-                    $_SESSION['folders']['my_files'] = '1';
+                    SessionService::setValue(array(
+                        'folders',
+                        'my_files'
+                    ), '1');
                 } else if ($userId == $rootUserId) {
-                    $_SESSION['folders']['my_files_root_user'] = '1';
+                    SessionService::setValue(array(
+                        'folders',
+                        'my_files_root_user'
+                    ), '1');
                 }
                 return true;
             }
         } else {
             if ($userId == $currentUserId) {
-                $_SESSION['folders']['my_files'] = '1';
+                SessionService::setValue(array(
+                    'folders',
+                    'my_files'
+                        ), '1');
             } else if ($userId == $rootUserId) {
-                $_SESSION['folders']['my_files_root_user'] = '1';
+                SessionService::setValue(array(
+                    'folders',
+                    'my_files_root_user'
+                        ), '1');
             }
             return true;
         }
@@ -886,11 +900,12 @@ abstract class AbstractFolderFactory extends GI_ModelFactory {
             $userId = $user->getProperty('id');
         }
         if ($userId == $currentUserId) {
-            if (isset($_SESSION['folders']['profile_pictures'])) {
-                $value = $_SESSION['folders'];
-                if ($value['profile_pictures'] === '1') {
-                    return true;
-                }
+            $value = SessionService::getValue(array(
+                'folders',
+                'profile_pictures'
+            ));
+            if (!empty($value) && $value === '1') {
+                return true;
             }
         }
         $rootFolderArray = static::search()
@@ -902,15 +917,24 @@ abstract class AbstractFolderFactory extends GI_ModelFactory {
             $rootFolder = $rootFolderArray[0];
         } else {
             if ($userId == $currentUserId) {
-                $_SESSION['folders']['my_files'] = '0';
-                $_SESSION['folders']['profile_pictures'] = '0';
+                SessionService::setValue(array(
+                    'folders',
+                    'my_files'
+                        ), '0');
+                SessionService::setValue(array(
+                    'folders',
+                    'profile_pictures'
+                        ), '0');
             }
             return false;
         }
         $ppFolder = $rootFolder->getProfilePictureFolder();
         if($ppFolder){
             if ($userId == $currentUserId) {
-                $_SESSION['folders']['profile_pictures'] = '1';
+                SessionService::setValue(array(
+                    'folders',
+                    'profile_pictures'
+                ), '1');
             }
             return true;
         }
@@ -927,8 +951,12 @@ abstract class AbstractFolderFactory extends GI_ModelFactory {
             $userId = $user->getProperty('id');
         }
         $userSessionKey = 'user_' . $userId;
-        if (isset($_SESSION[$userSessionKey]['temp_folder_id'])) {
-            return $_SESSION[$userSessionKey]['temp_folder_id'];
+        $tempFolderId = SessionService::getValue(array(
+            $userSessionKey,
+            'temp_folder_id'
+        ));
+        if (!empty($tempFolderId)) {
+            return $tempFolderId;
         }
         $rootFolderArray = static::search()
                 ->filter('uid', $userId)
@@ -943,7 +971,10 @@ abstract class AbstractFolderFactory extends GI_ModelFactory {
                     $subFolderTitle = $subFolder->getProperty('title');
                     if ($subFolderTitle === 'temp') {
                         $subFolderId = $subFolder->getProperty('id');
-                        $_SESSION[$userSessionKey]['temp_folder_id'] = $subFolderId;
+                        SessionService::setValue(array(
+                            $userSessionKey,
+                            'temp_folder_id'
+                        ), $subFolderId);
                         return $subFolderId;
                     }
                 }
@@ -958,7 +989,10 @@ abstract class AbstractFolderFactory extends GI_ModelFactory {
                 $linkResult = static::linkFolderToFolder($rootFolder, $newFolder);
                 if ($linkResult) {
                     $newFolderId = $newFolder->getProperty('id');
-                    $_SESSION[$userSessionKey]['temp_folder_id'] = $newFolderId;
+                    SessionService::setValue(array(
+                        $userSessionKey,
+                        'temp_folder_id'
+                    ), $newFolderId);
                     return $newFolderId;
                 }
             }

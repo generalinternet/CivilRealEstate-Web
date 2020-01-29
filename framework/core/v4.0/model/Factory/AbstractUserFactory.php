@@ -3,13 +3,16 @@
  * Description of AbstractUserFactory
  *
  * @author General Internet
- * @copyright  2016 General Internet
- * @version    4.0.1
+ * @copyright  2019 General Internet
+ * @version    4.0.2
  */
 class AbstractUserFactory extends GI_ModelFactory {
     
     protected static $primaryDAOTableName = 'user';
     protected static $models = array();
+    protected static $modelsBySocketId = array();
+    protected static $modelsBySocketUserId = array();
+    protected static $systemUser = NULL;
 
     public static function validateModelFranchise(\GI_Model $model) {
         return true;
@@ -21,7 +24,13 @@ class AbstractUserFactory extends GI_ModelFactory {
      * @return AbstractUser
      */
     protected static function buildModelByTypeRef($typeRef, $map) {
+        if (empty($typeRef)) {
+            $typeRef = '';
+        }
         switch ($typeRef) {
+            case 'unconfirmed':
+                $model = new UserUnconfirmed($map);
+                break;
             case 'user':
             default:
                 $model = new User($map);
@@ -36,6 +45,9 @@ class AbstractUserFactory extends GI_ModelFactory {
      */
     protected static function getTypeRefArrayFromTypeRef($typeRef) {
         switch ($typeRef) {
+            case 'unconfirmed':
+                $typeRefs = array('unconfirmed');
+                break;
             case 'user':
                 $typeRefs = array('user');
                 break;
@@ -170,6 +182,65 @@ class AbstractUserFactory extends GI_ModelFactory {
                 ->andIf()
                 ->groupBy('id');
         return $userSearch->select();
+    }
+    
+    public static function getSystemUser() {
+        if (empty(static::$systemUser)) {
+            $search = static::search();
+            $search->filter('email', 'system')
+                    ->filterNull('pass');
+            $results = $search->select();
+            if (!empty($results)) {
+                static::$systemUser = $results[0];
+            }
+        }
+        return static::$systemUser;
+    }
+    
+    public static function getBySocketId($socketId) {
+        if (!isset(static::$modelsBySocketId[$socketId])) {
+            $search = static::search();
+            $userTable = $search->prefixTableName('user');
+            $search->join('login', 'user_id', $userTable, 'id', 'L')
+                    ->filter('L.active', 1);
+            $search->filter('L.socket_id', $socketId);
+            $search->orderBy('id', 'ASC');
+            $results = $search->select();
+            if (empty($results)) {
+                return NULL;
+            }
+            $user = $results[0];
+            $lastLogin = $user->getLastLogin();
+            if($lastLogin && !$lastLogin->isExpired()){
+                static::$modelsBySocketId[$socketId] = $user;
+            } else {
+                return NULL;
+            }
+        }
+        return static::$modelsBySocketId[$socketId];
+    }
+    
+    public static function getBySocketUserId($socketUserId) {
+        if (!isset(static::$modelsBySocketUserId[$socketUserId])) {
+            $search = static::search();
+            $userTable = $search->prefixTableName('user');
+            $search->createJoin('login', 'user_id', $userTable, 'id', 'L')
+                    ->filter('L.active', 1);
+            $search->filter('L.socket_user_id', $socketUserId);
+            $search->orderBy('id', 'ASC');
+            $results = $search->select();
+            if (empty($results)) {
+                return NULL;
+            }
+            $user = $results[0];
+            $lastLogin = $user->getLastLogin();
+            if($lastLogin && !$lastLogin->isExpired()){
+                static::$modelsBySocketUserId[$socketUserId] = $user;
+            } else {
+                return NULL;
+            }
+        }
+        return static::$modelsBySocketUserId[$socketUserId];
     }
     
 }

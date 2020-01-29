@@ -4,7 +4,7 @@
  *
  * @author General Internet
  * @copyright  2019 General Internet
- * @version    4.0.0
+ * @version    4.0.1
  */
 abstract class AbstractDashboardAPARTableWidgetView extends AbstractDashboardWidgetView {
 
@@ -31,6 +31,10 @@ abstract class AbstractDashboardAPARTableWidgetView extends AbstractDashboardWid
     }
 
     public function buildBodyContent() {
+        if (empty($this->arReport) || empty($this->apReport)) {
+            $this->addHTML('<p>Data Unavailable</p>');
+            return;
+        }
         $this->addHTML('<h4 class="chart_title">As of ' . GI_Time::formatDateForDisplay(GI_Time::getDate()) . '</h4>');
         $this->buildTable();
         $currencyTitle = $this->arReport->getCurrencyTitle();

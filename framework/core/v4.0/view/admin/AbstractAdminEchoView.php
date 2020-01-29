@@ -10,11 +10,17 @@ abstract class AbstractAdminEchoView extends MainWindowView {
 
     protected $echoedContent = '';
     protected $footHTML = '';
+    protected $autoRefreshURL = NULL;
     
     public function __construct() {
         parent::__construct();
         $this->addSiteTitle('Logs');
         $this->setWindowTitle('Logs');
+    }
+    
+    public function setAutoRefreshURL($autoRefreshURL){
+        $this->autoRefreshURL = $autoRefreshURL;
+        return $this;
     }
     
     protected function addViewBodyContent() {
@@ -60,6 +66,14 @@ abstract class AbstractAdminEchoView extends MainWindowView {
     
     public function addHTMLOverride($html){
         return $this->addHTML($html);
+    }
+    
+    
+    public function beforeReturningView() {
+        parent::beforeReturningView();
+        if(!empty($this->autoRefreshURL)){
+            Header('Refresh: 1;url=' . $this->autoRefreshURL);
+        }
     }
     
 }

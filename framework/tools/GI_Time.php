@@ -569,6 +569,29 @@ class GI_Time{
             'end' => $endDate,
         );
     }
+    
+    /**
+     * @param String $month numeric representation of a month. I.e. '04' for April
+     * @param String $day numeric representation of a day. I.e. '09' for the ninth
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @return \DateTime represents the M-D-Y between $startDate and $endDate, null otherwise.
+     */
+    public static function getCompleteDateInRange($month, $day, DateTime $startDate, DateTime $endDate) {
+        if ($startDate > $endDate) {
+            return NULL;
+        }
+        $partialDateString = '-'.$month.'-'.$day . ' 00:00:00';
+        $dateTime1 = new DateTime($startDate->format('Y') . $partialDateString);
+        if ($dateTime1 >= $startDate && $dateTime1 <= $endDate) {
+            return $dateTime1;
+        }
+        $dateTime2 = new DateTime($endDate->format('Y') . $partialDateString);
+        if ($dateTime2 >= $startDate && $dateTime2 <= $endDate) {
+            return $dateTime2;
+        }
+        return NULL;
+    }
 
     /**
      * @param DateTime $start

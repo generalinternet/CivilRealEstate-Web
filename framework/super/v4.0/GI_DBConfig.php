@@ -3,8 +3,8 @@
  * Description of GI_DBConfig
  *
  * @author General Internet
- * @copyright  2017 General Internet
- * @version    2.0.1
+ * @copyright  2019 General Internet
+ * @version    4.0.1
  */
 abstract class GI_DBConfig {
 
@@ -266,6 +266,7 @@ abstract class GI_DBConfig {
         'integer_large' => 'integer_large',
         'money' => 'money',
         'decimal' => 'decimal',
+        'percentage' => 'decimal',
         'onoff' => 'onoff',
         'date' => 'date',
         'time' => 'time',
@@ -346,16 +347,14 @@ abstract class GI_DBConfig {
                 if (defined('RETS_DB_HOST')) {
                     return RETS_DB_HOST;
                 }
-                if (!DEV_MODE) {
-                    $config = KeyService::getDBConfigByAppRef('gi', 'rets');
-                    if (!empty($config) && isset($config['host'])) {
-                        $host = $config['host'];
-                        if (isset($config['port'])) {
-                            $host .= ':' . $config['port'];
-                        }
-                        define('RETS_DB_HOST', $host);
-                        return $host;
+                $config = KeyService::getDBConfigByAppRef('gi', 'rets');
+                if (!empty($config) && isset($config['host'])) {
+                    $host = $config['host'];
+                    if (isset($config['port'])) {
+                        $host .= ':' . $config['port'];
                     }
+                    define('RETS_DB_HOST', $host);
+                    return $host;
                 }
                 break;
             case 'client';
@@ -363,8 +362,9 @@ abstract class GI_DBConfig {
                 if (defined('DB_HOST')) {
                     return DB_HOST;
                 }
-                if (!DEV_MODE && defined('APP_REF')) {
-                    $config = KeyService::getDBConfigByAppRef(APP_REF, 'client');
+                $appRef = ProjectConfig::getAppRef();
+                if (!empty($appRef)) {
+                    $config = KeyService::getDBConfigByAppRef($appRef, 'client');
                     if (!empty($config) && isset($config['host'])) {
                         $host = $config['host'];
                         if (isset($config['port'])) {
@@ -385,13 +385,11 @@ abstract class GI_DBConfig {
                 if (defined('RETS_DB_USER')) {
                     return RETS_DB_USER;
                 }
-                if (!DEV_MODE) {
-                    $config = KeyService::getDBConfigByAppRef('gi', 'rets');
-                    if (!empty($config) && isset($config['username'])) {
-                        $user = $config['username'];
-                        define('RETS_DB_USER', $user);
-                        return $user;
-                    }
+                $config = KeyService::getDBConfigByAppRef('gi', 'rets');
+                if (!empty($config) && isset($config['username'])) {
+                    $user = $config['username'];
+                    define('RETS_DB_USER', $user);
+                    return $user;
                 }
                 break;
             case 'client':
@@ -399,8 +397,9 @@ abstract class GI_DBConfig {
                 if (defined('DB_USER')) {
                     return DB_USER;
                 }
-                if (!DEV_MODE && defined('APP_REF')) {
-                    $config = KeyService::getDBConfigByAppRef(APP_REF, 'client');
+                $appRef = ProjectConfig::getAppRef();
+                if (!empty($appRef)) {
+                    $config = KeyService::getDBConfigByAppRef($appRef, 'client');
                     if (!empty($config) && isset($config['username'])) {
                         $username = $config['username'];
                         define('DB_USER', $username);
@@ -418,13 +417,11 @@ abstract class GI_DBConfig {
                 if (defined('RETS_DB_PASS')) {
                     return RETS_DB_PASS;
                 }
-                if (!DEV_MODE) {
-                    $config = KeyService::getDBConfigByAppRef('gi', 'rets');
-                    if (!empty($config) && isset($config['password'])) {
-                        $password = $config['password'];
-                        define('RETS_DB_PASS', $password);
-                        return $password;
-                    }
+                $config = KeyService::getDBConfigByAppRef('gi', 'rets');
+                if (!empty($config) && isset($config['password'])) {
+                    $password = $config['password'];
+                    define('RETS_DB_PASS', $password);
+                    return $password;
                 }
                 break;
             case 'client':
@@ -432,8 +429,9 @@ abstract class GI_DBConfig {
                 if (defined('DB_PASS')) {
                     return DB_PASS;
                 }
-                if (!DEV_MODE && defined('APP_REF')) {
-                    $config = KeyService::getDBConfigByAppRef(APP_REF, 'client');
+                $appRef = ProjectConfig::getAppRef();
+                if (!empty($appRef)) {
+                    $config = KeyService::getDBConfigByAppRef($appRef, 'client');
                     if (!empty($config) && isset($config['password'])) {
                         $password = $config['password'];
                         define('DB_PASS', $password);
@@ -451,13 +449,11 @@ abstract class GI_DBConfig {
                 if (defined('RETS_DB_NAME')) {
                     return RETS_DB_NAME;
                 }
-                if (!DEV_MODE) {
-                    $config = KeyService::getDBConfigByAppRef('gi', 'rets');
-                    if (!empty($config) && isset($config['dbname'])) {
-                        $dbName = $config['dbname'];
-                        define('RETS_DB_NAME', $dbName);
-                        return $dbName;
-                    }
+                $config = KeyService::getDBConfigByAppRef('gi', 'rets');
+                if (!empty($config) && isset($config['dbname'])) {
+                    $dbName = $config['dbname'];
+                    define('RETS_DB_NAME', $dbName);
+                    return $dbName;
                 }
                 break;
             case 'client':
@@ -465,8 +461,9 @@ abstract class GI_DBConfig {
                 if (defined('DB_NAME')) {
                     return DB_NAME;
                 }
-                if (!DEV_MODE && defined('APP_REF')) {
-                    $config = KeyService::getDBConfigByAppRef(APP_REF, 'client');
+                $appRef = ProjectConfig::getAppRef();
+                if (!empty($appRef)) {
+                    $config = KeyService::getDBConfigByAppRef($appRef, 'client');
                     if (!empty($config) && isset($config['dbname'])) {
                         $dbname = $config['dbname'];
                         define('DB_NAME', $dbname);
@@ -479,11 +476,10 @@ abstract class GI_DBConfig {
     }
 
     static function getDbPrefix($type = 'client') {
-        switch($type){
+        switch ($type) {
             case 'rets':
                 $dbPrefix = RETS_DB_PREFIX;
                 break;
-            //case 'client':
             default:
                 $dbPrefix = DB_PREFIX;
                 break;

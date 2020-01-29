@@ -3,8 +3,8 @@
  * Description of GI_ProjectConfig
  *
  * @author General Internet
- * @copyright  2018 General Internet
- * @version    3.0.6
+ * @copyright  2019 General Internet
+ * @version    4.0.1
  */
 abstract class GI_ProjectConfig {
 
@@ -74,7 +74,7 @@ abstract class GI_ProjectConfig {
     public static function getAWSRegion(){
         return AWS_REGION;
     }
-    
+
     public static function getAWSKey() {
         if (DEV_MODE) {
             if (defined('AWS_KEY')) {
@@ -130,8 +130,18 @@ abstract class GI_ProjectConfig {
     public static function openSocket(){
         return OPEN_SOCKET;
     }
+    
+    public static function getLocalhostIP(){
+        if(defined('LOCALHOST_IP')){
+            return LOCALHOST_IP;
+        }
+        return '192.168.0.28';
+    }
 
     public static function getSocketServerURLWithPort() {
+        if(DEV_MODE){
+            return '//' . static::getLocalhostIP() . ':8001';
+        }
         $httpProtocol = ProjectConfig::getHTMLProtocol();
         if (!empty($httpProtocol && $httpProtocol === 'https')) {
             return 'https://' . SOCKET_SERVER_URL . ':' . SOCKET_SERVER_PORT;
@@ -775,18 +785,37 @@ abstract class GI_ProjectConfig {
         return false;
     }
     
-    public static function getDefaultConroller() {
-        //if (empty(Login::getUserId())) {
-        if(static::publicViewActive() && Login::isPublicUser()) {//@temp
+
+//    public static function getDefaultController() {
+//        $interfacePerspectiveRef = Login::getCurrentInterfacePerspectiveRef();
+//        if(static::publicViewActive() && (!empty($interfacePerspectiveRef) && $interfacePerspectiveRef !== 'admin')) {
+//            return DEFAULT_PUBLIC_CONTROLLER;
+//        } else {
+//            return DEFAULT_CONTROLLER;
+//        }
+//    }
+//    
+//    public static function getDefaultAction() {
+//        $interfacePerspectiveRef = Login::getCurrentInterfacePerspectiveRef();
+//        if (static::publicViewActive() && (!empty($interfacePerspectiveRef) && $interfacePerspectiveRef !== 'admin')) {
+//            return DEFAULT_PUBLIC_ACTION;
+//        } else {
+//            return DEFAULT_ACTION;
+//        }
+//    }
+
+    public static function getDefaultController() {
+        $interfacePerspectiveRef = Login::getCurrentInterfacePerspectiveRef();
+        if (static::publicViewActive() || (!empty($interfacePerspectiveRef) && $interfacePerspectiveRef !== 'admin')) {
             return DEFAULT_PUBLIC_CONTROLLER;
         } else {
             return DEFAULT_CONTROLLER;
         }
     }
-    
+
     public static function getDefaultAction() {
-        //if (empty(Login::getUserId())) {
-        if (static::publicViewActive() && Login::isPublicUser()) {//@temp
+        $interfacePerspectiveRef = Login::getCurrentInterfacePerspectiveRef();
+        if (static::publicViewActive() || (!empty($interfacePerspectiveRef) && $interfacePerspectiveRef !== 'admin')) {
             return DEFAULT_PUBLIC_ACTION;
         } else {
             return DEFAULT_ACTION;
@@ -812,6 +841,124 @@ abstract class GI_ProjectConfig {
             return REGISTER_REQUIRES_CODE_CONFIRMATION;
         }
         return true;
+    }
+    
+    public static function isRegistrationEnabled(){
+        if(defined('REGISTRATION_ENABLED')){
+            return REGISTRATION_ENABLED;
+        }
+        return false;
+    }
+    
+    public static function isChatEnabled(){
+        if(defined('CHAT_ENABLED')){
+            return CHAT_ENABLED;
+        }
+        return false;
+    }
+
+    public static function getEncryptionKey() {
+        openssl_digest(php_uname(), 'SHA256', TRUE);
+        $key = NULL;
+        if (DEV_MODE) {
+            if (defined('ENCRYPTION_KEY')) {
+                $key = ENCRYPTION_KEY;
+            }
+        } else {
+            $key = KeyService::getKey('app_encryption_key');
+        }
+        if (empty($key)) {
+            $key = openssl_digest(php_uname(), 'SHA256', TRUE);
+        }
+        return $key;
+    }
+
+    public static function getEncryptionCipherMethod() {
+        return 'aes-256-ctr';
+    }
+    
+    public static function getUseAdvancedSessionFunctions() {
+        if (defined('USE_ADVANCED_SESSION_FUNCTIONS')) {
+            return USE_ADVANCED_SESSION_FUNCTIONS;
+        }
+        return false;
+    }
+    
+    public static function getAppRef(){
+//        SessionService::setValue('CUR_APP_REF', 'sub-app');
+        $curAppRef = SessionService::getValue('CUR_APP_REF');
+        if(!empty($curAppRef)){
+            return $curAppRef;
+        }
+        if (defined('APP_REF')){
+            return APP_REF;
+        }
+        return NULL;
+    }
+
+    public static function getStripeSecretKey() {
+        if (DEV_MODE) {
+            if (defined('STRIPE_SECRET_KEY')) {
+                return STRIPE_SECRET_KEY;
+            }
+            return NULL;
+        } else {
+            return KeyService::getKey('stripe_secret_key');
+        }
+    }
+
+    public static function getStripePublishableKey() {
+        if (DEV_MODE) {
+            if (defined('STRIPE_PUBLISHABLE_KEY')) {
+                return STRIPE_PUBLISHABLE_KEY;
+            }
+            return NULL;
+        } else {
+            return KeyService::getKey('stripe_publishable_key');
+        }
+    }
+    
+    public static function getGoogleAPIKey(){
+        if (defined('GOOGLE_API_KEY')) {
+            return GOOGLE_API_KEY;
+        }
+        if (DEV_MODE) {
+            return NULL;
+        } else {
+            return KeyService::getKey('google_api_key');
+        }
+    }
+    
+    public static function getReCaptchaKey(){
+        if (defined('RE_CAPTCHA_KEY')) {
+            return RE_CAPTCHA_KEY;
+        }
+        if (DEV_MODE) {
+            return NULL;
+        } else {
+            return KeyService::getKey('re_captcha_key');
+        }
+    }
+    
+    public static function getReCaptchaSecret(){
+        if (defined('RE_CAPTCHA_SECRET')) {
+            return RE_CAPTCHA_SECRET;
+        }
+        if (DEV_MODE) {
+            return NULL;
+        } else {
+            return KeyService::getKey('re_captcha_secret');
+        }
+    }
+    
+    public static function getSupportEmail() {
+        if (defined('SUPPORT_EMAIL')) {
+            return SUPPORT_EMAIL;
+        }
+        if (defined('ROOT_USER_EMAIL')) {
+            return ROOT_USER_EMAIL;
+        }
+        return NULL;
     }
 
 }

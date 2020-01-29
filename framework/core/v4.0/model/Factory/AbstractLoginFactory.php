@@ -61,6 +61,10 @@ class AbstractLoginFactory extends GI_ModelFactory {
         if ($loginArray) {
             $login = $loginArray[0];
             $logKey = $login->getProperty('log_key');
+            $socketUserId = GI_URLUtils::getAttribute('socketUserId');
+            if(!empty($socketUserId)){
+                $login->setProperty('socket_user_id', $socketUserId);
+            }
             if($login->isExpired() && $logKey != NULL) {
                 return static::refreshLogin($logKey);
             } else {
@@ -77,6 +81,7 @@ class AbstractLoginFactory extends GI_ModelFactory {
                 ->select();
         if ($loginArray) {
             $login = $loginArray[0];
+            $login->setProperty('active', 1);
             if ($login->save()) {
                 return $login->getProperty('log_key');
             }
@@ -97,9 +102,14 @@ class AbstractLoginFactory extends GI_ModelFactory {
                 $originalLogKey = true;
             }
         }
+        $login->setProperty('active', 1);
         $login->setProperty('log_key', $logKey);
+        $socketUserId = GI_URLUtils::getAttribute('socketUserId');
+        if(!empty($socketUserId)){
+            $login->setProperty('socket_user_id', $socketUserId);
+        }
         if (!empty($user)) {
-            $userId = $user->getProperty('id');
+            $userId = $user->getId();
         } else {
             $userId = Login::getUserId();
         }
@@ -143,7 +153,7 @@ class AbstractLoginFactory extends GI_ModelFactory {
                     FolderFactory::verifyTempFolder(); //For ROOT user
                     FolderFactory::verifyUserRootFolder($user);
                     FolderFactory::verifyUserProfilePicturesFolder($user);
-                    $_SESSION['log_key'] = static::getLogKey();
+                    SessionService::setValue('log_key', static::getLogKey());
                     return true;
                 }
             }
@@ -165,7 +175,7 @@ class AbstractLoginFactory extends GI_ModelFactory {
             $password = filter_input(INPUT_POST, 'password');
             $rememberMe = filter_input(INPUT_POST, 'remember_me');
             if (static::validateCredentials($email, $password, $form)) {
-                $_SESSION['log_key'] = static::getLogKey();
+                SessionService::setValue('log_key', static::getLogKey());
                 if ($rememberMe) {
                     Login::setCookie('email', $email);
                     Login::setCookie('salty_pass', Login::getSaltyPass());
@@ -181,7 +191,7 @@ class AbstractLoginFactory extends GI_ModelFactory {
         return false;
     }
     
-    public static function validateCredentials($email, $password, GI_Form $form) {
+    public static function validateCredentials($email, $password, GI_Form $form = NULL, $setLogKey = false) {
         $userArray = UserFactory::search()
                 ->setAutoFranchise(false)
                 ->filter('email', $email)
@@ -192,13 +202,17 @@ class AbstractLoginFactory extends GI_ModelFactory {
             $salt = $user->getProperty('salt');
             $saltyPass = $user->generateSaltyPass($password, $salt);
             if ($saltyPass === $pass) {
-                static::loginAsUser($user, false);
+                static::loginAsUser($user, $setLogKey);
                 return true;
             } else {
-                $form->addFieldError('password', 'invalid', 'Invalid password.');
+                if($form){
+                    $form->addFieldError('password', 'invalid', 'Invalid password.');
+                }
             }
         } else {
-            $form->addFieldError('email', 'invalid', 'Invalid email.');
+            if($form){
+                $form->addFieldError('email', 'invalid', 'Invalid email.');
+            }
         }
 
         return false;
@@ -207,11 +221,11 @@ class AbstractLoginFactory extends GI_ModelFactory {
     public static function loginAsUser(AbstractUser $user, $setLogKey = true){
         $saltyPass = $user->getProperty('pass');
         Login::setSaltyPass($saltyPass);
-        Login::setUserId($user->getProperty('id'));
+        Login::setUserId($user->getId());
         FolderFactory::verifyUserRootFolder($user);
         FolderFactory::verifyUserProfilePicturesFolder($user);
         if($setLogKey){
-            $_SESSION['log_key'] = static::getLogKey();
+            SessionService::setValue('log_key', static::getLogKey()); 
         }
         return true;
     }

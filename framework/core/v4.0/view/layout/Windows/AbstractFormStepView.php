@@ -344,21 +344,37 @@ abstract class AbstractFormStepView extends MainWindowView {
         return $this->curStep;
     }
     
+    public function doesStepExist($stepKey){
+        if(isset($this->stepArray[$stepKey]) && !empty($this->stepArray[$stepKey])){
+            return true;
+        }
+        return false;
+    }
+    
     public function getPrevStep() {
-        if (($this->curStep - 1) > 0) {
-            return ($this->curStep - 1);
+        $stepArray = $this->stepArray;
+        if (!empty($stepArray)) {
+            $position = array_search($this->curStep, array_keys($stepArray));
+            $keys = array_keys($stepArray);
+            if (!empty($keys) && isset($keys[$position - 1])) {
+                return $keys[$position - 1];
+            }
         }
         return -1;
     }
-    
+
     public function getNextStep() {
-        $totalSteps = $this->getTotalSteps();
-        if (($this->curStep + 1) <= $totalSteps) {
-            return $this->curStep + 1;
-        } 
+        $stepArray = $this->stepArray;
+        if (!empty($stepArray)) {
+            $position = array_search($this->curStep, array_keys($stepArray));
+            $keys = array_keys($stepArray);
+            if (!empty($keys) && isset($keys[$position + 1])) {
+                return $keys[$position + 1];
+            }
+        }
         return -1;
     }
-    
+
     public function getSubmittedNextStep() {
         if ($this->form->wasSubmitted()) {
             $nextStep = filter_input(INPUT_POST, 'next_step');
@@ -456,7 +472,6 @@ abstract class AbstractFormStepView extends MainWindowView {
         }
     }
    
-   
     protected function openFormWrap($classNames = ''){
         $nextStep = $this->getNextStep();
         if ($nextStep === -1) {
@@ -535,7 +550,8 @@ abstract class AbstractFormStepView extends MainWindowView {
         $this->form->addHTML(' data-children-step="'.$countOfChildrenSteps.'"');
         $this->form->addHTML('>');
         if ($this->moveStepWithoutSubmit) {
-            $this->form->addHTML('<span class="title move_form_step '.$anchorClassNames.'" data-step="'.$step.'">'.(($withStep)? ('<span class="step_text">Step '.$step.' : </span>'):'').$stepTitle.'</span>');
+            $this->form->addHTML('<span class="title move_form_step '.$anchorClassNames.'" data-step="'.$step.'">'.(($withStep)? ('<span class="step_text">Step '.$step.' : </span>'):'')
+                .$stepTitle.'</span>');
         } else {
             if ($this->detectFormChange) {
                 $anchorClassNames .= ' check_for_form_change';
@@ -674,7 +690,7 @@ abstract class AbstractFormStepView extends MainWindowView {
         return NULL;
     }
     
-    protected function addPrevButton($buttonText = 'Prev', $classNames = '', $otherAttributes = array()) {
+    protected function addPrevButton($buttonText = 'Back', $classNames = '', $otherAttributes = array()) {
         if (!$this->forceHidePrevBtn || $this->moveStepWithoutSubmit) {
             $prevURL = $this->getPrevStepURL();
             if ($prevURL) {
@@ -703,7 +719,7 @@ abstract class AbstractFormStepView extends MainWindowView {
     }
     
     protected function addPrevButtonText($buttonText) {
-        return '<span class="icon_wrap"><span class="icon primary arrow_left"></span></span><span class="btn_text">'.$buttonText.'</span>';
+        return '<span class="icon_wrap">' . GI_StringUtils::getSVGIcon('bird_beak_left') . '<span class="btn_text">'.$buttonText.'</span></span>';
     }
 
     protected function addSubmitButton($buttonText = 'Save', $classNames = '', $otherAttributes = array()) {
@@ -718,7 +734,7 @@ abstract class AbstractFormStepView extends MainWindowView {
                 $classNames .= ' '.$this->getBtnClass('submit');
             }
             $otherAttributesHTML = $this->getAttributeHTML($otherAttributes);
-            $this->form->addHTML('<span class="submit_btn btn '.$classNames.'" '.$otherAttributesHTML.' data-field-name="'.$this->nextStepFieldName.'" data-field-value=""><span class="icon_wrap"><span class="icon primary check"></span></span><span class="btn_text">'.$buttonText.'</span></span>');
+            $this->form->addHTML('<span class="submit_btn btn '.$classNames.'" '.$otherAttributesHTML.' data-field-name="'.$this->nextStepFieldName.'" data-field-value=""><span class="btn_text">'.$buttonText.'</span></span>');
         }
         
         // Add custom button after the sumbmit button if any
@@ -752,16 +768,16 @@ abstract class AbstractFormStepView extends MainWindowView {
                 }
                 if ($this->moveStepWithoutSubmit) {
                     $buttonText = 'Next';
-                    $this->form->addHTML('<span class="btn next_btn other_btn next_form_step '.$classNames.'" '.$otherAttributesHTML.'>'.$this->addNextButtonText($buttonText).'</span>');
+                    $this->form->addHTML('<span class="btn next_btn other_btn next_form_step ' . $classNames . '" ' . $otherAttributesHTML . '>' . $this->addNextButtonText($buttonText) . '</span>');
                 } else {
-                    $this->form->addHTML('<span class="btn next_btn submit_btn '.$classNames.'" data-field-name="'.$this->nextStepFieldName.'" data-field-value="' . $nextStep . '" '.$otherAttributesHTML.'>'.$this->addNextButtonText($buttonText).'</span>');
+                    $this->form->addHTML('<span class="btn next_btn submit_btn ' . $classNames . '" data-field-name="' . $this->nextStepFieldName . '" data-field-value="' . $nextStep . '" ' . $otherAttributesHTML . '>' . $this->addNextButtonText($buttonText) . '</span>');
                 }
-            }    
+            } 
         }
     }
-    
+
     protected function addNextButtonText($buttonText) {
-        return '<span class="btn_text">'.$buttonText.'</span><span class="icon_wrap"><span class="icon primary arrow_right"></span></span>';
+        return '<span class="btn_text">'.$buttonText.'</span>' . GI_StringUtils::getSVGIcon('bird_beak_right') . '</span>';
     }
     
     /* Comment out for now

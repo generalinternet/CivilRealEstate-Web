@@ -309,6 +309,9 @@ abstract class GI_DataSearchFilterable{
      * @return \GI_DataSearchFilterable
      */
     public function filterIn($column, $values){
+        if(!is_array($values)){
+            $values = explode(',', $values);
+        }
         return $this->filter($column, $values, 'IN');
     }
     
@@ -646,6 +649,12 @@ abstract class GI_DataSearchFilterable{
     public function filterNotBetweenVCV($value, $column, $andValue){
         $filter = $this->createFilter($value, $column, 'NOT BETWEEN', $andValue);
         $filter->setBetweenOrder(array('V', 'C', 'V'));
+        $this->addFilterToGroup($filter);
+        return $this;
+    }
+    
+    public function filterNotExists($value){
+        $filter = $this->createFilter('NOT EXISTS', NULL, $value);
         $this->addFilterToGroup($filter);
         return $this;
     }

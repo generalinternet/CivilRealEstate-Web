@@ -291,11 +291,15 @@ class AbstractFileController extends GI_Controller {
 
     //AJAX
     public function actionMove($attributes) {
-        if ((!isset($attributes['ajax']) || $attributes['ajax'] != 1) || !isset($attributes['type']) || !isset($attributes['id']) || !isset($attributes['targetId'])) {
+        if ((!isset($attributes['ajax']) || $attributes['ajax'] != 1) || !isset($attributes['type']) || (!isset($attributes['id']) && !isset($attributes['ids'])) || !isset($attributes['targetId'])) {
             return array('content' => 0);
         }
         $targetId = $attributes['targetId'];
-        $id = $attributes['id'];
+        if(isset($attributes['id'])){
+            $ids = array($attributes['id']);
+        } elseif($attributes['ids']){
+            $ids = explode(',', $attributes['ids']);
+        }
         $type = $attributes['type'];
         $userId = Login::getUserId();
         //verify that user can move file/folder into target dir
@@ -304,13 +308,29 @@ class AbstractFileController extends GI_Controller {
         $moveResult = false;
         if ($type === 'file') {
             if ($perm) {
-                $file = FileFactory::getModelById($id);
-                $moveResult = FolderFactory::moveFileToFolder($file, $targetFolder);
+                $allFilesMoved = true;
+                foreach($ids as $id){
+                    $file = FileFactory::getModelById($id);
+                    if(!FolderFactory::moveFileToFolder($file, $targetFolder)){
+                        $allFilesMoved = false;
+                    }
+                }
+                if($allFilesMoved){
+                    $moveResult = true;
+                }
             }
         } else if ($type === 'folder') {
             if ($perm) {
-                $folder = FolderFactory::getModelById($id);
-                $moveResult = FolderFactory::moveFolderToFolder($folder, $targetFolder);
+                $allFoldersMoved = true;
+                foreach($ids as $id){
+                    $folder = FolderFactory::getModelById($id);
+                    if(!FolderFactory::moveFolderToFolder($folder, $targetFolder)){
+                        $allFoldersMoved = false;
+                    }
+                }
+                if($allFoldersMoved){
+                    $moveResult = true;
+                }
             }
         }
         if ($moveResult) {
@@ -684,6 +704,66 @@ class AbstractFileController extends GI_Controller {
         $view->setTargetFolder($folder);
         $returnArray = static::getReturnArray($view);
         return $returnArray;
+    }
+    
+    public function actionGetFileThumbnail($attributes) {
+        $missingFile = FileFactory::buildNewModel();
+        $missingFileView = new FileThumbnailView($missingFile);
+        if ((!isset($attributes['ajax']) || $attributes['ajax'] != 1) || !isset($attributes['fileId'])) {
+            return array('content' => $missingFileView->getHTMLView());
+        }
+        
+        $fileViewType = 'thumbnail';
+        if(isset($attributes['fileViewType'])){
+            $fileViewType = $attributes['fileViewType'];
+        }
+        
+        $fileId = $attributes['fileId'];
+        
+        $file = FileFactory::getModelById($fileId);
+        if(!$file){
+            return array('content' => $missingFileView->getHTMLView());
+        }
+            
+        $fileView = $file->getView($fileViewType);
+        $fileView->setIsDeleteable(false);
+        $fileView->setIsRenamable(false);
+        return array(
+            'content' => $fileView->getHTMLView()
+        );
+    }
+    
+    public function actionGetAvatarThumbnail($attributes){
+        if(!isset($attributes['userId']) && !isset($attributes['socketUserId'])){
+            GI_URLUtils::redirectToError(2000);
+        }
+        $user = NULL;
+        if(isset($attributes['userId'])){
+            $userId = $attributes['userId'];
+            $user = UserFactory::getModelById($userId);
+        } elseif(isset($attributes['socketUserId'])){
+            $socketUserId = $attributes['socketUserId'];
+            $user = UserFactory::getBySocketUserId($socketUserId);
+        }
+        
+        $width = NULL;
+        $height = NULL;
+        if(isset($attributes['width'])){
+            $width = $attributes['width'];
+        }
+        if(isset($attributes['height'])){
+            $height = $attributes['height'];
+        }
+        
+        if(empty($user)){
+            $user = UserFactory::buildNewModel();
+        }
+        
+        $avatarHTML = $user->getUserAvatarHTML($width, $height);
+        
+        return array(
+            'content' => $avatarHTML
+        );
     }
     
 }

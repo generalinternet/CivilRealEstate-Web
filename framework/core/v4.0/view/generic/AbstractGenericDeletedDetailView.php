@@ -4,9 +4,9 @@
  *
  * @author General Internet
  * @copyright  2018 General Internet
- * @version    2.0.0
+ * @version    4.0.0
  */
-abstract class AbstractDeletedDetailView extends GI_View {
+abstract class AbstractDeletedDetailView extends MainWindowView {
     
     /** @var GI_Model */
     protected $model;
@@ -17,6 +17,7 @@ abstract class AbstractDeletedDetailView extends GI_View {
         $this->model = $model;
         $this->addSiteTitle($this->model->getSpecificTitle());
         $this->addSiteTitle('Deleted');
+        $this->setWindowTitle($this->model->getSpecificTitle() . ' <span class="sub_status red">Deleted</span>');
     }
     
     protected function addMessage(){
@@ -35,26 +36,11 @@ abstract class AbstractDeletedDetailView extends GI_View {
         $this->message = $message;
         return true;
     }
-
-    protected function openViewWrap(){
-        $this->addHTML('<div class="content_padding">');
-        return $this;
-    }
     
-    protected function closeViewWrap(){
-        $this->addHTML('</div>');
-        return $this;
-    }
-    
-    public function buildView() {
-        $this->openViewWrap();
-        $this->addMainTitle($this->model->getSpecificTitle() . ' <span class="sub_status red">Deleted</span>');
+    public function addViewBodyContent() {
+        $this->openPaddingWrap();
         $this->addMessage();
-        $this->closeViewWrap();
-    }
-    
-    public function beforeReturningView() {
-        $this->buildView();
+        $this->closePaddingWrap();
     }
 
 }

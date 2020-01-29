@@ -4,7 +4,7 @@
  *
  * @author General Internet
  * @copyright  2019 General Internet
- * @version    4.0.0
+ * @version    4.0.1
  */
 abstract class AbstractUICardView extends GI_View{
 
@@ -30,8 +30,11 @@ abstract class AbstractUICardView extends GI_View{
     protected $avatarHTML = '';
     protected $addTab = false;
     protected $addAvatar = false;
+    protected $tabColour = '';
+    protected $dataAttrs = array();
     
     public function __construct(GI_Model $model = NULL){
+        parent::__construct();
         $this->model = $model;
     }
     
@@ -75,6 +78,10 @@ abstract class AbstractUICardView extends GI_View{
     
     public function getAvatarHTML(){
         return $this->avatarHTML;
+    }
+    
+    public function getTabColour(){
+        return $this->tabColour;
     }
     
     public function setURL($url){
@@ -143,6 +150,15 @@ abstract class AbstractUICardView extends GI_View{
         return $this;
     }
     
+    public function setTabColour($colourString){
+        $this->tabColour = $colourString;
+    }
+    
+    public function addDataAttr($attr, $val = NULL){
+        $this->dataAttrs[$attr] = $val;
+        return $this;
+    }
+    
     /*****CLASSES*****/
     
     public function getCardClass() {
@@ -150,7 +166,7 @@ abstract class AbstractUICardView extends GI_View{
     }
     
     public function getCardContentClass() {
-        return $this->cardClass;
+        return $this->cardContentClass;
     }
 
     public function getTabClass() {
@@ -251,6 +267,36 @@ abstract class AbstractUICardView extends GI_View{
         return $this->url;
     }
     
+    protected function getDataAttrs(){
+        return $this->dataAttrs;
+    }
+    
+    public function getCardDataString(){
+        $dataString = '';
+        if(!empty($this->model)){
+            $dataString .= ' data-model-id="' . $this->model->getId() . '"';
+        }
+        
+        $url = $this->getURL();
+        if(!empty($url)){
+            $dataString .= ' data-url="' . $url . '"';
+        }
+        
+        $targetId = $this->getTargetId();
+        if(!empty($targetId)){
+            $dataString .= ' data-target-id="' . $targetId . '"';
+        }
+        
+        $dataAttrs = $this->getDataAttrs();
+        if(!empty($dataAttrs)){
+            foreach($dataAttrs as $attr => $val){
+                $dataString .= ' data-' . $attr . '="' . $val . '" ';
+            }
+        }
+        
+        return $dataString;
+    }
+    
     protected function openCardWrap(){
         $hoverTitle = $this->getHoverTitle();
         
@@ -268,17 +314,9 @@ abstract class AbstractUICardView extends GI_View{
         $cardClass = $this->getCardClass();
         $this->addHTML('<div class="ui_tile ui_card ' . $cardClass . '" title="' . $hoverTitle . '"');
         
-        if(!empty($this->model)){
-            $this->addHTML(' data-model-id="' . $this->model->getId() . '"');
-        }
+        $dataString = $this->getCardDataString();
+        $this->addHTML($dataString);
         
-        if(!empty($url)){
-            $this->addHTML(' data-url="' . $url . '"');
-        }
-        $targetId = $this->getTargetId();
-        if(!empty($targetId)){
-            $this->addHTML(' data-target-id="' . $targetId . '"');
-        }
         $this->addHTML('>');
         
         $cardContentClass = $this->getCardContentClass();
@@ -295,7 +333,12 @@ abstract class AbstractUICardView extends GI_View{
         if($this->addTab){
             $tabClass = $this->getTabClass();
             $tabTitle = $this->getTabTitle();
-            $this->addHTML('<div class="card_tab ' . $tabClass . '" title="' . $tabTitle . '">');
+            $tabColour = $this->getTabColour();
+            $styleString = '';
+            if($tabColour){
+                $styleString = 'style="background:' . $tabColour . ';"';
+            }
+            $this->addHTML('<div class="card_tab ' . $tabClass . '" title="' . $tabTitle . '" ' . $styleString. '>');
                 $this->addHTML($tabTitle);
             $this->addHTML('</div>');
         }

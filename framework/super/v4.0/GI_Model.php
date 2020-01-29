@@ -30,6 +30,10 @@ abstract class GI_Model extends GI_Object {
     protected $tags = NULL;
     protected $fresh = false;
     
+    protected $contextRoles = NULL;
+    protected $defaultContextRoles = NULL;
+    protected $eventsLogFolder = NULL;
+    
     public function __construct(GI_DataMap $map, $factoryClassName = NULL) {
         $this->map = $map;
         $this->factoryClassName = $factoryClassName;
@@ -352,6 +356,10 @@ abstract class GI_Model extends GI_Object {
     public function getUICardView(){
         return NULL;
     }
+    
+    public function getUITableRowClass(){
+        return NULL;
+    }
 
     public function getViewTitle($plural = true) {
         $typeTitle = $this->getTypeTitle();
@@ -593,6 +601,10 @@ abstract class GI_Model extends GI_Object {
         return $this->addNote($noteContent, 'private', $dbType);
     }
     
+    public function getViewURL(){
+        return GI_URLUtils::buildURL($this->getViewURLAttrs());
+    }
+    
     public function getViewURLAttrs(){
         $reflector = new ReflectionMethod($this, 'getViewURLAttributes');
         if($reflector->getDeclaringClass()->getName() !== 'GI_Model'){
@@ -604,6 +616,18 @@ abstract class GI_Model extends GI_Object {
     /** @deprecated since version 3.0.6 */
     public function getViewURLAttributes() {
         return $this->getViewURLAttrs();
+    }
+    
+    public function getListBarURLAttrs(){
+        return NULL;
+    }
+    
+    public function getListBarURL(){
+        $urlAttrs = $this->getListBarURLAttrs();
+        if(!empty($urlAttrs)){
+            return GI_URLUtils::buildURL($urlAttrs);
+        }
+        return NULL;
     }
     
     /** @return AbstractUser */
@@ -739,11 +763,49 @@ abstract class GI_Model extends GI_Object {
     }
     
     /** @return AbstractTag[] */
-    public function getTags(){
-        if(is_null($this->tags)){
-            $this->tags = TagFactory::getByModel($this);
+    public function getTags($typeRef = NULL, $contextRef = NULL){
+        $dbType = 'client';
+        if(empty($typeRef) && empty($contextRef)){
+            if(is_null($this->tags)){
+                $this->tags = TagFactory::getByModel($this, false, $dbType);
+            }
+            return $this->tags;
         }
-        return $this->tags;
+        return TagFactory::getByModel($this, false, $dbType, $typeRef, false, $contextRef);
+    }
+    
+    public function getTagColumnDataArray($column, $typeRef = NULL, $contextRef = NULL){
+        $tableName = $this->getTableName();
+        $itemId = $this->getId();
+        
+        $tagSearch = TagFactory::search();
+        $tagTable = $tagSearch->prefixTableName('tag');
+        $tagSearch->createJoin('item_link_to_tag', 'tag_id', $tagTable, 'id', 'TL')
+                ->filter('TL.item_id', $itemId)
+                ->filter('TL.table_name', $tableName);
+        if (!empty($typeRef)) {
+            $tagSearch->filterByTypeRef($typeRef);
+        }
+        if(!empty($contextRef)){
+            $tagSearch->filter('TL.context_ref', $contextRef);
+        }
+        $tagSearch->setSelectColumns(array(
+            $column => $column
+        ));
+        $results = $tagSearch->select();
+        $tagInfo = array();
+        if(!empty($results)){
+            $tagInfo = array_column($results, $column);
+        }
+        return $tagInfo;
+    }
+    
+    public function getTagIds($typeRef = NULL, $contextRef = NULL){
+        return $this->getTagColumnDataArray('id', $typeRef, $contextRef);
+    }
+    
+    public function getTagTitles($typeRef = NULL, $contextRef = NULL){
+        return $this->getTagColumnDataArray('title', $typeRef, $contextRef);
     }
     
     public function saveTags($removeOldTags = true){
@@ -838,11 +900,242 @@ abstract class GI_Model extends GI_Object {
             case 'textarea':
                 $displayValue = GI_StringUtils::nl2brHTML($value);
                 break;
+            case 'money':
+                $displayValue = '$' . GI_StringUtils::formatMoney($value);
+                break;
+            case 'decimal':
+                $displayValue = GI_Math::defaultRound($value);
+                break;
             default:
                 $displayValue = $value;
                 break;
         }
         return $displayValue;
+    }
+    
+    public function getEditNotificationSettingsURLAttrs(AbstractEvent $event) {
+        return array();
+    }
+    
+    public function getEditNotificationSettingsURL(AbstractEvent $event) {
+        $attrs = $this->getEditNotificationSettingsURLAttrs($event);
+        if (!empty($attrs)) {
+            return GI_URLUtils::buildURL($attrs);
+        }
+        return NULL;
+    }
+
+    public function getContextRoleCount() {
+        return ContextRoleFactory::getContextRoleCount($this);
+    }
+
+    public function getContextRoles($includeDefaultsIfSpecific = false) {
+        if (empty($this->getId())) {
+            return $this->getDefaultContextRoles();
+        }
+        if (!$includeDefaultsIfSpecific) {
+            if (empty($this->contextRoles)) {
+                $search = ContextRoleFactory::search();
+                $search->filter('table_name', $this->getTableName());
+                if (!empty($this->getId())) {
+                    $search->filter('item_id', $this->getId());
+                } else {
+                    $search->filterNull('item_id');
+                }
+                $search->orderBy('pos', 'ASC')
+                        ->orderBy('id');
+                $this->contextRoles = $search->select(true);
+            }
+            return $this->contextRoles;
+        }
+        $combinedSearch = ContextRoleFactory::search();
+        $joinTableName = ContextRoleFactory::getDbPrefix() . 'context_role';
+        $combinedSearch->filter('table_name', $this->getTableName());
+        $join = $combinedSearch->createJoin('context_role', 'source_context_role_id', $joinTableName, 'id', 'SRC2', 'left');
+        $join->filter('SRC2.table_name', $this->getTableName())
+                ->filter('SRC2.item_id', $this->getId());
+        $combinedSearch->filterGroup()
+                ->filterGroup()
+                ->filter('item_id', $this->getId())
+                ->closeGroup()
+                ->orIf()
+                ->filterGroup()
+                ->andIf()
+                ->filterNullOr('SRC2.status')
+                ->filterNull('item_id')
+                ->closeGroup()
+                ->closeGroup()
+                ->andIf();
+        $combinedSearch->groupBy('id');
+        $combinedSearch->orderBy('pos', 'ASC')
+                ->orderBy('id');
+        return $combinedSearch->select(true);
+    }
+
+    public function getDefaultContextRoles() {
+        if (empty($this->defaultContextRoles)) {
+            $search = ContextRoleFactory::search();
+            $search->filter('table_name', $this->getTableName())
+                    ->filterNull('item_id');
+            $this->defaultContextRoles = $search->select();
+        }
+        return $this->defaultContextRoles;
+    }
+    
+    public function getEditContextRoleURLAttrs($contextRoleId) {
+        $attrs = array();
+        return $attrs;
+    }
+    
+    public function getEditContextRoleURL($contextRoleId) {
+        return GI_URLUtils::buildURL($this->getEditContextRoleURLAttrs($contextRoleId));
+    }
+    
+    public function getAddContextRoleURLAttrs() {
+        return array();
+    }
+    
+    public function getAddContextRoleURL() {
+        return GI_URLUtils::buildURL($this->getAddContextRoleURLAttrs());
+    }
+    
+    public function getDeleteContextRoleURLAttrs($contextRoleId) {
+        $attrs = array();
+        return $attrs;
+    }
+    
+    public function getDeleteContextRoleURL($contextRoleId) {
+        return GI_URLUtils::buildURL($this->getDeleteContextRoleURLAttrs($contextRoleId));
+    }
+    
+    public function getDefaultEventNotifies(AbstractEvent $event) {
+        return EventNotifiesFactory::getDefaultEventNotifies($this, $event);
+    }
+    
+    public function getNotificationViewURL() {
+        $attrs = $this->getViewURLAttrs();
+        if (!empty($attrs)) {
+            return GI_URLUtils::buildURL($attrs, true, true);
+        }
+        return NULL;
+    }
+    
+    public function getEventsLogFolder() {
+        if (empty($this->eventsLogFolder)) {
+            if (empty($this->getId())) {
+                return NULL;
+            }
+            $search = FolderFactory::search();
+            $folderTableName = FolderFactory::getDbPrefix() . 'folder';
+            $search->join('folder_link_to_folder', 'c_folder_id', $folderTableName, 'id', 'FLTF1')
+                    ->join('folder', 'id', 'FLTF1', 'p_folder_id', 'FOLD2')
+                    ->join('folder_link_to_folder', 'c_folder_id', 'FOLD2', 'id', 'FLTF2')
+                    ->join('folder', 'id', 'FLTF2', 'p_folder_id', 'FOLD3');
+            $search->filter('ref', $this->getTableName() . '_' . $this->getId())
+                    ->filter('FOLD2.ref', 'events')
+                    ->filter('FOLD3.ref', 'logs');
+            $results = $search->select();
+            if (!empty($results)) {
+                $this->eventsLogFolder = $results[0];
+            } else {
+                $logFolder = LogService::getLogsFolder();
+                if (empty($logFolder)) {
+                    return NULL;
+                }
+                $eventsSubFolder = FolderFactory::getSubFolderByRef($logFolder, 'events', true, false);
+                if (empty($eventsSubFolder)) {
+                    $eventsSubFolder = FolderFactory::buildNewModel();
+                    $eventsSubFolder->setProperty('ref', 'events');
+                    $eventsSubFolder->setProperty('title', 'Events');
+                    $eventsSubFolder->setProperty('system', 1);
+                    $eventsSubFolder->setProperty('is_root', 0);
+                    $eventsSubFolder->setProperty('user_root', 0);
+                    if (!($eventsSubFolder->save() && $logFolder->addSubfolder($eventsSubFolder))) {
+                        return NULL;
+                    }
+                }
+                $ref = 'event_logs_' . $this->getTableName() . '_' . $this->getId();
+                $eventsLogFolder = FolderFactory::getSubFolderByRef($eventsSubFolder, $ref, true, false);
+                if (empty($eventsLogFolder)) {
+                    $eventsLogFolder = FolderFactory::buildNewModel();
+                    $eventsLogFolder->setProperty('ref', $ref);
+                    $eventsLogFolder->setProperty('title', $this->getTypeTitle() . ' ' . $this->getId() . ' Event Logs');
+                    $eventsLogFolder->setProperty('system', 1);
+                    $eventsLogFolder->setProperty('is_root', 0);
+                    $eventsLogFolder->setProperty('user_root', 0);
+                    if (!($eventsLogFolder->save() && $eventsSubFolder->addSubfolder($eventsLogFolder))) {
+                        return NULL;
+                    }
+                }
+                $this->eventsLogFolder = $eventsLogFolder;
+            }
+        }
+        return $this->eventsLogFolder;
+    }
+    
+    /**
+     * @return AbstractGI_Uploader
+     */
+    public function getEventsLogUploader(){
+        $uploaderRef = $this->getTypeTitle() . '_events_log';
+        $id = $this->getId();
+        if (empty($id)) {
+            $id = 0;
+        }
+        $uploaderRef .= '_' . $id;
+        $uploader = GI_UploaderFactory::buildUploader($uploaderRef);
+        $folder = $this->getEventsLogFolder();
+        if (empty($folder)) {
+            return NULL;
+        }
+        $uploader->setTargetFolder($folder);
+        $uploader->setEnabled(false);
+        $uploader->setAddBrowseButton(false);
+        $uploader->setAreFilesDeleteable(false);
+        $uploader->setAreFilesRenamable(false);
+        $uploader->setFilesLabel('Log Files');
+        return $uploader;
+    }
+    
+    public function isSubTypeOf($typeRef){
+        $thisTypeRef = $this->getTypeRef();
+        $factoryClassName = $this->getFactoryClassName();
+        $thisTypeRefArray = $factoryClassName::getTypeRefArray($thisTypeRef);
+        if(in_array($typeRef, $thisTypeRefArray)){
+            return true;
+        }
+        return false;
+    }
+    
+    public function getPostDeleteRedirectProps(){
+        return array(
+            'controller' => 'dashboard',
+            'action' => 'index'
+        );
+    }
+    
+    protected static function filterSearchForm(GI_DataSearch $dataSearch, GI_Form $form = NULL){
+        $searchType = $dataSearch->getSearchValue('search_type');
+        if (!empty($searchType) && $searchType !== 'basic') {
+            $tagIds = $dataSearch->getSearchValue('tag_ids');
+            if(!empty($tagIds)){
+                static::addTagIdsFilterDataSearch($tagIds, $dataSearch);
+            }
+        }
+        
+        if(!is_null($form) && $form->wasSubmitted() && $form->validate()){
+            $searchType = filter_input(INPUT_POST, 'search_type');
+            if (!empty($searchType) && $searchType !== 'basic') {
+                $tagIds = explode(',', filter_input(INPUT_POST, 'search_tag_ids'));
+                $dataSearch->setSearchValue('tag_ids', $tagIds, true);
+            }
+        }
+        
+        return true;
+    }
+    
+    public static function addTagIdsFilterDataSearch($tagIds, GI_DataSearch $dataSearch){
+        $dataSearch->filterByTagIds($tagIds);
     }
 
 }

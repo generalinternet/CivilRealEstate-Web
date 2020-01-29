@@ -175,12 +175,17 @@ abstract class GI_ModelFactory extends GI_Object {
      * @param integer $itemsPerPage
      * @return GI_Model[]
      */
-    public static function getAll($status = 1, $pageNumber = NULL, $itemsPerPage = 100) {
-        $tableName = static::getTableName();
-        $defaultDAOClass = static::getStaticPropertyValueFromChild('defaultDAOClass');
-        $daoArray = $defaultDAOClass::getAll($tableName, static::getDBType(), $status, $pageNumber, $itemsPerPage);
-        $modelArray = static::buildModelArray($daoArray);
-        return $modelArray;
+    public static function getAll($status = 1, $pageNumber = NULL, $itemsPerPage = NULL) {
+        $search = static::search()
+                ->filter('status', $status);
+        if(!empty($pageNumber)){
+            $search->setPageNumber($pageNumber);
+        }
+        if(!empty($itemsPerPage)){
+            $search->setItemsPerPage($itemsPerPage);
+        }
+        $models = $search->select();
+        return $models;
     }
     
     /**
@@ -939,6 +944,20 @@ abstract class GI_ModelFactory extends GI_Object {
             }
             return static::getTablesFromTypeRefArray($typeRefs, $tables);
         }
+    }
+    
+    /**
+     * @param string||array $ids
+     * @return GI_Model[]
+     */
+    public static function getByIds($ids){
+        if(empty($ids)){
+            return array();
+        }
+        $search = static::search();
+        $search->filterIn('id', $ids);
+        $models = $search->select();
+        return $models;
     }
     
 }

@@ -13,6 +13,7 @@ abstract class AbstractContentDetailView extends MainWindowView {
     protected $referenceOnly = false;
     protected $displayAsChild = false;
     protected $pdfMode = false;
+    protected $detailWrapAttrs = array();
     
     public function __construct(AbstractContent $content) {
         parent::__construct();
@@ -33,6 +34,8 @@ abstract class AbstractContentDetailView extends MainWindowView {
             $refString = ' <a href="' . $refLink . '" title="' . $title . '" class="content_ref"><span class="icon primary link"></span></a>';
         }
         $this->setWindowTitle('<span class="inline_block">' . $title . '</span>' . $refString);
+        $this->setPrimaryViewModel($this->content);
+        $this->setCurLayoutMenuRef('content');
     }
     
     protected function addWindowTitle(){
@@ -79,14 +82,35 @@ abstract class AbstractContentDetailView extends MainWindowView {
         return NULL;
     }
     
+    protected function getDetailWrapAttrs(){
+        return $this->detailWrapAttrs;
+    }
+    
+    protected function getDetailWrapClass(){
+        return $this->content->getHTMLClass();
+    }
+    
+    protected function addDetailWrapAttr($attr, $val = NULL){
+        $this->detailWrapAttrs[$attr] = $val;
+        return $this;
+    }
+    
     protected function openDetailViewWrap(){
         $detailWrapId = $this->getDetailWrapId();
         $detailWrapIdAttr = '';
         if($detailWrapId){
             $detailWrapIdAttr = 'id="' . $detailWrapId . '"';
         }
+        $detailWrapAttrString = '';
+        $detailWrapAttrs = $this->getDetailWrapAttrs();
+        if(!empty($detailWrapAttrs)){
+            foreach($detailWrapAttrs as $attr => $val){
+                $detailWrapAttrString .= 'data-' . $attr . '="' . $val . '" ';
+            }
+        }
+        $detailWrapClass = $this->getDetailWrapClass();
         $typeRef = $this->content->getTypeRef();
-        $this->addHTML('<div ' . $detailWrapIdAttr . ' class="content_detail_view ' . $typeRef . ' ' . $this->content->getHTMLClass() . '">');
+        $this->addHTML('<div ' . $detailWrapIdAttr . ' class="content_detail_view ' . $typeRef . ' ' . $detailWrapClass . '" ' . $detailWrapAttrString . '>');
     }
     
     protected function closeDetailViewWrap(){
@@ -98,6 +122,7 @@ abstract class AbstractContentDetailView extends MainWindowView {
             return;
         }
         $this->openBtnWrap();
+        $this->addManageEditorsBtn();
         $this->addEditBtn();
         $this->addDeleteBtn();
         $this->closeBtnWrap();
@@ -115,11 +140,16 @@ abstract class AbstractContentDetailView extends MainWindowView {
         $this->addHTML('</div>');
     }
     
+    protected function getEditBtnClass(){
+        return NULL;
+    }
+    
     protected function addEditBtn(){
         if ($this->content->isEditable()) {
             $editURL = $this->content->getEditURL();
             $editTerm = Lang::getString('edit');
-            $this->addHTML('<a href="' . $editURL . '" title="' . $editTerm . '" class="custom_btn edit_btn">' . GI_StringUtils::getIcon('edit') . '<span class="btn_text">' . $editTerm . '</span></a>');
+            $editBtnClass = $this->getEditBtnClass();
+            $this->addHTML('<a href="' . $editURL . '" title="' . $editTerm . '" class="custom_btn edit_btn ' . $editBtnClass . '">' . GI_StringUtils::getIcon('edit') . '<span class="btn_text">' . $editTerm . '</span></a>');
         }
     }
     
@@ -128,6 +158,17 @@ abstract class AbstractContentDetailView extends MainWindowView {
             $deleteURL = $this->content->getDeleteURL();
             $deleteTerm = Lang::getString('delete');
             $this->addHTML('<a href="' . $deleteURL . '" class="custom_btn open_modal_form" title="' . $deleteTerm . '">' . GI_StringUtils::getIcon('delete') . '<span class="btn_text">' . $deleteTerm . '</span></a>');
+        }
+    }
+    
+    protected function addManageEditorsBtn(){
+        if ($this->content->canManageEditors()) {
+            $manageEditorsURL = GI_URLUtils::buildURL(array(
+                'controller' => 'content',
+                'action' => 'manageEditors',
+                'contentId' => $this->content->getId()
+            ));
+            $this->addHTML('<a href="' . $manageEditorsURL . '" title="Manage Editors" class="custom_btn open_modal_form">' . GI_StringUtils::getIcon('edit') . '<span class="btn_text">Manage Editors</span></a>');
         }
     }
     
@@ -146,6 +187,13 @@ abstract class AbstractContentDetailView extends MainWindowView {
         
         $this->buildViewGuts();
         
+        $this->buildInnerContent();
+        
+        $this->closeDetailViewWrap();
+        $this->closePaddingWrap();
+    }
+    
+    protected function buildInnerContent(){
         $innerContents = $this->content->getInnerContent();
         if(!empty($innerContents)){
             $this->addHTML('<div class="content_in_content">');
@@ -154,13 +202,11 @@ abstract class AbstractContentDetailView extends MainWindowView {
             $view = $innerContent->getView();
             $view->setDisplayAsChild(true);
             $this->addHTML($view->getHTMLView());
+            $this->innerContentAdded($innerContent);
         }
         if(!empty($innerContents)){
             $this->addHTML('</div>');
         }
-        
-        $this->closeDetailViewWrap();
-        $this->closePaddingWrap();
     }
     
     protected function addContentTitle(){
@@ -192,6 +238,11 @@ abstract class AbstractContentDetailView extends MainWindowView {
             }
             $this->addHTML('</div>');
         }
+    }
+    
+    protected function innerContentAdded(AbstractContent $content){
+        //listener for when inner content is added to the view
+        return $this;
     }
     
 }

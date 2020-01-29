@@ -4,13 +4,18 @@
  *
  * @author General Internet
  * @copyright  2017 General Internet
- * @version    2.0.1
+ * @version    4.0.0
  */
 abstract class AbstractTimeIntervalFactory extends GI_ModelFactory {
 
     protected static $primaryDAOTableName = 'time_interval';
     protected static $models = array();
 
+    /**
+     * @param string $typeRef
+     * @param GI_DataMap $map
+     * @return AbstractTimeInterval
+     */
     protected static function buildModelByTypeRef($typeRef, $map) {
         switch ($typeRef) {
             case 'project':
@@ -42,7 +47,7 @@ abstract class AbstractTimeIntervalFactory extends GI_ModelFactory {
     /**
      * @param type $id - the id of the model
      * @param type $force - Whether or not you want to force the system to update the model, or to use available model from object pool
-     * @return TimeInterval
+     * @return AbstractTimeInterval
      */
     public static function getModelById($id, $force = false) {
         return parent::getModelById($id, $force);
@@ -65,7 +70,7 @@ abstract class AbstractTimeIntervalFactory extends GI_ModelFactory {
  * @param type $startDate
  * @param type $endDate
  * @param type $intervalTypeRef
- * @return TimeInterval[]
+ * @return AbstractTimeInterval[]
  */
     public static function getTimeIntervalsByLinkedModel(GI_Model $model, $startDate = NULL, $endDate = NULL, $tags = array(), $intervalTypeRef = 'interval') {
         $itemId = $model->getProperty('id');
@@ -111,8 +116,6 @@ abstract class AbstractTimeIntervalFactory extends GI_ModelFactory {
             $intervalSearch->andIf();
         }
         if (!empty($intervalTypeRef)) {
-//            $pTypeRef = TimeIntervalFactory::getPTypeRef($intervalTypeRef);
-//            $intervalSearch->filterTypeByRef($pTypeRef, $intervalTypeRef);
             $intervalSearch->filterByTypeRef($intervalTypeRef);
         }
         

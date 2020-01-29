@@ -24,6 +24,7 @@ class AbstractContentSearchFormView extends GI_SearchView{
     protected function addSearchFields(){
         $this->addTitleField();
         $this->addDateFields();
+        $this->addTagField();
     }
     
     protected function addTitleField(){
@@ -60,6 +61,17 @@ class AbstractContentSearchFormView extends GI_SearchView{
             'value' => $this->getQueryValue('end_date'),
             'minDateFromField' => 'search_start_date'
         ));
+    }
+    
+    protected function addTagField($overWriteSettings = array(), $overWriteAutocompProps = array()) {
+        $autocompProps = array(
+            'type' => 'content',
+            'valueColumn' => 'id',
+        );
+        foreach ($overWriteAutocompProps as $prop => $val) {
+            $autocompProps[$prop] = $val;
+        }
+        parent::addTagField($overWriteSettings, $autocompProps);
     }
     
 }

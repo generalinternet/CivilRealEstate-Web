@@ -1,5 +1,11 @@
 <?php
-
+/**
+ * Description of AbstractGenericEmailView
+ *
+ * @author General Internet
+ * @copyright  2019 General Internet
+ * @version    4.0.0
+ */
 abstract class AbstractGenericEmailView {
     
     protected $html = '';
@@ -317,8 +323,12 @@ abstract class AbstractGenericEmailView {
         return $this;
     }
     
-    public function startButton($link){
-        $this->addHTML('<a href="' . $link . '" target="_blank" ' . $this->getStyleString('button') . '>');
+    public function startButton($link, $trackLink = true){
+        $this->addHTML('<a href="' . $link . '" target="_blank" ' . $this->getStyleString('button'));
+        if(!$trackLink){
+            $this->addHTML(' mc:disable-tracking');
+        }
+        $this->addHTML(' >');
         return $this;
     }
     
@@ -327,8 +337,8 @@ abstract class AbstractGenericEmailView {
         return $this;
     }
     
-    public function addButton($label, $link){
-        $this->startButton($link)
+    public function addButton($label, $link, $trackLink = true){
+        $this->startButton($link, $trackLink)
                 ->addHTML($label)
                 ->closeButton();
         return $this;

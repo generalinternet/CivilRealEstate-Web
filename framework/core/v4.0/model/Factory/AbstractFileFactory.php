@@ -247,4 +247,17 @@ abstract class AbstractFileFactory extends GI_ModelFactory {
         return NULL;
     }
 
+    public static function getFileByFolderAndFilename(AbstractFolder $folder, $filename) {
+        $fileTableName = static::getDbPrefix() . 'file';
+        $search = static::search();
+        $search->join('folder_link_to_file', 'file_id', $fileTableName, 'id', 'FLTF');
+        $search->filter('FLTF.folder_id', $folder->getId())
+                ->filter('filename', $filename);
+        $results = $search->select();
+        if (!empty($results)) {
+            return $results[0];
+        }
+        return NULL;
+    }
+
 }

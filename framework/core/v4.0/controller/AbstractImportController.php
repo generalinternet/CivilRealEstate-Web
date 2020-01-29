@@ -136,13 +136,15 @@ abstract class AbstractImportController extends GI_Controller {
         $key = $attributes['key'];
         $paymentType = $attributes['type'];
         $samplePayment = PaymentFactory::buildNewModel($paymentType);
-        if (!isset($_SESSION[$key]) || empty($samplePayment)) {
+
+        $results = SessionService::getValue($key);
+        if (empty($results) || empty($samplePayment)) {
             GI_URLUtils::redirectToError(2000);
         }
-        $results = $_SESSION[$key];
-        if (empty($results)) {
-            GI_URLUtils::redirectToError();
-        }
+        
+//        if (empty($results)) {
+//            GI_URLUtils::redirectToError();
+//        }
         $groupPayments = array();
 
         $cId = ProjectConfig::getDefaultCurrencyId();
@@ -172,9 +174,8 @@ abstract class AbstractImportController extends GI_Controller {
         $view = $importer->getImportPaymentsFormView($form, $groupPayments);
         $view->buildForm();
         if ($importer->handleImportPaymentsFormSubmission($form, $groupPayments)) {
-            if (isset($_SESSION[$key])) {
-                unset($_SESSION[$key]);
-            }
+
+            SessionService::unsetValue($key);
             //TODO - if user chose to continue, store group payment ids in string and forward to action to map in accounting controller
             //else, redirect as is
             
@@ -188,6 +189,11 @@ abstract class AbstractImportController extends GI_Controller {
         return $returnArray;
     }
     
+    /**
+     * @deprecated
+     * @param type $attributes
+     * @return int
+     */
     public function actionUsers($attributes){
         if (!Permission::verifyByRef('import_data')) {
             GI_URLUtils::redirect(array(
@@ -308,11 +314,12 @@ abstract class AbstractImportController extends GI_Controller {
                 'controller' => 'import',
                 'action' => 'afterUsersImport',
             );
-            $_SESSION['user_import_report'] = array(
+            
+            SessionService::setValue('user_import_report', array(
                 'success' => $successfulImports,
                 'fail' => $failedImports,
                 'duplicate' => $duplicateImports
-            );
+            ));
             if (isset($attributes['ajax']) && $attributes['ajax'] == 1) {
                 $newUrlArray['ajax'] = 1;
                 $newUrl = GI_URLUtils::buildLinkURL($newUrlArray);
@@ -327,12 +334,20 @@ abstract class AbstractImportController extends GI_Controller {
         $returnArray['success'] = $success;
         return $returnArray;
     }
-    
+
     public function actionAfterUsersImport($attributes) {
-        if (isset($_SESSION['user_import_report'])) {
-            $reportArray = $_SESSION['user_import_report'];
-            unset($_SESSION['user_import_report']);
-        } else {
+//        if (isset($_SESSION['user_import_report'])) {
+//            $reportArray = $_SESSION['user_import_report'];
+//            unset($_SESSION['user_import_report']);
+//        } else {
+//            GI_URLUtils::redirect(array(
+//                'controller' => 'user',
+//                'action' => 'index'
+//            ));
+//        }
+        $reportArray = SessionService::getValue('user_import_report');
+        SessionService::unsetValue('user_import_report');
+        if (empty($reportArray)) {
             GI_URLUtils::redirect(array(
                 'controller' => 'user',
                 'action' => 'index'

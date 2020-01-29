@@ -3,8 +3,8 @@
  * Description of AbstractGI_Index
  *
  * @author General Internet
- * @copyright  2018 General Internet
- * @version    3.0.2
+ * @copyright  2019 General Internet
+ * @version    4.0.1
  */
 abstract class AbstractGI_Index{
     
@@ -57,7 +57,11 @@ abstract class AbstractGI_Index{
     
     public static function startSession(){
         session_name(static::getSessionName());
-        session_start();
+        if (ProjectConfig::getUseAdvancedSessionFunctions()) {
+            Session::start();
+        } else {
+            session_start();
+        }
     }
     
     public static function routeRequest(){
@@ -72,16 +76,49 @@ abstract class AbstractGI_Index{
         } else {
             static::routeLoggedOutRequest($reqController, $reqAction);
         }
-        
+
         $controller = static::getController();
         $action = static::getAction();
+        
+
+
+        if ($controller !== 'login' && !GI_URLUtils::isAJAX()) {
+            $user = Login::getUser();
+            if (!empty($user)) {
+                if ($user->isSuspended() && ($controller !== 'static' && $action !== 'suspended')) {
+                    GI_URLUtils::redirect(array(
+                        'controller'=>'static',
+                        'action'=>'suspended',
+                    ));
+
+                }
+                $search = UserActionRequiredFactory::search();
+                $search->filterByTypeRef('redirect')
+                        ->filter('user_id', $user->getId());
+                $search->setPageNumber(1)
+                        ->setItemsPerPage(1)
+                        ->orderBy('rank', 'DESC');
+                $redirectResults = $search->select();
+                if (!empty($redirectResults)) {
+                    $redirectModel = $redirectResults[0];
+                    $redirectController = $redirectModel->getProperty('user_act_req_redirect.controller');
+                    $redirectAction = $redirectModel->getProperty('user_act_req_redirect.action');
+
+                    if ($controller !== $redirectController || $action !== $redirectAction) {
+                        $redirectURL = $redirectModel->getProperty('user_act_req_redirect.url');
+                        Header('Location: ' . $redirectURL);
+                        die();
+                    }
+                }
+            }
+        }
 
         if(GI_URLUtils::isAJAX()){
             static::routeAJAXRequest($controller, $action, $attributes);
         } else {
             static::routePageRequest($controller, $action, $attributes);
+            static::requestEnd();
         }
-        static::requestEnd();
     }
     
     public static function routeAJAXRequest($controller, $action, $attributes){
@@ -100,6 +137,7 @@ abstract class AbstractGI_Index{
                 'mainContent' => $errorString
             )));
         }
+        static::requestEnd();
         die(json_encode($returnArray));
     }
     
@@ -119,15 +157,14 @@ abstract class AbstractGI_Index{
         
         $layoutView->addBodyClass('controller_' . $controller);
         $layoutView->addBodyClass('action_' . $action);
-        if (isset($layoutArray['listBarURL'])) {
+        if (isset($layoutArray['listBarURL']) && method_exists($layoutView, 'setListBarURL')) {
             $layoutView->setListBarURL($layoutArray['listBarURL']);
         }
-        if (isset($layoutArray['listBarClass'])) {
+        if (isset($layoutArray['listBarClass']) && method_exists($layoutView, 'setListBarClass')) {
             $layoutView->setListBarClass($layoutArray['listBarClass']);
         }
-        
         Notification::markNotificationViewed();
-        $layoutView->display();
+        $layoutView->display(); 
     }
     
     public static function getBreadcrumbView($returnArray){
@@ -177,11 +214,16 @@ abstract class AbstractGI_Index{
      */
     public static function getLayoutView($layoutArray = array(), $controller = '', $action = ''){
         $layoutView = NULL;
-        if(ApplicationConfig::isPublic($controller, $action)){
-            $layoutView = new PublicLayoutView($layoutArray);
+        if(isset($layoutArray['layoutView'])){
+            $layoutViewName = $layoutArray['layoutView'];
+            $layoutView = new $layoutViewName($layoutArray);
         } else {
             if($controller !== 'login'){
-                $layoutView = new MainLayoutView($layoutArray);
+                if(ApplicationConfig::isPublic($controller, $action)){
+                    $layoutView = new PublicLayoutView($layoutArray);
+                } else {
+                    $layoutView = new MainLayoutView($layoutArray);
+                }
             } else {
                 $layoutView = new LoginLayoutView($layoutArray);
             }
@@ -204,10 +246,13 @@ abstract class AbstractGI_Index{
         
         $dbName = dbConfig::getDbName();
         if (!empty($dbName)) {
-            if (isset($_SESSION['log_key'])) {
+            $logKey = SessionService::getValue('log_key');
+           // if (isset($_SESSION['log_key'])) {
+            if (!empty($logKey)) {
                 try {
                     $loginResult = LoginFactory::search()
-                            ->filter('log_key', $_SESSION['log_key'])
+                           // ->filter('log_key', $_SESSION['log_key'])
+                            ->filter('log_key', $logKey)
                             ->select();
                     if ($loginResult) {
                         $login = $loginResult[0];
@@ -261,7 +306,7 @@ abstract class AbstractGI_Index{
     
     protected static function routeLoggedInRequest($controller = NULL, $action = NULL){
         if(ApplicationConfig::isLogoutRequired($controller, $action)){
-            static::setController(GI_ProjectConfig::getDefaultConroller());
+            static::setController(GI_ProjectConfig::getDefaultController());
             static::setAction(GI_ProjectConfig::getDefaultAction());
         } else {
             $user = Login::getUser();
@@ -286,20 +331,21 @@ abstract class AbstractGI_Index{
         static::$trackRequestTime = $trackRequestTime;
 }
     
-    public static function requestStart(){
-        if(static::$trackRequestTime){
+    public static function requestStart() {
+        if (static::$trackRequestTime) {
             static::$requestStartObj = new DateTime();
         }
     }
-    
-    public static function requestEnd(){
-        if(static::$trackRequestTime){
+
+    public static function requestEnd() {
+        if (static::$trackRequestTime) {
             static::$requestEndObj = new DateTime();
             $startString = GI_Time::formatDateTime(static::$requestStartObj);
             $endString = GI_Time::formatDateTime(static::$requestEndObj);
             static::$requestTime = GI_Time::formatTimeSince($startString, $endString);
             echo '<span class="admin_only">' . static::$requestTime . '</span>';
         }
+        EventService::processEvents();
     }
-    
+
 }

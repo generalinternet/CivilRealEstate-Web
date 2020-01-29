@@ -213,6 +213,9 @@ abstract class GI_AuditModel {
                 ));
                 $cols = $model->getCols();
                 foreach ($result[$i] as $key => $value2) {
+                    if(!isset($cols[$key])){
+                        continue;
+                    }
                     $columnType = $cols[$key]['type'];
                     if (($columnType === 'date' || $columnType === 'datetime' || $columnType === 'time')) {
                         $convertedTime = GI_Time::formatToUserTime($value2, $columnType);

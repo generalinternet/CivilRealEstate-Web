@@ -12,6 +12,7 @@ abstract class AbstractUserDetailView extends MainWindowView {
     protected $user;
     protected $notificationsTableView;
     protected $viewBuilt = false;
+    
 
     public function __construct(AbstractUser $user, $notificationsTableView = NULL) {
         parent::__construct();
@@ -58,6 +59,9 @@ abstract class AbstractUserDetailView extends MainWindowView {
         $this->addHTML('<div class="columns halves">');
         $this->addAdditionalDetailSection();
 //        $this->addNotificationsSection();
+        $this->addFilesSection();
+        $this->addLogsSection();
+        $this->addSettingsAdvancedBlock();
         $this->addHTML('</div>');
     }
 
@@ -133,19 +137,22 @@ abstract class AbstractUserDetailView extends MainWindowView {
         }
     }
     
-    protected function addNotificationsSection(){
-        if ($this->notificationsTableView) {
-            $this->addHTML('<div class="column">');
-                $this->addHTML('<div class="content_group ajax_link_wrap">')
-                    ->addHTML('<div class="right_btns">')
-                    ->addNotificationsBtn()
-                    ->addHTML('</div>')
-                        ->addHTML('<h2 class="content_group_title">Notifications</h2>')
-                        ->addHTML($this->notificationsTableView->getHTMLView())
-                    ->addHTML('</div>');
-            $this->addHTML('</div>');
-        }
-    }
+    /**
+     * @deprecated since version 4.0
+     */
+//    protected function addNotificationsSection(){
+//        if ($this->notificationsTableView) {
+//            $this->addHTML('<div class="column">');
+//                $this->addHTML('<div class="content_group ajax_link_wrap">')
+//                    ->addHTML('<div class="right_btns">')
+//                    ->addNotificationsBtn()
+//                    ->addHTML('</div>')
+//                        ->addHTML('<h2 class="content_group_title">Notifications</h2>')
+//                        ->addHTML($this->notificationsTableView->getHTMLView())
+//                    ->addHTML('</div>');
+//            $this->addHTML('</div>');
+//        }
+//    }
     
     protected function addWindowBtns(){
         $this->addEditBtn();
@@ -188,4 +195,98 @@ abstract class AbstractUserDetailView extends MainWindowView {
         return $this;
     }
     
+    protected function addFilesSection(GI_View $view = NULL) {
+        if(is_null($view)){
+            $view = $this;
+        }
+        $view->addHTML('<div class="columns halves">')
+                ->addHTML('<div class="column">')
+                ->addHTML('<h4>Avatars</h4>');
+        $this->addImageSection($view);
+        $view->addHTML('</div>')
+                ->addHTML('<div class="column">')
+                ->addHTML('<h4>Files</h4>');
+        $this->addFileSection($view);
+        $view->addHTML('</div>')
+                ->addHTML('</div>');
+    }
+    
+    protected function addImageSection(GI_View $view = NULL) {
+        if(is_null($view)){
+            $view = $this;
+        }
+        $folder = $this->user->getSubFolderByRef('profile_pictures');
+        if($folder){
+            $this->addFolderContents($view, $folder, 'avatars');
+            
+        }
+    }
+    
+    protected function addFileSection(GI_View $view = NULL) {
+        if(is_null($view)){
+            $view = $this;
+        }
+        $folder = $this->user->getFolder();
+        if($folder){
+            $this->addFolderContents($view, $folder);
+        }
+    }
+    
+    protected function addFolderContents(GI_View $view = NULL, $folder = NULL, $fileTypeTerm = 'files'){
+        if(empty($folder)){
+            return;
+        }
+        if(is_null($view)){
+            $view = $this;
+        }
+        $view->addHTML('<div class="content_files">');
+        $files = $folder->getFiles();
+        if(!empty($files)){
+            foreach($files as $file){
+                $fileView = $file->getView();
+                $fileView->setIsDeleteable(false);
+                $fileView->setIsRenamable(false);
+                $view->addHTML($fileView->getHTMLView());
+            }
+        } else {
+            $view->addHTML('<p class="no_model_message content_block">No ' . $fileTypeTerm . ' found.</p>');
+        }
+        $view->addHTML('</div>');
+    }
+
+    protected function addLogsSection() {
+        if (Permission::verifyByRef('view_user_activity_logs') || (($this->user->getId() == Login::getUserId()) && Permission::verifyByRef('view_my_user_activity_logs'))) {
+            $uploader = $this->user->getEventsLogUploader();
+            if (!empty($uploader)) {
+                $this->addHTML($uploader->getHTMLView());
+            }
+        }
+    }
+    
+    protected function addSettingsAdvancedBlock($classNames = '') {
+        if (!((Permission::verifyByRef('super_admin') || Login::getUserId() == $this->user->getId()))) {
+            return;
+        }
+        $isOpenOnLoad = false;
+        $attrs = array(
+            'controller'=>'user',
+            'action'=>'viewNotificationSettings',
+            'userId'=>$this->user->getId(),
+            'contentOnly'=>'1',
+            'ajax'=>1
+        );
+        $attrs['tabbed'] = 1;
+        $attrs['addAddBtn'] = 0;
+        $ajaxAutoLoadUrl = GI_URLUtils::buildURL($attrs);
+
+        $btnOptionsArray = NULL;
+        
+        $targetRef = 'settings';
+        $advClassNames = $classNames . ' ' . $this->targetRefPrefix . $targetRef;
+        $headerIcon = 'gear';
+        $headerTitle = 'Settings';
+        $isAddToSidebar = false;
+        $this->addAdvancedBlock($headerTitle, NULL, $btnOptionsArray, NULL, $isOpenOnLoad, '--', NULL, $targetRef, $advClassNames, $headerIcon, $isAddToSidebar, $ajaxAutoLoadUrl);
+    }
+
 }

@@ -84,6 +84,9 @@ abstract class AbstractKeyService extends GI_Service {
     }
 
     public static function getDBConfigByAppRef($appRef, $dbType = 'client') {
+        if(DEV_MODE){
+            return static::getDevDBConfigByAppRef($appRef, $dbType);
+        }
         switch ($dbType) {
             case 'rets':
             case 'client':
@@ -98,6 +101,38 @@ abstract class AbstractKeyService extends GI_Service {
         $config = static::getSecretArray($secretName);
         apcu_store($secretName, $config, ProjectConfig::getApcuTTL());
         return $config;
+    }
+    
+    public static function getDevDBConfigByAppRef($appRef, $dbType = 'client'){
+        switch($dbType){
+            case 'rets':
+                $hostAndPort = RETS_DB_HOST;
+                $username = RETS_DB_USER;
+                $password = RETS_DB_PASS;
+                $dbName = RETS_DB_NAME;
+                break;
+            default:
+                $hostAndPort = DEFAULT_DB_HOST;
+                $username = DEFAULT_DB_USER;
+                $password = DEFAULT_DB_PASS;
+                if(defined($appRef . '_DB_NAME')){
+                    $dbName = constant($appRef . '_DB_NAME');
+                } else {
+                    $dbName = DEFAULT_DB_NAME;
+                }
+                break;
+        }
+        $host = substr($hostAndPort, 0, strpos($hostAndPort, ':'));
+        $port = substr($hostAndPort, strpos($hostAndPort, ':') + 1);
+        
+        $devDBConfig = array(
+            'host' => $host,
+            'port' => $port,
+            'username' => $username,
+            'password' => $password,
+            'dbname' => $dbName
+        );
+        return $devDBConfig;
     }
 
 }

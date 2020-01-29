@@ -8,7 +8,7 @@ use Aws\Sqs\SqsClient;
  *
  * @author General Internet
  * @copyright  2019 General Internet
- * @version    4.0.2
+ * @version    4.0.3
  */
 abstract class AbstractAWSService extends GI_Service {
     
@@ -55,6 +55,7 @@ abstract class AbstractAWSService extends GI_Service {
             'DelaySeconds' => $delaySeconds,
         );
         $attributes['type'] = $type;
+        $messageAttributes = array();
         foreach ($attributes as $key => $value) {
             $key = static::sanitizeSQSDAttributeKey($key);
             $attributeArray = array(

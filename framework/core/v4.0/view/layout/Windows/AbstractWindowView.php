@@ -28,6 +28,25 @@ abstract class AbstractWindowView extends GI_View {
     protected $onlyBodyContent = false;
     protected $viewBodyBarClass = '';
     protected $addViewBodyBar = false;
+    /**
+     * The primary model to be displayed in the view (this property will be used to gather the common data to be displayed to a super admin)
+     * @var GI_Model 
+     */
+    protected $primaryViewModel = NULL;
+    protected $extraPrimaryViewModelData = array();
+    protected $useAJAXLoading = true;
+    protected $viewHeaderAttrs = array();
+    protected $viewFooterAttrs = array();
+    protected $viewBodyAttrs = array();
+    
+    public function __construct() {
+        parent::__construct();
+        
+        $isModal = GI_URLUtils::getAttribute('modal');
+        if($isModal){
+            $this->setAddOuterWrap(false);
+        }
+    }
     
     public function setWindowTitle($windowTitle){
         $this->windowTitle = $windowTitle;
@@ -114,6 +133,15 @@ abstract class AbstractWindowView extends GI_View {
         return $this;
     }
     
+    public function getUseAJAXLoading(){
+        return $this->useAJAXLoading;
+    }
+    
+    public function setUseAJAXLoading($useAJAXLoading){
+        $this->useAJAXLoading = $useAJAXLoading;
+        return $this;
+    }
+    
     protected function openViewWrap(){
         if(!$this->addViewWrap || !$this->addOuterWrap){
             return $this;
@@ -144,7 +172,7 @@ abstract class AbstractWindowView extends GI_View {
         if(!$this->addViewHeader){
             return $this;
         }
-        $this->addHTML('<div class="view_header ' . $this->getViewHeaderClass() . '">');
+        $this->addHTML('<div class="view_header ' . $this->getViewHeaderClass() . '" ' . $this->getViewHeaderAttrString() . '>');
         return $this;
     }
     
@@ -161,6 +189,41 @@ abstract class AbstractWindowView extends GI_View {
         return $this;
     }
     
+    public function setViewHeaderAttr($attr, $val){
+        $this->viewHeaderAttrs[$attr] = $val;
+        return $this;
+    }
+    
+    public function setViewFooterAttr($attr, $val){
+        $this->viewFooterAttrs[$attr] = $val;
+        return $this;
+    }
+    
+    public function setViewBodyAttr($attr, $val){
+        $this->viewBodyAttrs[$attr] = $val;
+        return $this;
+    }
+    
+    public function getViewAttrString($attrs){
+        $string = '';
+        foreach($attrs as $attr => $val){
+            $string .= ' ' . $attr . '="' . $val . '"';
+        }
+        return $string;
+    }
+    
+    public function getViewHeaderAttrString(){
+        return $this->getViewAttrString($this->viewHeaderAttrs);
+    }
+    
+    public function getViewFooterAttrString(){
+        return $this->getViewAttrString($this->viewFooterAttrs);
+    }
+    
+    public function getViewBodyAttrString(){
+        return $this->getViewAttrString($this->viewBodyAttrs);
+    }
+    
     protected function openViewBody(){
         if(!$this->addViewBody || !$this->addViewBodyWrap){
             return $this;
@@ -170,7 +233,7 @@ abstract class AbstractWindowView extends GI_View {
         if($viewBodyId){
             $this->addHTML(' id="'.$viewBodyId.'"');
         }
-        $this->addHTML(' class="view_body ' . $this->getViewBodyClass() . '">');
+        $this->addHTML(' class="view_body ' . $this->getViewBodyClass() . '" ' . $this->getViewBodyAttrString() . '>');
         return $this;
     }
     
@@ -200,7 +263,7 @@ abstract class AbstractWindowView extends GI_View {
         if(!$this->addViewFooter){
             return $this;
         }
-        $this->addHTML('<div class="view_footer ' . $this->getViewFooterClass() . '">');
+        $this->addHTML('<div class="view_footer ' . $this->getViewFooterClass() . '" ' . $this->getViewFooterAttrString() . '>');
         return $this;
     }
     
@@ -223,6 +286,13 @@ abstract class AbstractWindowView extends GI_View {
     }
     
     public function getListBarURL(){
+        if(empty($this->listBarURL)){
+            //@todo we should have a way to set the default list bar url when one is not provided
+            $notification = NotificationFactory::buildNewModel();
+            if($notification){
+                $this->listBarURL = $notification->getListBarURL();
+            }
+        }
         return $this->listBarURL;
     }
     
@@ -265,6 +335,7 @@ abstract class AbstractWindowView extends GI_View {
         if(!$this->addViewBody){
             return $this;
         }
+        $this->addPrimaryViewModelInfo();
         $this->openViewBody();
             $this->addViewBodyContent();
         $this->closeViewBody();
@@ -305,7 +376,7 @@ abstract class AbstractWindowView extends GI_View {
         $class = 'main_head';
         if($windowIcon){
             $class .= ' has_left_icon';
-            $mainTitle .= GI_StringUtils::getSVGIcon($windowIcon, '26px', '26px', 'left_icon');
+            $mainTitle .= GI_StringUtils::getSVGIcon($windowIcon, '1em', '1em', 'left_icon');
         }
         $windowTitle = $this->getWindowTitle();
         if($windowTitle){
@@ -316,7 +387,11 @@ abstract class AbstractWindowView extends GI_View {
     }
     
     protected function addWindowBtnWrap(){
-        $this->addHTML('<div class="right_btns ajax_link_wrap">');
+        $class = '';
+        if($this->getUseAJAXLoading()){
+            $class = 'ajax_link_wrap';
+        }
+        $this->addHTML('<div class="right_btns ' . $class . '">');
             $this->addWindowBtns();
         $this->addHTML('</div>');
         return $this;
@@ -324,6 +399,16 @@ abstract class AbstractWindowView extends GI_View {
     
     protected function addWindowBtns(){
         return $this;
+    }
+    
+    public function setPrimaryViewModel($primaryViewModel = NULL){
+        $this->primaryViewModel = $primaryViewModel;
+        return $this;
+    }
+    
+    /** @return GI_Model */
+    public function getPrimaryViewModel(){
+        return $this->primaryViewModel;
     }
     
     public function setAddWrap($addWrap){
@@ -386,6 +471,32 @@ abstract class AbstractWindowView extends GI_View {
     }
     
     protected function addViewBodyBarContent(){
+        return $this;
+    }
+    
+    protected function addPrimaryViewModelInfo(){
+        $primaryViewModel = $this->getPrimaryViewModel();
+        if(!empty($primaryViewModel)){
+            $inception = GI_Time::formatDateTimeForDisplay($primaryViewModel->getProperty('inception'));
+            $lastMod = GI_Time::formatDateTimeForDisplay($primaryViewModel->getProperty('last_mod'));
+            $this->addHTML('<div class="admin_only view_body_bar">');
+                $this->addHTML(GI_StringUtils::getLabelWithValue('Id', $primaryViewModel->getId()));
+                $this->addHTML(GI_StringUtils::getLabelWithValue('Created By', $primaryViewModel->getCreatedByName()));
+                $this->addHTML(GI_StringUtils::getLabelWithValue('Created Date', $inception));
+                $this->addHTML(GI_StringUtils::getLabelWithValue('Last Modified By', $primaryViewModel->getLastModByName()));
+                $this->addHTML(GI_StringUtils::getLabelWithValue('Last Modified Date', $lastMod));
+                foreach($this->extraPrimaryViewModelData as $extraData){
+                    $this->addHTML(GI_StringUtils::getLabelWithValue($extraData['label'], $extraData['value']));
+                }
+            $this->addHTML('</div>');
+        }
+    }
+    
+    public function addExtraPrimaryViewModelData($label, $value){
+        $this->extraPrimaryViewModelData[] = array(
+            'label' => $label,
+            'value' => $value
+        );
         return $this;
     }
     

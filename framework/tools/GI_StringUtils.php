@@ -3,8 +3,8 @@
  * Description of GI_StringUtils
  *
  * @author General Internet
- * @copyright  2017 General Internet
- * @version    3.0.5
+ * @copyright  2019 General Internet
+ * @version    4.0.1
  */
 class GI_StringUtils{
     
@@ -125,40 +125,50 @@ class GI_StringUtils{
     }
     
     public static function buildAddrString($addrStreet = '', $addrCity = '', $addrRegion = '', $addrCode = '', $addrCountry = '', $breakLines = true, $addrStreetTwo = '', $forceIncludeCountry = true) {
-        $addrArray = [];
+        $addr = '';
         if ($breakLines) {
             $lineBreaker = '<br/>';
         } else {
             $lineBreaker = ', ';
         }
-
         if (!empty($addrStreet)) {
-            $addrArray[] = $addrStreet;
+            $addr .= $addrStreet;
+            if (!empty($addrStreetTwo) || !empty($addrCity) || !empty($addrRegion)) {
+                $addr .= $lineBreaker;
+            }
         }
-
         if (!empty($addrStreetTwo)) {
-            $addrArray[] = $addrStreetTwo;
+            $addr .= $addrStreetTwo;
+            if (!empty($addrCity) || !empty($addrRegion)) {
+                $addr .= $lineBreaker;
+            }
         }
-
         if (!empty($addrCity)) {
-            $addrArray[] = $addrCity;
+            $addr .= $addrCity;
+            if (!empty($addrRegion)) {
+                $addr .= ', ';
+            } elseif (!empty($addrCode)) {
+                $addr .= $lineBreaker;
+            }
         }
-
         if (!empty($addrRegion)) {
-            $addrArray[] = $addrRegion;
+            $addr .= $addrRegion;
+            if (!empty($addrCode)) {
+                $addr .= ' ' . $addrCode;
+            }
+            if (!empty($addrCountry)) {
+                $addr .= $lineBreaker;
+            }
+        } else {
+            $addr .= $lineBreaker;
         }
-
-        if (
-            (!empty($addrCountry)) &&
-            ($forceIncludeCountry || ($addrCountry != ProjectConfig::getDefaultCountryCode()))
-        ) {
-            $addrArray[] = GeoDefinitions::getCountryNameFromCode($addrCountry);
-        }
-
-        $addr = implode($lineBreaker, $addrArray);
-
-        if (!empty($addrCode)) {
-            $addr .= ' ' . $addrCode;
+        if (!empty($addrCountry)) {
+            if ($forceIncludeCountry || ($addrCountry != ProjectConfig::getDefaultCountryCode())) {
+                $addr .= GeoDefinitions::getCountryNameFromCode($addrCountry);
+                if (!empty($addrCode)) {
+                    $addr .= ' ';
+                }
+            }
         }
         return $addr;
     }
@@ -365,7 +375,7 @@ class GI_StringUtils{
             return number_format($amount, $precision, '.', '');
         }
     }
-    
+
     public static function formatMoneyRate($amount, $withCommas = true, $precision = 7) {
         if (GI_Math::floatEquals($amount, 0)) {
             $amount = 0;
@@ -708,7 +718,7 @@ class GI_StringUtils{
      * @param type $classNames
      * @return type
      */
-    public static function getSVGIcon($fileName, $width = '50px', $height = '50px', $classNames = '', $customPath = false){
+    public static function getSVGIcon($fileName, $width = '1em', $height = '1em', $classNames = '', $customPath = false){
         //Find SVG file
         if($customPath){
             $svgFilePath = $fileName;
@@ -858,7 +868,7 @@ class GI_StringUtils{
     }
     
     public static function getLabelWithValue($label, $value = NULL, $forceShow = false, $emptyValue = '--'){
-        if(empty($value) && !$forceShow){
+        if(is_null($value) && !$forceShow){
             return NULL;
         }
         $finalValue =  $value;
@@ -871,7 +881,7 @@ class GI_StringUtils{
         $string .= '</span>';
         return $string;
     }
-
+    
     public static function getSVGAvatar($modelNum, $width = '50px', $height = '50px', $classNames = '', $customPath = false){
         //Find SVG file
         if($customPath){
@@ -879,7 +889,7 @@ class GI_StringUtils{
         } else {
             $svgDirPath = 'framework/core/' . FRMWK_CORE_VER. '/resources/media/avatars/';
             $svgFilePath = $svgDirPath. 'avatar_model_' . sprintf('%03d', $modelNum) . '.svg';
-}
+        }
         if(!file_exists($svgFilePath)){
             return $svgFilePath;
             return;
@@ -888,32 +898,46 @@ class GI_StringUtils{
     }
     
     public static function getPasswordRules($field, $confField = NULL, $showCannotBeSame = false){
+        $minLength = ProjectConfig::getPassMinLength();
+        $forceUpper = ProjectConfig::getPassReqUpper();
+        $forceLower = ProjectConfig::getPassReqLower();
+        $forceSymbol = ProjectConfig::getPassReqSymbol();
+        $forceNum = ProjectConfig::getPassReqNum();
+        if(class_exists('GenericPasswordRuleView')){
+            $ruleView = new GenericPasswordRuleView();
+            $ruleView->setFieldName($field);
+            $ruleView->setConfFieldName($confField);
+            $ruleView->setShowCannotBeSame($showCannotBeSame);
+            $ruleView->setNoWhiteSpace(true);
+            $ruleView->setMinLength($minLength);
+            $ruleView->setForceUpper($forceUpper);
+            $ruleView->setForceLower($forceLower);
+            $ruleView->setForceSymbol($forceSymbol);
+            $ruleView->setForceNum($forceNum);
+            return $ruleView->getHTMLView();
+        }
+        
         $string = '<div class="validate_pass" data-field="' . $field . '" data-conf-field="' . $confField . '">';
         $string .= '<ul class="sml_text pass_check">';
         if($showCannotBeSame){
             $string .= '<li>Cannot be the same as your current password.</li>';
         }
-        $minLength = ProjectConfig::getPassMinLength();
         if($minLength > 1){
             $string .= '<li data-rule="length" data-val="' . $minLength . '">Must be at least ' . $minLength . ' characters long.</li>';
         }
         
-        $forceUpper = ProjectConfig::getPassReqUpper();
         if($forceUpper){
             $string .= '<li data-rule="upper" data-val="1">Must contain at least 1 uppercase letter.</li>';
         }
         
-        $forceLower = ProjectConfig::getPassReqLower();
         if($forceLower){
             $string .= '<li data-rule="lower" data-val="1">Must contain at least 1 lowercase letter.</li>';
         }
         
-        $forceSymbol = ProjectConfig::getPassReqSymbol();
         if($forceSymbol){
             $string .= '<li data-rule="symbol" data-val="1">Must contain at least 1 symbol. (ex. #,@,!,?)</li>';
         }
         
-        $forceNum = ProjectConfig::getPassReqNum();
         if($forceNum){
             $string .= '<li data-rule="number" data-val="1">Must contain at least 1 number.</li>';
         }
@@ -924,6 +948,24 @@ class GI_StringUtils{
         $string .= '</ul>';
         $string .= '</div>';
         return $string;
+    }
+
+    public static function encrypt($string) {
+        $cipherMethod = ProjectConfig::getEncryptionCipherMethod();
+        $key = ProjectConfig::getEncryptionKey();
+        $initVector = openssl_random_pseudo_bytes(openssl_cipher_iv_length($cipherMethod));
+        $encryptedString = openssl_encrypt($string, $cipherMethod, $key, 0, $initVector) . "::" . bin2hex($initVector);
+        unset($string, $cipherMethod, $key, $initVector);
+        return $encryptedString;
+    }
+
+    public static function decrypt($string) {
+        list($encryptedString, $initVector) = explode("::", $string);
+        $cipherMethod = ProjectConfig::getEncryptionCipherMethod();
+        $key = ProjectConfig::getEncryptionKey();
+        $decryptedString = openssl_decrypt($encryptedString, $cipherMethod, $key, 0, hex2bin($initVector));
+        unset($encryptedString, $cipherMethod, $key, $initVector);
+        return $decryptedString;
     }
 
 }

@@ -8,11 +8,14 @@ class GI_CSV {
     protected $csvFilePath = NULL;
     protected $overWrite = false;
     protected $addToExisting = false;
-    /**
-     * @var UITableCol[]
-     */
+    /** @var UITableCol[] */
     protected $uiTableCols = array();
+    protected $resultColumnData = array();
     protected static $csvExporting = false;
+    /** Result Row Cell Value Method */
+    protected $rrcvMethod = NULL;
+    /** Result Row Cell Value Object */
+    protected $rrcvObject = NULL;
     
     public function __construct($fileName) {
         $slashPos = strrpos($fileName, '/');
@@ -45,6 +48,10 @@ class GI_CSV {
     public function setAddToExisting($addToExisting){
         $this->addToExisting = $addToExisting;
         return $this;
+    }
+    
+    public function setCSVPath($csvPath) {
+        $this->csvPath = $csvPath;
     }
     
     public function makeCSVFile(){
@@ -147,6 +154,13 @@ class GI_CSV {
         foreach ($this->uiTableCols as $uiTableCol) {
             $headerTitles[] = $this->formatCell($uiTableCol->getHeaderTitle());
         }
+        foreach ($this->resultColumnData as $resultColInfo) {
+            $headerTitle = NULL;
+            if(!empty($resultColInfo['header_title'])){
+                $headerTitle = $resultColInfo['header_title'];
+            }
+            $headerTitles[] = $this->formatCell($headerTitle);
+        }
         $this->addContent(implode(',', $headerTitles));
         return $this;
     }
@@ -210,6 +224,76 @@ class GI_CSV {
             $formattedContent[] = $this->formatCell($cellContent);
         }
         $this->addContent(implode(',', $formattedContent));
+        return $this;
+    }
+    
+    public function setResultColumnData($resultColumnData, $addHeader = false){
+        $this->resultColumnData = $resultColumnData;
+        if($addHeader){
+            $this->addHeader();
+        }
+        return $this;
+    }
+    
+    public function addResultRows($results){
+        foreach($results as $result){
+            $this->addResultRow($result);
+        }
+        return $this;
+    }
+    
+    public function addResultRow($result){
+        static::setCSVExporting(true);
+        $rowContent = array();
+        foreach ($this->resultColumnData as $resultColInfo) {
+            if(!empty($this->rrcvMethod)){
+                $methodName = $this->rrcvMethod;
+                if(!empty($this->rrcvObject)){
+                    $value = $this->rrcvObject->$methodName($this, $result, $resultColInfo);
+                } else {
+                    $value = $methodName($this, $result, $resultColInfo);
+                }
+            } else{
+                $value = $this->getResultRowCellValue($result, $resultColInfo);
+            }
+            $rowContent[] = $this->formatCell($value);
+        }
+        static::setCSVExporting(false);
+        $this->addContent(implode(',', $rowContent));
+        return $this;
+    }
+    
+    public function getResultRowCellValue($result, $resultColInfo){
+        $value = NULL;
+        if(isset($resultColInfo['column']) && isset($result[$resultColInfo['column']])){
+            $rawValue = $result[$resultColInfo['column']];
+            $format = 'string';
+            if(isset($resultColInfo['column_format'])){
+                $format = $resultColInfo['column_format'];
+            }
+            switch($format){
+                case 'date':
+                case 'datetime':
+                case 'time':
+                    $value = GI_Time::formatToUserTime($rawValue, $resultColInfo['column_format']);
+                    break;
+                case 'string':
+                default:
+                    $value = trim($rawValue);
+                    break;
+            }
+        }
+        
+        return $value;
+    }
+    
+    public function setResultRowCellValueMethod($rrcvMethod, $rrcvObject = NULL){
+        $this->rrcvMethod = $rrcvMethod;
+        if(!empty($rrcvObject) && method_exists($rrcvObject, $rrcvMethod)){
+            $this->rrcvObject = $rrcvObject;
+        } else {
+            $this->rrcvObject = NULL;
+        }
         return $this;
     }
     

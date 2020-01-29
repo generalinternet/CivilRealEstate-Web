@@ -100,7 +100,7 @@ abstract class AbstractRoleFormView extends MainWindowView {
             'formElementClass'=>'list_options column_groups zippable'
         ));
         
-        $this->form->addHTML('<span class="submit_btn" title="Save">'.Lang::getString('submit').'</span>');
+        $this->form->addHTML('<span class="submit_btn" title="Save" tabindex="0">'.Lang::getString('submit').'</span>');
     }
     
     public function addViewBodyContent() {

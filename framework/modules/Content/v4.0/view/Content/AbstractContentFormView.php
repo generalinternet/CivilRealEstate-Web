@@ -52,6 +52,7 @@ abstract class AbstractContentFormView extends MainWindowView {
         $this->setListBarURL($this->content->getListBarURL());
         $this->formTitle = $actionTerm . ' ' . $this->content->getTypeTitle();
         $this->setWindowTitle($this->formTitle);
+        $this->setCurLayoutMenuRef('content');
     }
     
     public function setDisplayAsChild($displayAsChild){
@@ -99,14 +100,23 @@ abstract class AbstractContentFormView extends MainWindowView {
         $this->form->addHTML('</div>');
     }
     
+    protected function getFormTitleClass(){
+        return '';
+    }
+    
+    protected function addFormTitle(){
+        if($this->displayAsChild){
+            $this->form->addHTML('<h3 class="' . $this->getFormTitleClass() . '">' . $this->content->getFormTitle() . '</h3>');
+        }
+        return $this;
+    }
+    
     public function buildForm($buildInnerContentForm = true){
         $this->openFormBlockWrap();
         
         $this->addBtns();
         
-        if($this->displayAsChild){
-            $this->form->addHTML('<h3>' . $this->formTitle . '</h3>');
-        }
+        $this->addFormTitle();
         
         $this->form->addHTML('<div class="content_form_block">');
             $this->buildFormGuts();
@@ -303,9 +313,13 @@ abstract class AbstractContentFormView extends MainWindowView {
                 }
                 
                 $this->form->addHTML('<div class="add_content_in_content">');
+                $addToAttr = 'data-parent-type-ref="' . $this->content->getTypeRef() . '"';
+                if($this->content->getId()){
+                    $addToAttr .= ' data-parent-id="' . $this->content->getId() . '"';
+                }
                 foreach($childTypes as $childType){
                     $childContentType = $childType->getEmptyChildContent();
-                    $this->form->addHTML('<span class="custom_btn add_content" data-type-ref="' . $childContentType->getTypeRef() . '" data-min-children="' . $childType->getProperty('min_children') . '" data-max-children="' . $childType->getProperty('max_children') . '">' . GI_StringUtils::getIcon('add') . '<span class="btn_text">' . $childContentType->getTypeTitle() . '</span></span>');
+                    $this->form->addHTML('<span class="custom_btn add_content" data-type-ref="' . $childContentType->getTypeRef() . '" data-min-children="' . $childType->getProperty('min_children') . '" data-max-children="' . $childType->getProperty('max_children') . '" ' . $addToAttr . '>' . GI_StringUtils::getIcon('add') . '<span class="btn_text">' . $childContentType->getTypeTitle() . '</span></span>');
                 }
                 $this->form->addHTML('</div>');
                 //$this->form->addHTML('<span class="custom_btn add_content" >' . GI_StringUtils::getIcon('add') . '<span class="btn_text">Content</span></span>');
@@ -327,13 +341,16 @@ abstract class AbstractContentFormView extends MainWindowView {
         if($this->displayAsChild){
             $this->addHTML($this->form->getForm('', false));
         } else {
-            $this->form->addHTML('<span class="submit_btn" title="' . Lang::getString('save') . '">' . Lang::getString('save') . '</span>');
+            $this->addBtnSection();
             $this->openPaddingWrap();
                 $this->addHTML('<div class="content_form_parent" data-cur-content-number="' . $this->form->curContentNumber . '">');
                 $this->addHTML($this->form->getForm());
                 $this->addHTML('</div>');
             $this->closePaddingWrap();
         }
+    }
+    protected function addSubmitBtn(){
+        $this->form->addHTML('<span class="submit_btn" title="' . Lang::getString('save') . '" tabindex="0">' . Lang::getString('save') . '</span>');
     }
     /*
     public function buildView($buildForm = true) {
@@ -351,6 +368,20 @@ abstract class AbstractContentFormView extends MainWindowView {
     }
      * 
      */
+    
+    protected function addBtnSection(){
+        $this->openBtnSectionWrap();
+            $this->addSubmitBtn();
+        $this->closeBtnSectionWrap();
+    }
+    
+    protected function openBtnSectionWrap(){
+        $this->form->addHTML('<div class="content_btn_section_wrap">');
+    }
+    
+    protected function closeBtnSectionWrap(){
+        $this->form->addHTML('</div>');
+    }
     
     public function beforeReturningView() {
         if(!$this->viewBuilt){

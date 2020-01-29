@@ -25,6 +25,24 @@ class GI_LogFile {
         $this->fileName = $fileName;
     }
     
+    public static function addToDebugLog($content = '', $lineBreak = true){
+        if(defined('DEBUG_LOG_MODE') && DEBUG_LOG_MODE){
+            if(!defined('DEBUG_LOG_NAME')){
+                $dateTime = GI_Time::getDateTime();
+                $logFileName = GI_Sanitize::filename('debug_log_' . $dateTime);
+                define('DEBUG_LOG_NAME', $logFileName);
+                $debugLog = new GI_LogFile($logFileName);
+                $debugLog->addContent('###### NEW DEBUG LOG ######');
+                $debugLog->addContent('Controller: ' . GI_URLUtils::getAttribute('controller'));
+                $debugLog->addContent('Action: ' . GI_URLUtils::getAttribute('action'));
+                $debugLog->addContent('Attributes: ' . print_r(GI_URLUtils::getAttributes(), true));
+            }
+            $debugLog = new GI_LogFile(DEBUG_LOG_NAME);
+            $debugLog->setAddToExisting(true);
+            $debugLog->addContent($content, $lineBreak);
+        }
+    }
+    
     public static function setLogExporting($logExporting){
         static::$logExporting = $logExporting;
     }

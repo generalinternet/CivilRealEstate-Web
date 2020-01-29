@@ -25,6 +25,7 @@ abstract class AbstractWidgetService extends GI_Service {
         'my_sales_table',
         'sales_by_salesperson_table',
         'ap_ar_table',
+        'sales_comparison_table',
     ); 
     protected static $dashboardWidgets = array();
     protected static $dashboardIndexWidgetColumnCount = 3; //Max 6
@@ -123,6 +124,9 @@ abstract class AbstractWidgetService extends GI_Service {
                 break;
             case'ap_ar_table':
                 $widget = new DashboardAPARTableWidgetView($ref);
+                break;
+            case 'sales_comparison_table':
+                $widget = new DashboardSalesComparisonTableWidgetView($ref);
                 break;
             default:
                 break;

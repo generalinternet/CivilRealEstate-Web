@@ -7,6 +7,7 @@ function createGIUploader(uploaderName, containerId, awsURL, awsKey, awsPolicy, 
         multipartParams = {
             "acl": "authenticated-read",
             "Content-Type": "",
+            "Content-Disposition" : 'inline',
             "AWSAccessKeyId" : awsKey,
             "policy": awsPolicy,
             "signature": awsSignature
@@ -60,7 +61,8 @@ function createGIUploader(uploaderName, containerId, awsURL, awsKey, awsPolicy, 
                 if(fileInplup != undefined){
                     uploadURL = fileInplup.data('upload-url');
                 }
-                jQuery.post('index.php?ajax=1&controller=file&action=saveUploadData&displayName=' + file.name + '&key=' + up.settings.multipart_params.key + '&size=' + file.size + uploadURL, function(data){
+                var fullURL = 'index.php?controller=file&action=saveUploadData&ajax=1&displayName=' + file.name + '&key=' + up.settings.multipart_params.key + '&size=' + file.size + uploadURL;
+                jQuery.post(fullURL, function(data){
                     //var parsedData = JSON.parse(data);
                     var uploaderType = '';
                     if(fileInplup != undefined){
@@ -74,6 +76,9 @@ function createGIUploader(uploaderName, containerId, awsURL, awsKey, awsPolicy, 
                         fileId: data.fileId,
                         uploaderName: uploaderName
                     });
+                    container.trigger('fileUploaded', {
+                        fileId: data.fileId
+                    });
                 });
             },
 
@@ -82,6 +87,9 @@ function createGIUploader(uploaderName, containerId, awsURL, awsKey, awsPolicy, 
                 up.settings.multipart_params.Filename = file.name;
                 var awsFileName = keyBase + jQuery.now() + '/' + file.name;
                 up.settings.multipart_params.key = awsFileName;
+                
+                up.settings.multipart_params["Content-Type"] = file.type;
+                up.settings.multipart_params["Content-Disposition"] = 'inline';
                 up.settings.verifyfilecount();
             },
 
@@ -100,13 +108,16 @@ function createGIUploader(uploaderName, containerId, awsURL, awsKey, awsPolicy, 
                         if(fileNameLen>14){
                             shortFileName = shortFileName.substr(0, 14);
                         }
-                        file.inplup.find('.files_area').append('<div id="uploading_file_' + file.id + '" class="file_wrap"><div class="file_thumb uploading" title="' + file.name + '" ><span class="cancel_file" data-file-id="' + file.id + '"></span><span class="ext percentage"><span class="ext_icon"></span><span class="ext_title">0%</span></span><span class="filename">' + shortFileName + '</span><span class="corner"></span><span class="percentage_bar"></span></div></div>');
+                        file.inplup.find('.files_area').append('<div id="uploading_file_' + file.id + '" class="file_wrap uploading"><div class="file_thumb uploading" title="' + file.name + '" ><span class="cancel_file" data-file-id="' + file.id + '"></span><span class="ext percentage"><span class="ext_icon"></span><span class="ext_title">0%</span></span><span class="filename">' + shortFileName + '</span><span class="corner"></span><span class="percentage_bar"></span></div></div>');
+                        container.trigger('fileAdded', {
+                            fileId: file.id
+                        });
                     } else {
                         var fileLimit = container.data('file-limit');
                         giModalConfirm('Uploader Error', 'File limit of ' + fileLimit + ' reached.');
                         up.removeFile(file);
                     }
-                    });
+                });
                 up.start();
                 var dropzone = container.find('.dropzone');
                 if(dropzone.length){
@@ -149,8 +160,12 @@ function removeFolderLink(file, fileId, folderId){
                 fileId: fileId,
                 uploaderName: uploaderName
             });
+            uploaderContainer.trigger('fileRemoved', {
+                fileId: data.fileId
+            });
             window[uploaderName].settings.verifyfilecount();
         } else {
+            console.log(data);
             alert('An error occurred when deleting file.');
         }
     });
@@ -182,6 +197,9 @@ $(document).on('click','.remove_file',function(e){
             $('body').trigger('fileRemoved', {
                 fileId: fileId,
                 uploaderName: uploaderName
+            });
+            uploaderContainer.trigger('fileRemoved', {
+                fileId: fileId
             });
             window[uploaderName].settings.verifyfilecount();
         }
@@ -227,7 +245,7 @@ $(document).on('click','.cancel_file',function(){
     var uploaderContainer = $(this).closest('.uploader_container');
     var uploaderName = uploaderContainer.data('uploader-name');
     window[uploaderName].removeFile(window[uploaderName].getFile(fileId));
-    var file = $(this).closest('.file_thumb');
+    var file = $(this).closest('.file_wrap');
     file.remove();
 });
 
@@ -360,4 +378,62 @@ $(document).on('click', '.open_folder', function () {
         }
         newContentLoaded();
     });
+});
+
+function getFileThumbnails(){
+    $('.get_file_thumbnail').each(function(){
+        let fileId = $(this).data('file-id');
+        let placeholder = $('<div class="file_wrap"><div class="file_thumb" ><span class="corner"></span><span class="loading_bar"></span></div></div>');
+        elmStartLoading(placeholder.find('.loading_bar'));
+        $(this).replaceWith(placeholder);
+        
+        let url = 'index.php?controller=file&action=getFileThumbnail&fileId=' + fileId + '&ajax=1';
+        jQuery.post(url, function (data) {
+            if(data.content != undefined){
+                let fileThumb = $(data.content);
+                placeholder.replaceWith(fileThumb);
+                fileThumb.trigger('fileThumbnailLoaded');
+            } else {
+                console.log(data);
+            }
+        });
+    });
+}
+
+function getAvatarThumbnails(){
+    $('.get_avatar_thumbnail').each(function(){
+        let userId = $(this).data('user-id');
+        let socketUserId = $(this).data('socket-user-id');
+        let placeholder = $('<div class="avatar_wrap"><span class="loading_bar"></span></div>');
+        elmStartLoading(placeholder.find('.loading_bar'));
+        $(this).replaceWith(placeholder);
+        
+        let url = 'index.php?controller=file&action=getAvatarThumbnail&ajax=1';
+        if(userId !== undefined && userId !== null && userId !== ''){
+            url += '&userId=' + userId;
+        }
+        if(socketUserId !== undefined && socketUserId !== null && socketUserId !== ''){
+            url += '&socketUserId=' + socketUserId;
+        }
+        if($(this).data('width') != undefined){
+            url += '&width=' + $(this).data('width');
+        }
+        if($(this).data('height') != undefined){
+            url += '&height=' + $(this).data('height');
+        }
+        jQuery.post(url, function (data) {
+            if(data.content != undefined){
+                let avatarThumb = $(data.content);
+                placeholder.replaceWith(avatarThumb);
+                avatarThumb.trigger('avatarThumbnailLoaded');
+            } else {
+                console.log(data);
+            }
+        });
+    });
+}
+
+$(document).on('bindActionsToNewContent',function(){
+    getFileThumbnails();
+    getAvatarThumbnails();
 });

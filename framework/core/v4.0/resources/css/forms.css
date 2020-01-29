@@ -225,10 +225,7 @@ ul.tagit.error,
 /**Submit Buttons**/
 .form_element input[type='submit'],
 .form_element input[type="button"]{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     cursor: pointer;
     font-size: 1em;
     border: none;
@@ -245,10 +242,7 @@ ul.tagit.error,
 .browse_computer,
 .other_btn,
 input[type="button"]{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     cursor: pointer;
     background-color: #fff;
     border: 2px solid #ccc;
@@ -263,8 +257,8 @@ input[type="button"]{
     border-radius: 1.07em;   
     transition: background, color, border;
     -webkit-transition: background, color, border;
-    transition-duration: 0.4s;
-    -webkit-transition-duration: 0.4s;
+    transition-duration: 0.3s;
+    -webkit-transition-duration: 0.3s;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -272,12 +266,23 @@ input[type="button"]{
     user-select: none;
     vertical-align: middle;
 }
+.submit_btn{
+    color: #fff;
+    background-color: #6ca7da;
+}
 .submit_btn .svg_icon svg *,
 .reset_btn .svg_icon svg *,
 .browse_computer .svg_icon svg *,
 .other_btn .svg_icon svg *,
 input[type="button"] .svg_icon svg *{
    fill: #6ca7da; 
+   transition: fill;
+    -webkit-transition: fill;
+    transition-duration: 0.3s;
+    -webkit-transition-duration: 0.3s;
+}
+.submit_btn .svg_icon svg *{
+    fill: #fff; 
 }
 .submit_btn:hover,
 .other_btn:hover,
@@ -287,6 +292,23 @@ input[type="button"]:hover,
 input[type="button"]:focus{
     background: #3c6688;
     color: #fff;
+}
+.submit_btn:hover,
+.submit_btn:focus{
+    color: #fff;
+    background: #3c6688;
+}
+.submit_btn:hover .svg_icon svg *,
+.reset_btn:hover .svg_icon svg *,
+.browse_computer:hover .svg_icon svg *,
+.other_btn:hover .svg_icon svg *,
+input[type="button"]:hover .svg_icon svg *,
+.submit_btn:focus .svg_icon svg *,
+.reset_btn:focus .svg_icon svg *,
+.browse_computer:focus .svg_icon svg *,
+.other_btn:focus .svg_icon svg *,
+input[type="button"]:focus .svg_icon svg *{
+   fill: #fff;
 }
 
 .submit_btn.disabled,
@@ -324,28 +346,28 @@ p .submit_btn{
 }
 .other_btn .count{
     margin-left: 0.5em;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
 }
 
+.submit_btn .svg_icon,
+.other_btn .svg_icon,
 * .icon_wrap,
 * .btn_text{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
+    vertical-align: middle;
 }
-
+.submit_btn .svg_icon:first-child,
+.other_btn .svg_icon:first-child,
 * .icon_wrap:first-child{
     margin-right: 0.5em;
 }
-
+.submit_btn .svg_icon:last-child,
+.other_btn .svg_icon:last-child,
 * .icon_wrap:last-child{
     margin-left: 0.5em;
 }
-
+.submit_btn .svg_icon:only-child,
+.other_btn .svg_icon:only-child,
 * .icon_wrap:only-child{
     margin: 0;
 }
@@ -395,10 +417,7 @@ input[type="button"].gray:hover{
     display: none;
 }
 .save_order.allow_save{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
 }
 
 input[type="submit"]{
@@ -564,10 +583,7 @@ fieldset:last-child{
 
 fieldset legend{
     margin-bottom: 0;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     color: #505050;
     position: relative;
     width: 100%;
@@ -646,6 +662,24 @@ fieldset.label_legend legend{
 .form_element .autocomp_dropdown_field{
     padding-right: 3.2em !important;
     text-overflow: ellipsis;
+}
+
+.form_element .autocomp_search_icon{
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: 1em;
+    margin-top: -0.65em;
+}
+.form_element .autocomp_dropdown + .autocomp_search_icon{
+    right: 2.8em;
+}
+.form_element .autocomp_search_icon svg *{
+    fill: #ccc !important;
+}
+
+.form_element.searching .autocomp_search_icon{
+    display: none;
 }
 
 .percentage_field{
@@ -733,10 +767,7 @@ fieldset.label_legend legend{
     margin-bottom: 1em;
     position: relative;  
     vertical-align: top;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
 }
 
 .options_wrap label:only-child{
@@ -761,14 +792,12 @@ fieldset.label_legend legend{
 
 .list_options .options_wrap label{
     display: block;
+    width: 100%;
 }
 
 .list_options.column_groups .option_group{
     width: 50%;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: top;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -784,6 +813,12 @@ fieldset.label_legend legend{
 
 .list_options.column_groups .option_group:nth-last-of-type(-n+2) {
     margin-bottom: 0;
+}
+
+.list_options.list_in_columns .options_wrap{
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;
 }
 
 .options_wrap input[type="radio"].gi_styled,
@@ -811,10 +846,7 @@ fieldset.label_legend legend{
     box-shadow: #fff 0px 2px 0px;
     width: 20px;
     height: 20px;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: middle;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -881,15 +913,18 @@ fieldset.label_legend legend{
 
 .options_wrap label .radio_label,
 .options_wrap label .checkbox_label{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     line-height: 1em;
     cursor: pointer;
     margin-left: 0.5em;
     color: #808080;
     vertical-align: middle;
+    max-width: calc(100% - 32px - 2em);
+}
+
+.options_wrap label .radio_label .status_box,
+.options_wrap label .checkbox_label .status_box{
+    margin: 0.2em;
 }
 
 .options_wrap label .radio_label:first-child,
@@ -924,6 +959,11 @@ label .checkbox_box{
 /**Log In Styling**/
 .login_actions{
     margin-bottom: 2em;
+    text-align: left;
+}
+
+.gi_modal .login_actions{
+    margin-bottom: 0;
 }
 
 .login_actions:after{
@@ -933,20 +973,14 @@ label .checkbox_box{
 }
 
 .login_actions .form_element label.main{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     margin-bottom: 0;
     cursor: pointer;
 }
 
 .login_actions .form_element,
 .login_actions a{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     margin-bottom: 0;
 }
 
@@ -958,6 +992,7 @@ label .checkbox_box{
 .login_actions .form_element,
 .login_actions .field_content{
     float: left;
+    width: 60%;
 }
 
 .login_actions a{
@@ -1003,13 +1038,15 @@ form.submitting:before{
     content: '';
 }
 
+.form_element.searching .gi_field_autocomplete,
 .ui-autocomplete-loading{
     background: #fff url('images/input_loader.gif') no-repeat !important;
     background-position: center right 0.5em !important;
 }
 
+.form_element.searching .gi_field_autocomplete.autocomp_dropdown_field,
 .ui-autocomplete-loading.autocomp_dropdown_field{
-    background-position: center right 3.8em !important;
+    background-position: center right 2.3em !important;
 }
 
 .form_element.loading:before{
@@ -1233,17 +1270,11 @@ td .form_element .selectric-open .selectric .button:after{
 }
 
 .inline_form_elements label.main{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
 }
 
 .inline_form_elements .form_element{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: top;
     margin-right: 2em;
 }
@@ -1263,10 +1294,7 @@ td .form_element .selectric-open .selectric .button:after{
 
 .form_element.inline_label label.main,
 .form_element.inline_label .field_content{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: middle;
 }
 
@@ -1282,10 +1310,7 @@ td .form_element .selectric-open .selectric .button:after{
 
 .form_element.half_width{
     width: 50%;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: middle;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -1299,10 +1324,7 @@ td .form_element .selectric-open .selectric .button:after{
 }
 
 td .unit_title{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: middle;
     margin-left: 0.5em;
 }
@@ -1403,10 +1425,7 @@ fieldset.advanced:not(.open):after{
 .ui_table th.tax_column .options_wrap label,
 .ui_table td.tax_column .options_wrap label{
     margin-right: 0;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     float: none;
 }
 
@@ -1651,7 +1670,7 @@ textarea.expander_added{
     background: #fff;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
-    border-radius: 3px;    
+    border-radius: 3px;
     font-weight: 400;
 }
 
@@ -1729,10 +1748,7 @@ ul.tagit input[type="text"]{
 
 .inline_field,
 .inline_field_wrap .inline_block{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: top;
 }
 
@@ -1752,10 +1768,7 @@ ul.tagit input[type="text"]{
 .inline_field_wrap .inline_block .text{
     padding-top: 1.85em;
     font-size: 1.4em;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
 }
 
 .inline_field_wrap .inline_block .text.double{
@@ -1825,13 +1838,16 @@ input::-moz-placeholder { /* Firefox 19+ */
 .addr_element{
     margin-bottom: 2em;
     background: #fff;
-    border: 1px solid #dcdcdc;
+    border: 1px solid transparent;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
-    border-radius: 3px;    
+    border-radius: 3px;
+    -webkit-box-shadow: inset rgba(0, 0, 0, 0.4) 0px 0px 6px;
+    -moz-box-shadow: inset rgba(0, 0, 0, 0.4) 0px 0px 6px;
+    box-shadow: inset rgba(0, 0, 0, 0.4) 0px 0px 6px;
 }
 
 .blend_form_elements{
@@ -1888,6 +1904,11 @@ input::-moz-placeholder { /* Firefox 19+ */
 .addr_element .addr_row.halves > .form_element,
 .blend_form_elements.halves > .form_element{
     max-width: 50%;
+}
+
+.addr_element .addr_row.halves > .form_element:only-child,
+.blend_form_elements.halves > .form_element:only-child{
+    max-width: 100%;
 }
 
 .addr_element .addr_row .form_element{
@@ -1955,7 +1976,7 @@ input::-moz-placeholder { /* Firefox 19+ */
 
 .addr_element .form_element:not(.error) input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]),
 .addr_element .form_element:not(.error) > .field_content .selectric{
-    border: none;
+    /*border: none;*/
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
     box-shadow: none;
@@ -1963,6 +1984,8 @@ input::-moz-placeholder { /* Firefox 19+ */
 
 .addr_element .form_element:not(.error) input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):focus,
 .addr_element .form_element:not(.error) > .field_content .selectric-focus .selectric{
+    /*border-color: #6da4d8;*/
+    background: #fff;
     -webkit-box-shadow: inset rgba(0, 0, 0, 0.5) 0px 0px 2px;
     -moz-box-shadow: inset rgba(0, 0, 0, 0.5) 0px 0px 2px;
     box-shadow: inset rgba(0, 0, 0, 0.5) 0px 0px 2px;
@@ -2018,10 +2041,7 @@ form .addr_view .content_block{
 .selected_count_title,
 .selected_count,
 .zippable .option_group_title .check_all{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: middle;
 }
 .zippable .option_group_title .check_all{
@@ -2087,6 +2107,7 @@ form .addr_view .content_block{
     margin-bottom: 1em;
 }
 
+.form_body:last-of-type,
 .form_body:last-child{
     margin-bottom: 0;
 }
@@ -2168,6 +2189,10 @@ form .addr_view .content_block{
 }
 .wrap_btns{
     margin-top: 1em;
+    margin-bottom: 1em;
+}
+.wrap_btns:last-child{
+    margin-bottom: 0;
 }
 /***Toggle Checkbox***/
 .form_element:not(.equals_or_tilde):not(.hidden_or_visible):not(.custom_checkbox) .options_wrap label input[type="checkbox"].gi_field_onoff.slide_toggle + .checkbox_box {
@@ -2379,4 +2404,9 @@ input[type="checkbox"].gi_field_onoff:checked + .checkbox_box + .off_label + .on
         display: none;
     }
     
+    .list_options.list_in_columns .options_wrap{
+        -webkit-column-count: 1;
+        -moz-column-count: 1;
+        column-count: 1;
+    }
 }

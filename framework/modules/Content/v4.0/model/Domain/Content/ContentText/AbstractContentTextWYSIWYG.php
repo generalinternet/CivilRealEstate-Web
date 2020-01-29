@@ -17,19 +17,6 @@ abstract class AbstractContentTextWYSIWYG extends AbstractContentText {
     }
     
     /**
-     * Get a view title
-     * @param type $plural
-     * @return string
-     */
-    public function getViewTitle($plural = true) {
-        $title = 'WYSIWYG Editor';
-        if ($plural) {
-            $title .= 's';
-        }
-        return $title;
-    }
-    
-    /**
      * Get a form view
      * @param \GI_Form $form
      * @param boolean $buildForm

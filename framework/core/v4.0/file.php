@@ -12,7 +12,7 @@ require_once 'model/Utility/Uploader/AbstractGI_UploaderFactory.php';
 //Abstract Domains
 require_once 'model/Domain/File/AbstractFile.php';
 require_once 'model/Domain/File/AbstractFileSignature.php';
-require_once 'model/Domain/AbstractFolder.php';
+require_once 'model/Domain/Folder/AbstractFolder.php';
 
 //Abstract Factories
 require_once 'model/Factory/AbstractFileFactory.php';
@@ -25,6 +25,7 @@ require_once 'view/file/AbstractFileIndexView.php';
 require_once 'view/file/file/AbstractFileThumbnailView.php';
 require_once 'view/file/file/AbstractFileSmallThumbnailView.php';
 require_once 'view/file/file/AbstractFileAvatarView.php';
+require_once 'view/file/file/AbstractFileAvatarPlaceholderView.php';
 require_once 'view/file/file/AbstractFileSizedView.php';
     //folder views
 require_once 'view/file/folder/AbstractFileFolderThumbnailView.php';
@@ -54,6 +55,7 @@ require_once 'view/file/file_indexView.php';
 require_once 'view/file/file/file_thumbnailView.php';
 require_once 'view/file/file/file_smallThumbnailView.php';
 require_once 'view/file/file/file_avatarView.php';
+require_once 'view/file/file/file_avatarPlaceholderView.php';
 require_once 'view/file/file/file_sizedView.php';
     //folder views
 require_once 'view/file/folder/file_folderThumbnailView.php';

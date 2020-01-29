@@ -4,7 +4,7 @@
  *
  * @author General Internet
  * @copyright  2017 General Internet
- * @version    3.0.10
+ * @version    4.0.1
  */
 abstract class GI_View {
 
@@ -32,7 +32,10 @@ abstract class GI_View {
     protected static $uploaders = array();
     protected static $recaptchaUsed = false;
     protected $modalClass = '';
+    protected $curLayoutMenuRef = '';
     protected $bodyAttrs = array();
+    protected $targetRefPrefix = 'target_ref_';
+    protected $appIconDir = NULL;
 
     public function __construct() {
         $reverseSiteTitle = ProjectConfig::reverseSiteTitle();
@@ -140,6 +143,13 @@ abstract class GI_View {
         }
         if (!empty($this->favicon)) {
             $html .= '<link rel="shortcut icon" type="image/x-icon" href="' . $this->favicon . '" />';
+        }
+        if(!empty($this->appIconDir)){
+            $html .= '<link href="' . $this->appIconDir . '/apple-touch-icon.png" rel="apple-touch-icon">';
+            $html .= '<link href="' . $this->appIconDir . '/apple-touch-icon-76x76.png" rel="apple-touch-icon" sizes="76x76">';
+            $html .= '<link href="' . $this->appIconDir . '/apple-touch-icon-120x120.png" rel="apple-touch-icon" sizes="120x120">';
+            $html .= '<link href="' . $this->appIconDir . '/apple-touch-icon-152x152.png" rel="apple-touch-icon" sizes="152x152">';
+            $html .= '<link rel="apple-touch-icon-precomposed" href="' . $this->appIconDir . '/apple-touch-icon-152x152.png">';
         }
 
         $html .= $this->getCSS();
@@ -334,6 +344,29 @@ abstract class GI_View {
         } else {
             $constString .= 'const USE_HTTPS = false;';
         }
+        if(DEV_MODE){
+            $constString .= 'const DEV_MODE = true;';
+        } else {
+            $constString .= 'const DEV_MODE = false;';
+        }
+        $sessionName = ProjectConfig::getSessionName();
+        $constString .= 'const SESSION_NAME = "' . $sessionName . '";';
+        $localhostIP = ProjectConfig::getLocalhostIP();
+        $constString .= 'const LOCALHOST_IP = "' . $localhostIP . '";';
+        $user = Login::getUser();
+        $userString = '';
+        $colour = '#3c6688';
+        if($user){
+            $userString = '&nickname=' . $user->getFullName();
+            $userString .= '&userId=' . $user->getId();
+            $userString .= '&chatUserType=' . $user->getChatUserType();
+        } else {
+            //@todo find a better way to set the default convo group...
+            $convoGroup = 'support';
+            $userString = '&convoGroup=' . $convoGroup;
+        }
+        $userString .= '&colour=' . str_replace('#', '' , $colour);
+        $constString .= 'const SOCKET_QUERY_STRING = "appRef=' . $sessionName . $userString . '";';
         if(!empty($constString)){
             return '<script type="text/javascript">' . $constString . '</script>';
         }
@@ -532,6 +565,10 @@ abstract class GI_View {
             return false;
         }
     }
+    public function setAppIconDir($appIconDir){
+        $this->appIconDir = $appIconDir;
+        return $this;
+    }
     public function setTitleDivider($titleDivider){
         $this->titleDivider = $titleDivider;
     }
@@ -698,7 +735,7 @@ abstract class GI_View {
         if (isset($btnOptionArray['close_icon'])) {
             $btnCloseIcon = $btnOptionArray['close_icon'];
         }
-        $advancedButton .= '><span class="icon_wrap"><span class="icon toggle_icon '.$btnOpenIcon.'" data-open-icon="'.$btnOpenIcon.'" data-close-icon="'.$btnCloseIcon.'"></span></span>';
+        $advancedButton .= '><span class="icon_wrap"><span class="icon toggle_icon '.$btnOpenIcon.' primary" data-open-icon="'.$btnOpenIcon.'" data-close-icon="'.$btnCloseIcon.'"></span></span>';
         if(!empty($btnTitle)){
             $advancedButton .= '<span class="btn_text">'.$btnTitle.'</span>';
         }
@@ -969,12 +1006,65 @@ abstract class GI_View {
         return $this;
     }
     
+    public function getCurLayoutMenuRef(){
+        return $this->curLayoutMenuRef;
+    }
+    
+    public function setCurLayoutMenuRef($curLayoutMenuRef){
+        $this->curLayoutMenuRef = $curLayoutMenuRef;
+        return $this;
+    }
+    
     public function addModalClass($modalClass){
         if(!empty($modalClass)){
             $this->modalClass .= ' ';
         }
         $this->modalClass .= $modalClass;
         return $this;
+    }
+    
+    public function openClosableSection($class = ''){
+        $this->addHTML('<div class="closable_section ' . $class . '">');
+        $this->addHTML('<span class="close_section">' . GI_StringUtils::getSVGIcon('close', '1em', '1em') . '</span>');
+        return $this;
+    }
+    
+    public function closeClosableSection(){
+        $this->addHTML('</div>');
+        return $this;
+    }
+    
+    protected function addPasswordRules(){
+        $this->addHTML('<h4 class="sml_text">Your password</h4>');
+        $this->addHTML('<ul class="simple_list sml_text">');
+        $this->addHTML('<li>Cannot be the same as your current password.</li>');
+        $minLength = ProjectConfig::getPassMinLength();
+        if($minLength > 1){
+            $this->addHTML('<li>Must be at least ' . $minLength . ' characters long.</li>');
+        }
+        
+        $forceUpper = ProjectConfig::getPassReqUpper();
+        if($forceUpper){
+            $this->addHTML('<li>Must contain at least 1 uppercase letter.</li>');
+        }
+        
+        $forceLower = ProjectConfig::getPassReqLower();
+        if($forceLower){
+            $this->addHTML('<li>Must contain at least 1 lowercase letter.</li>');
+        }
+        
+        $forceSymbol = ProjectConfig::getPassReqSymbol();
+        if($forceSymbol){
+            $this->addHTML('<li>Must contain at least 1 symbol. (ex. #,@,!,?)</li>');
+        }
+        
+        $forceNum = ProjectConfig::getPassReqNum();
+        if($forceNum){
+            $this->addHTML('<li>Must contain at least 1 number.</li>');
+        }
+        
+        $this->addHTML('<li>Cannot contain any whitespace.</li>');
+        $this->addHTML('</ul>');
     }
     
 }

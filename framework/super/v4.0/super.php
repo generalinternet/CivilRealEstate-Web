@@ -33,6 +33,8 @@ require_once 'GI_LogFile.php';
 set_include_path($curIncludePath . '/' . FRMWK_SUPER_VER);
 require_once 'AbstractGI_Index.php';
 
+require_once 'Session.php';
+
 //AbstractConfig
 require_once 'GI_DBConfig.php';
 require_once 'GI_ProjectConfig.php';
@@ -89,6 +91,9 @@ set_include_path('config');
 require_once 'client_config/config.database.php';
 if(file_exists('config/client_config/config.keys.php')){
     require_once 'client_config/config.keys.php';
+}
+if(file_exists('config/client_config/payment_processors/config.stripe.php')) {
+    require_once 'config/client_config/payment_processors/config.stripe.php';
 }
 require_once 'client_config/config.project.php';
 require_once 'client_config/config.info.php';

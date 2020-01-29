@@ -16,7 +16,7 @@ abstract class AbstractContentRefDetailView extends AbstractContentDetailView {
         if($refContent){
             $refView = $refContent->getView();
             $refView->setReferenceOnly(true);
-            $refView->buildView();
+            $refView->setDisplayAsChild($this->displayAsChild);
             $this->addHTML($refView->getHTMLView());
         }
         $this->viewBuilt = true;

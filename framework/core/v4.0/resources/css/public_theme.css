@@ -1,26 +1,22 @@
 *{
     font-family: 'Open Sans', sans-serif;
 }
-/*breakpoints
-iPad/Galaxy tab landscape: 2048px;
-hd landscape:1920px;
-Google Nexus portrait: 1600px;
-iPad/Galaxy tab portrait: 1536px;
-Bootstrap3 lg-max: 1499px;
-smaller monitor ladscape(Mac Air 13"): 1440px;
-smaller monitor ladscape(Chromebook): 1366px;
-tablet general ladscape: 1280px;
-Bootstrap3 md-max: 1199px;
-iPad-mini ladscape:1024px
-Bootstrap3 sm-max: 991px;
-mobile-max: 960px;
-iPad-mini portrait:768px
-Bootstrap3 xs-max: 767px;
-iphoneplus-ladscape-max: 736px; //iPhone6+ ladscape size
-tablet general portrait: 720px;
-iphone-ladscape-max: 667px; //iPhone6 ladscape size
-samsung-max: 589px;
-iphoneplus-max: 414px; //iPhone6+ portrait size
-iphone-max: 375px; //iPhone6 portrait size
-iphone-min: 320px;
-*/
+
+@media only screen and (max-width : 1300px){
+    
+}
+
+@media only screen and (max-device-width: 960px) {
+    
+}
+
+@media only screen and (max-width : 1050px){
+    
+}
+
+@media only screen and (max-width : 960px){
+
+}
+@media only screen and (max-width : 640px){
+    
+}

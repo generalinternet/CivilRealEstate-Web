@@ -6,7 +6,7 @@
  * @copyright  2016 General Internet
  * @version    4.0.0
  */
-class AbstractLoginResetPasswordView extends GI_View {
+class AbstractLoginResetPasswordView extends MainWindowView {
     
     /**
      * @var GI_Form
@@ -18,6 +18,8 @@ class AbstractLoginResetPasswordView extends GI_View {
         
         parent::__construct();
         $this->buildForm();
+        $this->addSiteTitle(Lang::getString('reset_password'));
+        $this->setWindowTitle(Lang::getString('enter_a_new_password'));
     }
     
     protected function overWriteSettings($defaultFieldSettings, $fieldSettings = array()){
@@ -32,7 +34,9 @@ class AbstractLoginResetPasswordView extends GI_View {
             'displayName' => Lang::getString('new_password'),
             'placeHolder' => Lang::getString('new_password'),
             'value' => '',
-            'required' => true
+            'required' => true,
+            'autoComplete' => false,
+            'inputAutoCompleteVal' => 'new-password'
         ), $fieldSettings);
         $this->form->addField('password', 'password', $defaultFieldSettings);
     }
@@ -42,66 +46,55 @@ class AbstractLoginResetPasswordView extends GI_View {
             'displayName' => Lang::getString('re_enter_new_password'),
             'placeHolder' => Lang::getString('re_enter_new_password'),
             'value' => '',
-            'required' => true
+            'required' => true,
+            'autoComplete' => false,
+            'inputAutoCompleteVal' => 'new-password'
         ), $fieldSettings);
         $this->form->addField('password_conf', 'password', $defaultFieldSettings);
     }
     
     protected function addSubmitBtn(){
-        $this->form->addHTML('<span class="submit_btn">' . Lang::getString('save_password') . '</span>');
+        $this->form->addHTML('<span class="submit_btn" tabindex="0">' . Lang::getString('save_password') . '</span>');
     }
 
     public function buildForm() {
         $user = Login::getUser();
         if($user && $user->requiresPassReset()){
-            $this->addHTML('<div class="alert_message red"><p>For your security, we require you to reset your password.</p></div>');
+            $this->form->addHTML('<div class="alert_message red"><p>For your security, we require you to reset your password.</p></div>');
         }
-        $this->addHTML('<h3>Enter a New Password</h3>');
-        $this->addPasswordRules();
         $this->addPasswordField();
         $this->addRePasswordField();
+        $this->addPasswordRules();
         $this->addSubmitBtn();
     }
     
     protected function addPasswordRules(){
-        $this->addHTML('<h4 class="sml_text">Your password</h4>');
-        $this->addHTML('<ul class="simple_list sml_text">');
-        $this->addHTML('<li>Cannot be the same as your current password.</li>');
-        $minLength = ProjectConfig::getPassMinLength();
-        if($minLength > 1){
-            $this->addHTML('<li>Must be at least ' . $minLength . ' characters long.</li>');
-        }
-        
-        $forceUpper = ProjectConfig::getPassReqUpper();
-        if($forceUpper){
-            $this->addHTML('<li>Must contain at least 1 uppercase letter.</li>');
-        }
-        
-        $forceLower = ProjectConfig::getPassReqLower();
-        if($forceLower){
-            $this->addHTML('<li>Must contain at least 1 lowercase letter.</li>');
-        }
-        
-        $forceSymbol = ProjectConfig::getPassReqSymbol();
-        if($forceSymbol){
-            $this->addHTML('<li>Must contain at least 1 symbol. (ex. #,@,!,?)</li>');
-        }
-        
-        $forceNum = ProjectConfig::getPassReqNum();
-        if($forceNum){
-            $this->addHTML('<li>Must contain at least 1 number.</li>');
-        }
-        
-        $this->addHTML('<li>Cannot contain any whitespace.</li>');
-        $this->addHTML('</ul>');
-    }
-
-    public function buildView() {           
-        $this->addHTML($this->form->getForm());
+        $this->form->addHTML(GI_StringUtils::getPasswordRules('password', 'password_conf', true));
     }
     
-    public function beforeReturningView() {
-        $this->buildView();
+    protected function addViewBodyContent(){
+        $this->addHTML($this->form->getForm());
+        $this->addLoginLink();
+        $this->addRegisterLink();
+    }
+                
+    protected function addLoginLink(){
+        $loginURL = GI_URLUtils::buildURL(array(
+            'controller' => 'login',
+            'action' => 'index'
+        ));
+        $this->addHTML('<p>Nevermind I remember my old password. <a href="' . $loginURL . '" title="' . Lang::getString('log_in') . '" class="login_action_btn">' . Lang::getString('log_in') . '</a></p>');
+    }
+                
+    protected function addRegisterLink(){
+        if(!ProjectConfig::isRegistrationEnabled()){
+            return;
+        }
+        $registerURL = GI_URLUtils::buildURL(array(
+            'controller' => 'login',
+            'action' => 'register'
+        ));
+        $this->addHTML('<p>Would you like to create a new account instead? <a href="' . $registerURL . '" title="' . Lang::getString('sign_up') . '" class="login_action_btn" >' . Lang::getString('sign_up') . '</a></p>');
     }
     
 }

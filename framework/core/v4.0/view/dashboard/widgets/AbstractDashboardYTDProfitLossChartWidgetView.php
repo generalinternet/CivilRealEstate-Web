@@ -40,6 +40,10 @@ abstract class AbstractDashboardYTDProfitLossChartWidgetView extends AbstractDas
             return;
         }
         $this->profitAndLossAccReport = $profitAndLossAccReport;
+        if (empty($this->profitAndLossAccReport)) {
+            $this->addHTML('<p>Data Unavailable</p>');
+            return;
+        }
         $this->addDateRange();
         $this->addHTML('<div class="graph_wrap" id="ytd_profit_loss_widget_graph"></div>');
         $this->addGraphJS();

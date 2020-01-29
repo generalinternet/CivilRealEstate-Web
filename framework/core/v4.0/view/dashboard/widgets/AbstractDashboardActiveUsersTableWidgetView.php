@@ -4,7 +4,7 @@
  *
  * @author General Internet
  * @copyright  2019 General Internet
- * @version    4.0.0
+ * @version    4.0.1
  */
 abstract class AbstractDashboardActiveUsersTableWidgetView extends AbstractDashboardWidgetView {
 
@@ -12,21 +12,6 @@ abstract class AbstractDashboardActiveUsersTableWidgetView extends AbstractDashb
         parent::__construct($ref);
         $this->setTitle('Active Users');
         $this->setHeaderIcon('activity');
-//        $linkURL = GI_URLUtils::buildURL(array(
-//                    'controller' => 'user',
-//                    'action' => 'index',
-//                    'search' => 1,
-//                    'redirectAfterSearch' => 1
-//        ));
-//        $this->setLinkURL($linkURL);
-//        $btnOptionsArray = array(
-//            'title' => 'Search',
-//            'icon' => 'search',
-//            'link' => $linkURL,
-//            'class_names' => 'open_modal_form',
-//            'other_data' => ' data-modal-class="shadow_box_modal large_sized"',
-//        );
-//        $this->setBtnOptions($btnOptionsArray);
     }
 
     public function buildBodyContent() {

@@ -14,10 +14,10 @@ abstract class AbstractCancelFormView extends GI_View {
 
     protected function buildForm() {
         if ($this->cancelError){
-            $this->form->addHTML('<div class="center_btns wrap_btns"><span class="other_btn gray close_gi_modal" >Cancel</span></div>');
+            $this->form->addHTML('<div class="center_btns wrap_btns"><span class="other_btn gray close_gi_modal" tabindex="0" >Cancel</span></div>');
         } else {
             $this->form->addHTML('<p>Are you sure you want to cancel <b>'.$this->model->getSpecificTitle().'</b>?</p>');
-            $this->form->addHTML('<div class="center_btns wrap_btns"><span class="submit_btn" >Cancel</span><span class="other_btn gray close_gi_modal" >Do Not Cancel</span></div>');
+            $this->form->addHTML('<div class="center_btns wrap_btns"><span class="submit_btn" tabindex="0" >Cancel</span><span class="other_btn gray close_gi_modal" tabindex="0" >Do Not Cancel</span></div>');
         }
     }
 

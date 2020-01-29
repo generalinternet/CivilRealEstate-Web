@@ -193,72 +193,18 @@ abstract class AbstractAutocompleteController extends GI_Controller {
     }
 
     public function actionMLSCity($attributes){
-        if ((!isset($attributes['ajax']) || !$attributes['ajax'] == 1)){
-            $returnArray = GI_Controller::getReturnArray();
-            return $returnArray;
-        }
-
-        if(isset($attributes['curVal'])){
-
-            $curVal = $attributes['curVal'];
-            $curVals = explode(',', $curVal);
-
-            $finalLabel = array();
-            $finalValue = array();
-            $finalResult = array();
-
-            foreach($curVals as $cityId){
-                $city = MLSCityFactory::getModelById($cityId);
-                if($city){
-                    $name = $city->getTitle();
-
-                    $finalLabel[] = $name;
-                    $finalValue[] = $cityId;
-                    $finalResult[] = '<span class="result_text">'.$name.'</span>';
-                }
-            }
-            $results = array(
-                'label' => $finalLabel,
-                'value' => $finalValue,
-                'autoResult' => $finalResult
-            );
-            return $results;
-        } else {
-            if(isset($_REQUEST['term'])){
-                $term = $_REQUEST['term'];
-            } else {
-                $term = '';
-            }
-
-            $citySearch = MLSCityFactory::search()
-                    ->setItemsPerPage(ProjectConfig::getAutocompleteItemLimit());
-
-            if(!empty($term)){
-                $citySearch->filterTermsLike('title', $term)
-                        ->orderByLikeScore('title', $term);
-            }
-
-            $cities = $citySearch->select();
-
-            $results = array();
-
-            foreach($cities as $city){
-                /*@var $city iMLSCity*/
-                $name = $city->getTitle();
-
-                $cityInfo = array(
-                    'label' => $name,
-                    'value' => $city->getId(),
-                    'autoResult' => '<span class="result_text">'.$this->markTerm($term, $name).'</span>'
-                );
-
-                $results[] = $cityInfo;
-            }
-
-            $this->addMoreResult($citySearch, $results);
-
-            return $results;
-        }
+        $mlsController = new MLSController();
+        return $mlsController->actionAutocompMLSCity($attributes);
+    }
+    
+    public function actionMLSArea($attributes){
+        $mlsController = new MLSController();
+        return $mlsController->actionAutocompMLSArea($attributes);
+    }
+    
+    public function actionMLSSubArea($attributes){
+        $mlsController = new MLSController();
+        return $mlsController->actionAutocompMLSSubArea($attributes);
     }
 
     public function actionLabourRate($attributes){

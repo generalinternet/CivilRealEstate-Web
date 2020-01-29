@@ -26,6 +26,7 @@ abstract class GI_ApplicationConfig {
         'billing'=>true,
         'contact' => true,
         'contactevent' => true,
+        'contactprofile'=>true,
         'content' => true,
         'order'=>true,
         'file' => true,
@@ -45,7 +46,11 @@ abstract class GI_ApplicationConfig {
         'dashboard' => true,
         'project' => true,
         'schedule' => true,
-        'forms' => true
+        'forms' => true,
+        're' => true,
+        'chat' => array(
+            'activeClientIndex'
+        )
     );
     
     /**
@@ -53,7 +58,26 @@ abstract class GI_ApplicationConfig {
      * @var String[]
      */
     protected static $unprotectedActions = array(
-        'accounting'=>array('QBWebhooks'),
+        'file' => array(
+            'getFileThumbnail',
+            'getAvatarThumbnail'
+        ),
+        'accounting' => array(
+            'QBWebhooks'
+        ),
+        'contact' => array(
+            'viewPublicInfo',
+            'autocompPublicContact',
+        ),
+        'tag' => array(
+            'autocompTag'
+        ),
+        'forms' => array(
+            'fillout'
+        ),
+        'notification' => array(
+            'setSocketId'
+        )
     );
     
     /**
@@ -76,10 +100,7 @@ abstract class GI_ApplicationConfig {
      */
     protected static $publicActions = array(
         //@todo:check admin static actions like Dashboard
-        //'static' => true,
-        'static' => array(
-            'home',
-        ),
+        'static' => true,
         'qna' => true,
         'login' => true,
         //@todo:check other login controller actions
@@ -88,6 +109,34 @@ abstract class GI_ApplicationConfig {
             'forgotPassword',
             'requestNewPass',
         ),
+        'contact' => array(
+            'viewPublicInfo',
+            'autocompPublicContact',
+        ),
+        'contactprofile'=>array(
+            'application',
+            'edit',
+            'view',
+            'addperson',
+            'addPaymentMethod',
+            'removePaymentMethod',
+            'setPaymentMethodAsDefault',
+            'changeSubscription',
+            ),
+        'forms' => array(
+            'fillout'
+        ),
+        'relisting' => true
+    );
+    
+    /**
+     * Exceptions to $publicActions
+     * @var array (ex. [controller] => array of actions)
+     * Only required if entire controller is defined as public in $publicActions, as
+     * default is not public
+     */
+    protected static $nonPublicActions = array(
+        'qna'=>array('editProfile', 'viewProfile'),
     );
     
     protected function __construct() {
@@ -183,6 +232,10 @@ abstract class GI_ApplicationConfig {
      * @return boolean
      */
     protected static function validatePublicAction($controller, $action){
+        if (isset(static::$nonPublicActions[$controller]) && in_array($action, static::$nonPublicActions[$controller])) {
+            return false;
+        }
+        
         if(isset(static::$publicActions[$controller])){
             if(is_array(static::$publicActions[$controller])){
                 if(in_array($action, static::$publicActions[$controller])){
@@ -290,6 +343,13 @@ abstract class GI_ApplicationConfig {
             return true;
         }
         return false;
+    }
+    
+    /** @return GI_DAO */
+    public static function getNewDefaultDAOModel($tableName){
+        $defaultDAOClass = static::getProperty('defaultDAOClass');
+        $newDAO = new $defaultDAOClass($tableName);
+        return $newDAO;
     }
 
 }

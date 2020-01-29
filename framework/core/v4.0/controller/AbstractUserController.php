@@ -164,9 +164,6 @@ class AbstractUserController extends GI_Controller {
             if ($success) {
                 //Set the list bar with index view to update new data
                 $returnArray['jqueryCallbackAction'] = 'reloadInElementByTargetId("list_bar");historyPushState("reload", "'.$redirectURL.'", "main_window");';
-            } else {
-                //UploaderScripts is only for a form
-                $returnArray['jqueryCallbackAction'] = $view->getUploaderScripts();
             }
         } else {
             //Set the list bar with index view
@@ -227,9 +224,6 @@ class AbstractUserController extends GI_Controller {
                 //Set the list bar with index view to update new data
                 $curId = $user->getId();
                 $returnArray['jqueryCallbackAction'] = 'reloadInElementByTargetId("list_bar", '.$curId.');historyPushState("reload", "'.$redirectURL.'", "main_window");';
-            } else {
-                //UploaderScripts is only for a form
-                $returnArray['jqueryCallbackAction'] = $view->getUploaderScripts();
             }
         } else {
             //Set the list bar with index view
@@ -573,4 +567,74 @@ class AbstractUserController extends GI_Controller {
         return $returnArray;
     }
     
+    public function actionViewNotificationSettings($attributes) {
+        if (isset($attributes['userId'])) {
+            $user = UserFactory::getModelById($attributes['userId']);
+        } else{
+            $user = Login::getUser();
+        }
+        if (empty($user)) {
+            GI_URLUtils::redirectToError(3000);
+        }
+        //TODO - permission check
+        $view = $user->getNotificationSettingsView();
+        if (isset($attributes['contentOnly']) && $attributes['contentOnly'] == '1') {
+            $view->setOnlyBodyContent(true);
+        }
+        $returnArray = GI_Controller::getReturnArray($view);
+        return $returnArray;
+    }
+
+    public function actionEditNotificationSettings($attributes) {
+        if (!isset($attributes['id']) && !isset($attributes['type'])) {
+            GI_URLUtils::redirectToError(2000);
+        }
+        if (isset($attributes['userId']) && Permission::verifyByRef('super_admin')) {
+            $userId = $attributes['userId'];
+        } else {
+            $userId = Login::getUserId();
+        }
+        $user = UserFactory::getModelById($userId);
+        if (empty($user)) {
+            GI_URLUtils::redirectToError(2000);
+        }
+        $eventId = NULL;
+        if (isset($attributes['id'])) {
+            $settings = SettingsFactory::getModelById($attributes['id']);
+            if (empty($settings)) {
+                GI_URLUtils::redirectToError(2000);
+            }
+        } else {
+            $type = $attributes['type'];
+            if ($type !== 'notification_global') {
+                if (!isset($attributes['eventId'])) {
+                    GI_URLUtils::redirectToError(2000);
+                }
+                $eventId = $attributes['eventId'];
+            }
+            $settings = $user->getNotificationSettingsModel($eventId, $type);
+            $globalSettings = $user->getGlobalNotificationSettingsModel();
+            $settings->setPropertiesFromModel($globalSettings);
+            $settings->setProperty('settings_notif.event_id', $eventId);
+        }
+        if ($settings->getProperty('user_id') != $userId) {
+            GI_URLUtils::redirectToError(2000);
+        }
+        $form = new GI_Form('edit_settings');
+        $view = $settings->getFormView($form);
+        $view->buildForm();
+        $success = 0;
+        $newUrl = NULL;
+        if ($settings->handleFormSubmission($form)) {
+            $success = 1;
+            $newUrl = 'refresh';
+        }
+        $returnArray = GI_Controller::getReturnArray($view);
+        $returnArray['success'] = $success;
+        if (!empty($newUrl)) {
+            $returnArray['newUrl'] = $newUrl;
+        }
+        return $returnArray;
+    }
+
 }

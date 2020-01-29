@@ -244,6 +244,11 @@ abstract class AbstractTagController extends GI_Controller {
                 $tagSearch->filterLike('ref', '%' . $termRef . '%')
                         ->orderByLikeScore('ref', $termRef);
             }
+            
+            if(isset($attributes['notIds']) && !empty($attributes['notIds'])){
+                $notIds = explode(',', $attributes['notIds']);
+                $tagSearch->filterNotIn('id', $notIds);
+            }
             $tags = $tagSearch->select();
             $results = array();
             foreach ($tags as $tag) {

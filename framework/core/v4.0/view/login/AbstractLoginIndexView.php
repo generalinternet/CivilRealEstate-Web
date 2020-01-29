@@ -6,7 +6,7 @@
  * @copyright  2016 General Internet
  * @version    2.0
  */
-class AbstractLoginIndexView extends GI_View {
+class AbstractLoginIndexView extends MainWindowView {
     
     /**
      * @var GI_Form
@@ -16,15 +16,23 @@ class AbstractLoginIndexView extends GI_View {
     protected $addWrapper = false;
     protected $addRememberMe = true;
     protected $addForgotPass = true;
+    protected $doNotRedirect = false;
 
     public function __construct(GI_Form $form) {
         $this->form = $form;
         parent::__construct();
         $this->buildForm();
+        $this->addSiteTitle(Lang::getString('log_in'));
+        $this->setWindowTitle(Lang::getString('log_in'));
     }
     
     public function setAddWrapper($addWrapper){
         $this->addWrapper = $addWrapper;
+        return $this;
+    }
+    
+    public function setDoNotRedirect($doNotRedirect){
+        $this->doNotRedirect = $doNotRedirect;
         return $this;
     }
     
@@ -90,7 +98,7 @@ class AbstractLoginIndexView extends GI_View {
                 'controller' => 'login',
                 'action' => 'forgotPassword'
             ));
-            $this->form->addHTML('<a href="'.$forgotPassURL.'" title="Forgot Your Password?">Forgot Password?</a>');
+            $this->form->addHTML('<a href="'.$forgotPassURL.'" title="Forgot Your Password?" class="login_action_btn">Forgot Password?</a>');
         }
     }
     
@@ -104,23 +112,13 @@ class AbstractLoginIndexView extends GI_View {
     }
     
     protected function addSubmitBtn(){
-        $this->form->addHTML('<span class="submit_btn">Log In</span>');
+        $this->form->addHTML('<span class="submit_btn" tabindex="0">' . Lang::getString('log_in') . '</span>');
     }
 
     protected function buildForm() {
         $this->openFormBody();
             $this->buildFormBody();
         $this->closeFormBody();
-    }
-    
-    protected function openViewWrap(){
-        $this->addHTML('<div class="view_wrap">');
-        return $this;
-    }
-    
-    protected function closeViewWrap(){
-        $this->addHTML('</div>');
-        return $this;
     }
     
     protected function openFormBody($class ='') {
@@ -138,19 +136,20 @@ class AbstractLoginIndexView extends GI_View {
         $this->addSubmitBtn();
     }
     
-    public function buildView() {
-        if($this->ajax || $this->addWrapper){
-            $this->openViewWrap()
-                    ->addHTML('<h1 class="main_head">Log In</h1>');
-        }
+    protected function addViewBodyContent(){
         $this->addHTML($this->form->getForm());
-        if($this->ajax || $this->addWrapper){
-            $this->closeViewWrap();
-        }
+        $this->addRegisterLink();
     }
-    
-    public function beforeReturningView() {
-        $this->buildView();
+                
+    protected function addRegisterLink(){
+        if(!ProjectConfig::isRegistrationEnabled()){
+            return;
+        }
+        $registerURL = GI_URLUtils::buildURL(array(
+            'controller' => 'login',
+            'action' => 'register'
+        ));
+        $this->addHTML('<p>Don’t have an account yet? <a href="' . $registerURL . '" title="' . Lang::getString('sign_up') . '" class="login_action_btn" >' . Lang::getString('sign_up') . '</a></p>');
     }
 
 }

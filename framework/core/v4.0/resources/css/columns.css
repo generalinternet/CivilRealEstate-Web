@@ -8,10 +8,7 @@
 }
 .columns > .column,
 .auto_columns > *{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: top;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -52,12 +49,18 @@
     width: 50%;
 }
 .columns.halves > .column:nth-child(odd),
-.auto_columns > *:nth-child(odd){
+.auto_columns > *:nth-child(odd),
+.auto_columns > .full_width:nth-child(odd) ~ *:nth-child(even),
+.auto_columns > .full_width:nth-child(odd) ~ *:nth-child(even) ~ .full_width:nth-child(even) ~ *:nth-child(odd){
     padding-right: 1.07em;
+    padding-left: 0;
 }
 .columns.halves > .column:nth-child(even),
-.auto_columns > *:nth-child(even){
+.auto_columns > *:nth-child(even),
+.auto_columns > .full_width:nth-child(odd) ~ *:nth-child(even) ~ *:nth-child(odd),
+.auto_columns > .full_width:nth-child(odd) ~ .full_width:nth-child(even) ~ *:nth-child(even){
     padding-left: 1.07em;
+    padding-right: 0;
 }
 .auto_columns > .multi_column{
     width: 100%;
@@ -410,6 +413,13 @@ e5cffc
 }
 .outlined_columns .column:nth-child(6) .content_block{
     background: #e5cffc;
+}
+/**FULL WIDTH**/
+.columns.full_width > .column,
+.auto_columns.full_width > *,
+.auto_columns > .full_width{
+    width: 100% !important;
+    padding: 0 !important;
 }
 @media only screen and (max-width : 960px){
     .columns .column{

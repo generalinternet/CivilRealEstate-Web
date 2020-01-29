@@ -95,6 +95,7 @@ li.ui-menu-item a{
 .ac_results ul{
     max-height: 300px;
     overflow: auto;
+    z-index: 200;
 }
 
 .selectric-items ul.selectric-group{
@@ -106,10 +107,7 @@ li.ui-menu-item a{
 }
 
 .ac_results ul li i.float_right{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     padding-left: 0.5em;
     font-size: 0.8em;
     line-height: 1.3em;
@@ -174,10 +172,7 @@ li.ui-menu-item a{
 }
 
 .ac_remove{
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     cursor: pointer;
     vertical-align: middle;
     /*float: right;*/
@@ -306,10 +301,7 @@ li.ui-menu-item a{
 .ui_tpicker_timezone_label{
     font-weight: 700;
     width: 35%;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: middle;
     margin-top: 0.5em;
 }
@@ -322,10 +314,7 @@ li.ui-menu-item a{
 .ui_tpicker_microsec,
 .ui_tpicker_timezone{
     width: 50%;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: middle;
 }
 
@@ -379,10 +368,7 @@ li.ui-menu-item a{
 .selectric .label .colour{
     width: 1em;
     height: 1em;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: middle;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;

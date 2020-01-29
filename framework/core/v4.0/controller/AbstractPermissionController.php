@@ -66,7 +66,12 @@ abstract class AbstractPermissionController extends GI_Controller {
         } else {
             //List style view
             $uiTableCols = $samplePermission->getUITableCols();
-            $uiTableView = new UITableView($permissions, $uiTableCols, $pageBar);
+            $catalog = $attributes['catalog'];
+            if($catalog == 1){
+                $uiTableView = new UICatalogView($permissions, $uiTableCols, $pageBar);
+            } else {
+                $uiTableView = new UITableView($permissions, $uiTableCols, $pageBar);
+            }
             if(isset($attributes['addSelectRowCol']) && $attributes['addSelectRowCol'] == 1){
                 $uiTableView->addDefaultSelectRowColumn('Permission');
             }
@@ -206,6 +211,9 @@ abstract class AbstractPermissionController extends GI_Controller {
     
     public function actionDenied($attributes){
         $view = new PermissionDeniedView();
+        if(GI_URLUtils::isAJAX()){
+            $view->setAddOuterWrap(false);
+        }
         $returnArray = GI_Controller::getReturnArray($view);
         $returnArray['breadcrumbs'] = array(
             array(
@@ -213,11 +221,14 @@ abstract class AbstractPermissionController extends GI_Controller {
                 'link' => GI_URLUtils::buildURL($attributes)
             )
         );
+        if (Login::getCurrentInterfacePerspectiveRef() !== 'admin') {
+            $returnArray['layoutView'] = 'publicLayoutView';
+        }
         return $returnArray;
     }
-    
-    public function actionAutocompPermission($attributes){
-        if ((!isset($attributes['ajax']) || !$attributes['ajax'] == 1)){
+
+    public function actionAutocompPermission($attributes) {
+        if ((!isset($attributes['ajax']) || !$attributes['ajax'] == 1)) {
             $returnArray = GI_Controller::getReturnArray();
             return $returnArray;
         }

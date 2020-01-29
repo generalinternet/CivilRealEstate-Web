@@ -120,7 +120,7 @@ abstract class AbstractNoteFormView extends GI_View {
     }
     
     protected function addSubmitBtn(){
-        $this->form->addContent('<span class="submit_btn" title="Save"><span class="icon_wrap"><span class="icon primary post"></span></span></span>');
+        $this->form->addContent('<span class="submit_btn" title="Save" tabindex="0"><span class="icon_wrap"><span class="icon primary post"></span></span></span>');
     }
     
     protected function addUploaderBtn() {

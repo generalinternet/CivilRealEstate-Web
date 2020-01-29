@@ -759,7 +759,7 @@ abstract class GI_FormStepView extends GI_View {
                 //Left step nav
                 $this->form->addFormClass('side_step_form');
                 $this->buildStepNav();
-                $this->form->addHTML('<div id="side_step_form_body">');
+                $this->form->addHTML('<div id="side_step_form_body" class="side_step_form_body">');
                 $this->buildFormHeader();
             } else {
                 //Top step nav

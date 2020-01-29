@@ -36,10 +36,7 @@ tr.form_row:after{
 .remove_form_row_wrap
 ,.form_row .sort_handle_wrap{
     width: 40px;
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: top;
     margin-top: 2.4em;
 }
@@ -57,10 +54,7 @@ tr.form_row:after{
 }
 .form_row_fields{
     width: calc(100% - 40px);
-    display:-moz-inline-stack;
     display:inline-block;
-    zoom:1;
-    *display:inline;
     vertical-align: top;
 }
 

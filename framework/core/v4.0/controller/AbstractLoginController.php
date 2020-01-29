@@ -17,11 +17,40 @@ class AbstractLoginController extends GI_Controller {
         $view = new LoginIndexView($form);
         if(isset($attributes['ajax']) && $attributes['ajax'] == 1){
             $view->setAjax(true);
+            $view->setAddOuterWrap(false);
         }
         $success = 0;
         $jqueryAction = '';
         
+        $doNotRedirect = false;
+        if(isset($attributes['doNotRedirect']) && $attributes['doNotRedirect'] == 1){
+            $doNotRedirect = true;
+            $view->setDoNotRedirect(true);
+        }
+        
+        if(isset($attributes['redirURL'])){
+            $redirURL = $attributes['redirURL'];
+            if($attributes['redirURL'] == 'referer'){
+                $redirURL = $_SERVER['HTTP_REFERER'];
+            }
+            SessionService::setValue('loginRedirURL', $redirURL);
+            unset($attributes['redirURL']);
+            GI_URLUtils::redirect($attributes);
+        }
+        
+        $controller = GI_URLUtils::getController();
+        $doNotSetAttrsFor = array(
+            'login',
+            'permission'
+        );
+        if(!in_array($controller, $doNotSetAttrsFor) && !GI_URLUtils::isAJAX()){
+            GI_URLUtils::setLastAttributes($attributes);
+        }
+        
         if(LoginFactory::logIn($form)){
+            if($doNotRedirect){
+                return Login::getUser();
+            }
             if(isset($attributes['ajax']) && $attributes['ajax'] == 1){
                 $success = 1;
                 $jqueryAction = 'sessionReset();';
@@ -101,15 +130,15 @@ class AbstractLoginController extends GI_Controller {
                     $user = $userArray[0];
                     $giEmail = NULL;
                     if($user->sendForgotPassEmail($giEmail)){
-                            $view->setThanks(true);
-                            if(DEV_MODE){
-                                echo $giEmail->getBody(true);
-                                die();
-                            }
-                        } else {
-                            $emailIssue = true;
+                        $view->setThanks(true);
+                        if(DEV_MODE){
+                            echo $giEmail->getBody(true);
+                            die();
                         }
                     } else {
+                        $emailIssue = true;
+                    }
+                } else {
                     //user not found
                     $emailIssue = true;
                 }
@@ -139,7 +168,7 @@ class AbstractLoginController extends GI_Controller {
             Login::setUserId($userId);
             Login::setUserLang();
             $user = UserFactory::getModelById($userId);
-            
+            $reason = '';
             $form = new GI_Form('reset_pass');
             if ($form->wasSubmitted() && $form->validate()) {
                 $newPassword = filter_input(INPUT_POST, 'password');
@@ -158,7 +187,7 @@ class AbstractLoginController extends GI_Controller {
 
                         if ($user->save()) {
                             $newLogKey = $this->createNewLogin();
-                            $_SESSION['log_key'] = $newLogKey;
+                            SessionService::setValue('log_key', $newLogKey);
                             static::redirectAfterRequestPassword();
                         } else {
                             GI_URLUtils::redirectToError(1000);
@@ -195,9 +224,10 @@ class AbstractLoginController extends GI_Controller {
         
         $forceLogOut = true;
         
-        if (isset($_SESSION['log_key'])) {
+        $logKey = SessionService::getValue('log_key');
+            if (!empty($logKey)) {
             $loginArray = LoginFactory::search()
-                    ->filter('log_key', $_SESSION['log_key'])
+                    ->filter('log_key', $logKey)
                     ->select();
             if ($loginArray) {
                 $forceLogOut = false;
@@ -239,26 +269,54 @@ class AbstractLoginController extends GI_Controller {
     }
     
     public function actionRegister($attributes){
+        if(!ProjectConfig::isRegistrationEnabled()){
+            return $this->actionIndex($attributes);
+        }
         $form = new GI_Form('register');
         
-        $user = UserFactory::buildNewModel();
+        $user = UserFactory::buildNewModel('unconfirmed');
+        $defaultContactCat = NULL;
+        if(isset($attributes['catRef']) && !empty($attributes['catRef'])){
+            $defaultContactCat = ContactCatFactory::buildNewModel($attributes['catRef']);
+            if($defaultContactCat->getTypeProperty('id')){
+                $user->setContactCat($defaultContactCat);
+            }
+        }
         $view = new LoginRegisterView($form, $user);
         
+        if(GI_URLUtils::isAJAX()){
+            $view->setAddOuterWrap(false);
+        }
+
+        $doNotRedirect = false;
+        if(isset($attributes['doNotRedirect']) && $attributes['doNotRedirect'] == 1){
+            $doNotRedirect = true;
+            $view->setDoNotRedirect(true);
+        }
+        
+        if(GI_URLUtils::getController() !== 'login'){
+            GI_URLUtils::setLastAttributes($attributes);
+        }
+
         if ($user->handleFormSubmission($form)) {
             if (!ProjectConfig::registerRequiresConfirmation()) {
                 $user = UserFactory::changeModelType($user, 'user');
                 if (!$user->save()) {
                     GI_URLUtils::redirectToError(1000);
                 }
-            LoginFactory::loginAsUser($user);
+                LoginFactory::loginAsUser($user);
+            }
+            if(!$doNotRedirect){
+                static::redirectAfterRegistration($user);
+            } else {
+                return $user;
+            }
         }
-            static::redirectAfterRegistration($user);
-        }
-        
+
         $returnArray = GI_Controller::getReturnArray($view);
         return $returnArray;
     }
-    
+
     public function actionConfirmEmail($attributes) {
         if (!isset($attributes['id'])) {
             GI_URLUtils::redirectToError();
@@ -274,7 +332,7 @@ class AbstractLoginController extends GI_Controller {
         $confirmCodeSentDate = $user->getProperty('confirm_code_sent_date');
         if (!empty($confirmCodeSentDate)) {
             $confirmExpiryDateTime = new DateTime($confirmCodeSentDate);
-            $confirmExpiryDateTime->modify("+".USER_CONFIRM_TTL." minutes");
+            $confirmExpiryDateTime->modify("+" . USER_CONFIRM_TTL . " minutes");
             $currentDateTime = new DateTime(GI_Time::getDateTime());
             if ($currentDateTime > $confirmExpiryDateTime) {
                 GI_URLUtils::redirect(array(
@@ -307,6 +365,12 @@ class AbstractLoginController extends GI_Controller {
             if ($password !== $passwordTwo) {
                 $form->addFieldError('password_two', 'mismatch', 'You must re-enter the same password as above.');
                 $fieldErrors = true;
+            } else {
+                $reason = '';
+                if(!GI_StringUtils::validatePassword($password, $reason)){
+                    $form->addFieldError('password', 'invalid', $reason);
+                    $fieldErrors = true;
+                }
             }
             if (!$fieldErrors) {
                 $salt = GI_StringUtils::generateRandomString(8, false, true, true, true, 2, 1);
@@ -316,6 +380,11 @@ class AbstractLoginController extends GI_Controller {
                 $user->setProperty('confirmed', 1);
                 if ($user->save()) {
                     LoginFactory::loginAsUser($user);
+                    $redirectAttributes = array(
+                        'controller'=>'dashboard',
+                        'action'=>'index'
+                    );
+                    GI_URLUtils::setLastAttributes($redirectAttributes);
                     static::redirectAfterLogin();
                 } else {
                     GI_URLUtils::redirectToError();
@@ -391,11 +460,22 @@ class AbstractLoginController extends GI_Controller {
     }
     
     public static function redirectAfterLogin(){
+        $redirURL = SessionService::getValue('loginRedirURL');
+        if(!empty($redirURL)){
+            SessionService::unsetValue('loginRedirURL');
+            GI_URLUtils::redirectToURL($redirURL);
+        }
+        $lastAttrs = GI_URLUtils::getLastAttributes();
+        if(!empty($lastAttrs)){
+            GI_URLUtils::setLastAttributes(NULL);
+            GI_URLUtils::redirect($lastAttrs);
+        }
+        
         $attributes = GI_URLUtils::getAttributes();
         $targetController = $attributes['controller'];
         $targetAction = $attributes['action'];
         if ($targetController === 'login' && $targetAction == 'index') {
-            $attributes['controller'] = GI_ProjectConfig::getDefaultConroller();
+            $attributes['controller'] = GI_ProjectConfig::getDefaultController();
             $attributes['action'] = GI_ProjectConfig::getDefaultAction();
         }
         GI_URLUtils::redirect($attributes);
@@ -408,16 +488,56 @@ class AbstractLoginController extends GI_Controller {
         ));
     }
     
-    public static function redirectAfterRegistration(){
-        GI_URLUtils::redirect(array(
-            'controller' => GI_ProjectConfig::getDefaultConroller(),
-            'action' => GI_ProjectConfig::getDefaultAction()
-        ));
+    public static function redirectAfterRegistration(AbstractUser $user){
+        $lastAttrs = GI_URLUtils::getLastAttributes();
+        if(!empty($lastAttrs)){
+            GI_URLUtils::setLastAttributes(NULL);
+            GI_URLUtils::redirect($lastAttrs);
+        }
+        
+        $contactCat = $user->getContactCat();
+        if (empty($contactCat)) {
+            GI_URLUtils::redirectToError(2001);
+        }
+        if ($contactCat->getApplicationRequired()) {
+            $applicationURLAttrs = $contactCat->getApplicationURLAttrs();
+            if (empty($applicationURLAttrs)) {
+                GI_URLUtils::redirectToError(2001);
+            }
+            if (isset($applicationURLAttrs['controller']) && $applicationURLAttrs['controller'] !== 'login') {
+                $applicationActionRequired = UserActionRequiredFactory::buildNewModel('redirect');
+                $applicationActionRequired->setProperty('user_id', $user->getId());
+                $applicationActionRequired->setProperty('rank', 100);
+                $applicationActionRequired->setProperty('user_act_req_redirect.url', GI_URLUtils::buildURL($applicationURLAttrs, false, true));
+                $applicationActionRequired->setProperty('user_act_req_redirect.controller', $applicationURLAttrs['controller']);
+                $applicationActionRequired->setProperty('user_act_req_redirect.action', $applicationURLAttrs['action']);
+
+                if (!$applicationActionRequired->save()) {
+                    GI_URLUtils::redirectToError(1000);
+                }
+            }
+        }
+
+        if (ProjectConfig::registerRequiresConfirmation()){
+            if (!$user->sendConfirmEmailAddressEmail()) {
+                GI_URLUtils::redirectToError(5000);
+            }
+            GI_URLUtils::redirect(array(
+                'controller' => 'login',
+                'action' => 'confirmationSent',
+                'id' => $user->getId()
+            ));
+        } else {
+            GI_URLUtils::redirect(array(
+                'controller' => GI_ProjectConfig::getDefaultController(),
+                'action' => GI_ProjectConfig::getDefaultAction()
+            ));
+        }
     }
     
     public static function redirectAfterRequestPassword(){
         GI_URLUtils::redirect(array(
-            'controller' => GI_ProjectConfig::getDefaultConroller(),
+            'controller' => GI_ProjectConfig::getDefaultController(),
             'action' => GI_ProjectConfig::getDefaultAction()
         ));
     }

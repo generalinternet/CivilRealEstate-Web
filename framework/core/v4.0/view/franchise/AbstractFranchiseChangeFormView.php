@@ -42,7 +42,7 @@ abstract class AbstractFranchiseChangeFormView extends GI_View{
     }
     
     protected function buildFormFooter() {
-        $this->form->addHTML('<span class="submit_btn" title="Save">Submit</span>');
+        $this->form->addHTML('<span class="submit_btn" title="Save" tabindex="0">Submit</span>');
     }
     
     protected function addFranchiseField(){

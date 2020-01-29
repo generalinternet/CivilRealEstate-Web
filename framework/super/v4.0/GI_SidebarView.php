@@ -211,7 +211,7 @@ abstract class GI_SidebarView extends GI_View {
     }
     
     protected function openSidebarCategoryWrap($headerTitle, $headerIcon = NULL, $targetRef = NULL, $isOpenOnLoad = false){
-        $this->addHTML('<div class="advanced sidebar_cagegory');
+        $this->addHTML('<div class="advanced sidebar_category');
         if (!empty($targetRef)) {
            $this->addHTML(' link_to_target '.$this->targetRefPrefix.$targetRef); 
         }
@@ -233,7 +233,7 @@ abstract class GI_SidebarView extends GI_View {
     
     protected function closeSidebarCategoryWrap(){
             $this->addHTML('</div><!--.advanced_content-->');
-        $this->addHTML('</div><!--.advanced sidebar_cagegory-->');
+        $this->addHTML('</div><!--.advanced sidebar_category-->');
     }
     
     protected function addGeneralInfoBtns(){
@@ -266,7 +266,7 @@ abstract class GI_SidebarView extends GI_View {
                         $headerTitle = $category['title'];
                         $headerIcon = $category['icon'];
                         $targetRef = $category['ref'];
-                        $advClassNames = 'sidebar_cagegory';
+                        $advClassNames = 'sidebar_category';
                         $classNames = $category['class_names'];
                         if (!empty($classNames)) {
                             $advClassNames .= ' '.$classNames;

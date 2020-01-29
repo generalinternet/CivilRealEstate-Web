@@ -1,28 +1,15 @@
 <?php
 
-abstract class AbstractPermissionDeniedView extends GI_View {
+abstract class AbstractPermissionDeniedView extends MainWindowView {
 
     public function __construct() {
         parent::__construct();
         $this->addSiteTitle('Access Denied');
-        $this->buildView();
-    }
-
-    protected function openViewWrap(){
-        $this->addHTML('<div class="content_padding">');
-        return $this;
+        $this->setWindowTitle('Access Denied');
     }
     
-    protected function closeViewWrap(){
-        $this->addHTML('</div>');
-        return $this;
-    }
-    
-    protected function buildView() {
-        $this->openViewWrap();
-        $this->addHTML('<h1>Access Denied</h1>');
+    protected function addViewBodyContent() {
         $this->addHTML('<p>You do not have permission to perform the requested action. Please contact your system administrator for more information.</p>');
-        $this->closeViewWrap();
     }
 
 }

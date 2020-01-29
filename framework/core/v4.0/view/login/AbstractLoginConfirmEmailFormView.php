@@ -4,9 +4,9 @@
  *
  * @author General Internet
  * @copyright  2017 General Internet
- * @version    2.0.1
+ * @version    4.0.0
  */
-Abstract class AbstractLoginConfirmEmailFormView extends GI_View {
+Abstract class AbstractLoginConfirmEmailFormView extends MainWindowView {
     
     protected $form;
     protected $user;
@@ -19,6 +19,8 @@ Abstract class AbstractLoginConfirmEmailFormView extends GI_View {
         parent::__construct();
         $this->form = $form;
         $this->user = $user;
+        $this->addSiteTitle(Lang::getString('confirm_email'));
+        $this->setWindowTitle(Lang::getString('confirm_email'));
     }
     
     public function setAddWrapper($addWrapper){
@@ -31,15 +33,8 @@ Abstract class AbstractLoginConfirmEmailFormView extends GI_View {
         return $this;
     }
     
-    protected function buildView() {
-        if($this->ajax || $this->addWrapper){
-            $this->openViewWrap();
-        }
-        $this->buildForm();
-        $this->addHTML($this->form->getForm(''));
-        if($this->ajax || $this->addWrapper){
-            $this->closeViewWrap();
-        }
+    protected function addViewBodyContent(){
+        $this->addHTML($this->form->getForm());
     }
     
     public function setAddCodeField($addCodeField = false) {
@@ -61,7 +56,9 @@ Abstract class AbstractLoginConfirmEmailFormView extends GI_View {
             
             $this->addConfirmPasswordField();
             
-            $this->form->addHTML('<span class="submit_btn" title="Submit">Submit</span>');
+            $this->addPasswordRules();
+            
+            $this->form->addHTML('<span class="submit_btn" title="Submit" tabindex="0">' . Lang::getString('submit') . '</span>');
             $this->formBuilt = true;
         }
     }
@@ -72,8 +69,14 @@ Abstract class AbstractLoginConfirmEmailFormView extends GI_View {
             'action'=>'sendConfirmationEmail',
             'id'=>$this->user->getProperty('id'),
         ));
-        $this->addHTML('<h1>Create a Password</h1>');
-        $this->addHTML('<p>If you need another confirmation code, you can <a href="'.$sendCodeURL.'" title="Re-send confirmation code">re-send the confirmation email</a>.</p>');
+        $this->form->addHTML('<h3>Set your Password</h3>');
+//        if ($this->addCodeField) {
+            $this->form->addHTML('<p>If you need another confirmation code, you can <a href="'.$sendCodeURL.'" title="Re-send confirmation code">re-send the confirmation email</a>.</p>');
+//        }
+    }
+    
+    protected function addPasswordRules(){
+        $this->form->addHTML(GI_StringUtils::getPasswordRules('password', 'password_two', false));
     }
     
     protected function addMessageSection() {
@@ -93,6 +96,8 @@ Abstract class AbstractLoginConfirmEmailFormView extends GI_View {
             'displayName' => Lang::getString('new_password'),
             'placeHolder' => Lang::getString('new_password'),
             'required'=>true,
+            'autoComplete' => false,
+            'inputAutoCompleteVal' => 'new-password'
         ));
     }
 
@@ -100,22 +105,10 @@ Abstract class AbstractLoginConfirmEmailFormView extends GI_View {
         $this->form->addField('password_two', 'password', array(
             'displayName' => Lang::getString('re_enter_new_password'),
             'placeHolder' => Lang::getString('re_enter_new_password'),
-            'required'=>true
+            'required'=>true,
+            'autoComplete' => false,
+            'inputAutoCompleteVal' => 'new-password'
         ));
-    }
-
-    public function beforeReturningView() {
-        $this->buildView();
-    }
-    
-    protected function openViewWrap(){
-        $this->addHTML('<div class="content_padding">');
-        return $this;
-    }
-    
-    protected function closeViewWrap(){
-        $this->addHTML('</div>');
-        return $this;
     }
 
 }

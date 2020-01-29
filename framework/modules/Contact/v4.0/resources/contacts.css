@@ -1,0 +1,105 @@
+.public_profile_wrap{
+    display: block;
+    position: relative;
+    padding: 1em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background: #fff;
+}
+.public_profile_wrap{
+    border-top: 10px solid #ccc;
+}
+.public_profile_contact_info{
+    display: inline-block;
+    margin-bottom: 0.5em;
+}
+.public_profile_contact_info:last-child{
+    margin-bottom: 0;
+}
+.public_profile_contact_info svg *{
+    fill: #6ca7da !important;
+}
+.public_profile_contact_info .info,
+.public_profile_contact_info .svg_icon,
+.public_profile_contact_info .icon_wrap{
+    display: inline-block;
+    vertical-align: middle;
+}
+.public_profile_contact_info .svg_icon + .info,
+.public_profile_contact_info .icon_wrap + .info{
+    margin-left: 0.5em;
+}
+h3.public_profile_title{
+    font-size: 1.8em;
+    line-height: 1.2em;
+    font-weight: 300;
+    margin-bottom: 0.5em;
+}
+h4.public_profile_sub_title{
+    font-size: 1em;
+    font-weight: 600;
+    line-height: 1.2em;
+    margin-bottom: 0.5em;
+}
+
+.public_profile_wrap{
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+.public_profile_wrap:before,
+.public_profile_wrap:after{
+    content: normal; /** To fix Safari bug with flex-wrap **/
+}
+
+.public_profile_wrap .sized_img_wrap,
+.public_profile_info{
+    display: inline-block;
+    vertical-align: top;
+    flex: 1;
+}
+
+.public_profile_wrap .sized_img_wrap{
+    flex: 0.2;
+    padding-right: 1em;
+}
+
+.public_profile_wrap .sized_img_wrap img{
+    max-width: 100%;
+}
+
+.public_profile_contact_info.desc{
+    font-size: 0.8em;
+}
+.public_profile_wrap .advanced{
+    border: none;
+    padding-bottom: 0;
+}
+.public_profile_wrap .advanced_content{
+    padding: 0;
+    padding-top: 0.5em;
+    border: none;
+}
+.public_profile_wrap .avatar_placeholder{
+    width: 125px;
+    height: 125px;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    font-size: 125px;
+    flex: 0.2;
+    background: none;
+    text-align: left;
+}
+.public_profile_wrap .avatar_placeholder .svg_icon{
+    background: rgba(0,0,0,0.2);
+    margin-left: 0;
+    left: 0;
+}
+.public_profile_wrap .avatar_placeholder + .public_profile_info{
+    padding-left: 2em;
+}

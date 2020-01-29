@@ -4,7 +4,7 @@
  *
  * @author General Internet
  * @copyright  2019 General Internet
- * @version    4.0.0
+ * @version    4.0.1
  */
 abstract class AbstractUIRolodexView extends AbstractUITableView {
     
@@ -39,7 +39,7 @@ abstract class AbstractUIRolodexView extends AbstractUITableView {
         $this->loadLinksWithAJAX = $loadLinksWithAJAX;
         return $this;
     }
-    
+   
     protected function openTable(){
         $this->addHTML('<div class="' . $this->getTableClass() . '">');
         return $this;
@@ -111,8 +111,8 @@ abstract class AbstractUIRolodexView extends AbstractUITableView {
         return $this;
     }
     
-    protected function openModelCell($cssClass, $cellHoverTitle){
-        $this->addHTML('<div class="ui_tile_cell ' . $cssClass . '" title="' . $cellHoverTitle . '">');
+    protected function openModelCell($cssClass, $cellHoverTitle, $headerTitle){
+        $this->addHTML('<div class="ui_tile_cell ' . $cssClass . '" title="' . $cellHoverTitle . '" data-label="' . $headerTitle . '">');
         return $this;
     }
     

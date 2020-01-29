@@ -36,7 +36,7 @@ abstract class AbstractAdminEditCurrencyFormView extends GI_View {
             ));
             $this->form->endFieldset();
         }
-        $this->form->addContent('<span class="submit_btn" data-form-id="' . $this->form->getFormId() . '">Submit</span>');
+        $this->form->addContent('<span class="submit_btn" data-form-id="' . $this->form->getFormId() . '" tabindex="0">Submit</span>');
     }
     
     protected function openViewWrap(){

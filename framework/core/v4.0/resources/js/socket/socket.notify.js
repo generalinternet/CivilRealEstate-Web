@@ -2,10 +2,12 @@
 socket.notify.js v3.0.0
 */
 // request permission on page load
-document.addEventListener('DOMContentLoaded', function () {
-  if (Notification.permission !== "granted")
-    Notification.requestPermission();
-});
+if(USE_HTTPS){
+    document.addEventListener('DOMContentLoaded', function () {
+      if (Notification.permission !== "granted")
+        Notification.requestPermission();
+    });
+}
 
 function notify(title, body, url) {
   if (Notification.permission !== 'granted')
@@ -34,28 +36,6 @@ function reportSeen(modelId) {
      });
 }
 
-socket.on('notified', function (data) {
-    //Get notifications from BOS and add new ones to notification bar
-    jQuery.post('index.php?controller=notification&action=getUnseenNotificationData&ajax=1', function (data) {
-        //var parsedData = JSON.parse(data);
-        var count = data.count;
-        var totalCount = data.totalCount;
-        var bData = data.b_data;
-        for (i=0;i<count;i++) {
-            var title = bData[i].title;
-            var sbj = bData[i].sbj;
-            var url = bData[i].url;
-            notify(title, sbj, url);
-            var modelId = bData[i].model_id;
-            reportSeen(modelId);
-        }
-        $('.notify_count').show();
-        $('.notify_count').html(totalCount);
-        notifyBounce();      
-        $('#notify_sound')[0].play();
-    });
-});
-
 function notifyBounce(){
     $('.notify_count').animate({
         marginTop: '-0.5em'
@@ -69,5 +49,27 @@ function notifyBounce(){
 }
 
 $(function(){
+    socket.on('notified', function (data) {
+        //Get notifications from BOS and add new ones to notification bar
+        jQuery.post('index.php?controller=notification&action=getUnseenNotificationData&ajax=1', function (data) {
+            //var parsedData = JSON.parse(data);
+            var count = data.count;
+            var totalCount = data.totalCount;
+            var bData = data.b_data;
+            for (i=0;i<count;i++) {
+                var title = bData[i].title;
+                var sbj = bData[i].sbj;
+                var url = bData[i].url;
+                notify(title, sbj, url);
+                var modelId = bData[i].model_id;
+                reportSeen(modelId);
+            }
+            $('.notify_count').show();
+            $('.notify_count').html(totalCount);
+            notifyBounce();      
+            $('#notify_sound')[0].play();
+        });
+    });
+    
     $('<audio id="notify_sound"><source src="resources/media/sounds/open-ended.ogg" type="audio/ogg"><source src="resources/media/sounds/open-ended.mp3" type="audio/mpeg"><source src="resources/media/sounds/open-ended.wav" type="audio/wav"></audio>').appendTo('body');
 });

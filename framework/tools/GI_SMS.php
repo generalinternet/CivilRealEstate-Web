@@ -11,10 +11,16 @@ class GI_SMS{
     
     protected $message = '';
     protected $phoneNumber = '';
+    protected $forceSend = false;
     
     public function __construct($phoneNumber = NULL, $message = NULL) {
         $this->setPhoneNumber($phoneNumber);
         $this->setMessage($message);
+    }
+    
+    public function setForceSend($forceSend){
+        $this->forceSend = $forceSend;
+        return $this;
     }
     
     public function setPhoneNumber($phoneNumber){
@@ -73,12 +79,16 @@ class GI_SMS{
     }
     
     public function sendMessage(){
+//        if(DEV_MODE && !$this->forceSend){
+//            return true;
+//        }
         $phoneNumber = $this->getPhoneNumber();
         $message = $this->getMessage();
         
         if(!empty($phoneNumber) && !empty($message)){
             $sid = ProjectConfig::getTwilioSID();
             $token = ProjectConfig::getTwilioAuthToken();
+            
             $fromPhoneNumber = ProjectConfig::getTwilioPhoneNumber();
             $client = new TwilioClient($sid, $token);
             
@@ -118,6 +128,23 @@ class GI_SMS{
             $token = ProjectConfig::getTwilioTestAuthToken();
             $fromPhoneNumber = static::getTestPhoneNumber();
             $client = new TwilioClient($sid, $token);
+            try{
+                $client->lookups
+                ->v1
+                ->phoneNumbers($fromPhoneNumber)
+                ->fetch(array(
+                    'countryCode' => 'CA'
+                ));
+            } catch (\Twilio\Exceptions\TwilioException $ex) {
+                if(method_exists($ex, 'getStatusCode')){
+                    $statusCode = $ex->getStatusCode();
+                    if($statusCode == 404 || $statusCode == 403){
+                        return false;
+                    }
+                }
+                echo '<pre>';
+                die(var_dump($ex));
+            }
             
             try{
                 $result = $client->messages->create(

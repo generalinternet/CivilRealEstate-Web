@@ -42,7 +42,7 @@ abstract class AbstractFileEditFormView extends GI_View {
             'placeHolder' => 'Enter file description',
             'value' => $this->file->getProperty('description')
         ));
-        $this->form->addContent('<div class="center_btns wrap_btns"><span class="submit_btn" >Save</span></div>');
+        $this->form->addContent('<div class="center_btns wrap_btns"><span class="submit_btn" tabindex="0" >Save</span></div>');
     }
 
     protected function openViewWrap(){

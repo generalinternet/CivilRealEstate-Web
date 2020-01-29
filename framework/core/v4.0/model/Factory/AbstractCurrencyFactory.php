@@ -17,6 +17,7 @@ abstract class AbstractCurrencyFactory extends GI_ModelFactory {
         'cad_usd' => 0.75
     );
     protected static $cachedRates = array();
+    protected static $allCurrencies = array();
 
     /**
      * @param type $typeRef
@@ -121,6 +122,14 @@ abstract class AbstractCurrencyFactory extends GI_ModelFactory {
             return true;
         }
         return false;
+    }
+
+    /** @return AbstractCurrency[] */
+    public static function &getAllCurrencies(){
+        if(empty(static::$allCurrencies)){
+            static::$allCurrencies = static::getAll();
+        }
+        return static::$allCurrencies;
     }
 
 }

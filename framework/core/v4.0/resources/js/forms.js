@@ -293,6 +293,10 @@ function formatFields() {
             var acElm = $(this);
             var acURL = acElm.data('url');
             var prefill = fillData.prefill;
+            let acFelm = acElm.closest('.form_element');
+            if(acFelm.length){
+                acFelm.addClass('searching');
+            }
             jQuery.post(acURL+'&curVal='+fillData.value, function(data){
                 var dataLabel = data.label;
                 var dataResult = data.autoResult;
@@ -313,6 +317,9 @@ function formatFields() {
                     checkACLimit(elm);
                 } else {
                     acElm.val(dataLabel);
+                }
+                if(acFelm.length){
+                    acFelm.removeClass('searching');
                 }
                 if(prefill){
                     acElm.trigger('autocompletePreFill', [data]);
@@ -394,6 +401,18 @@ function formatFields() {
                     if (elm.val()==='' && !acMultiple && acRemFull) {
                         acElm.val('');
                     }
+                },
+                search : function (event, ui){
+                    let acFelm = acElm.closest('.form_element');
+                    if(acFelm.length){
+                        acFelm.addClass('searching');
+                    }
+                },
+                response : function (event, ui){
+                    let acFelm = acElm.closest('.form_element');
+                    if(acFelm.length){
+                        acFelm.removeClass('searching');
+                    }
                 }
             }).data('ui-autocomplete')._renderItem = function(ul, item){
                 var hoverTitle = item.hoverTitle;
@@ -418,7 +437,7 @@ function formatFields() {
             elm.addClass('ac_added');
             if(acMinLength == 0){
                 acElm.on('focus', function(){
-                    $(this).autocomplete('search');
+                    $(this).autocomplete('search', '');
                 });
             }
             if (acRemFull) {
@@ -772,8 +791,8 @@ $(document).on('click','input[type="checkbox"].read_only, input[type="radio"].re
 $(document).on('keydown','.form_element.error input, .form_element.error textarea, .trumbowyg-editor, input.error, textarea.error',function(){
     if($(this).is(':focus')){
         $(this).removeClass('error');
-    $(this).closest('.form_element').removeClass('error');
-    $(this).closest('.form_element').find('.field_error').remove();
+        $(this).closest('.form_element').removeClass('error');
+        $(this).closest('.form_element').find('.field_error').remove();
     }
 });
 
@@ -781,8 +800,8 @@ $(document).on('change','.form_element.error input, .form_element.error select, 
     var selectricWrapper = $(this).closest('.selectric-wrapper');
     if($(this).is(':focus') || selectricWrapper.is('.selectric-focus')){
         $(this).removeClass('error');
-    $(this).closest('.form_element').removeClass('error');
-    $(this).closest('.form_element').find('.field_error').remove();
+        $(this).closest('.form_element').removeClass('error');
+        $(this).closest('.form_element').find('.field_error').remove();
         selectricWrapper.removeClass('selectric-error');
     }
 });
@@ -813,13 +832,18 @@ $(document).on('click','.submit_btn',function(e){
 
 $(document).on('formSubmitBtn', '.submit_btn[data-field-name]', function(e){
     e.preventDefault();
-    var fieldName = $(this).data('field-name');
-    var fieldValue = $(this).data('field-value');
+    let fieldName = $(this).data('field-name');
+    let fieldValue = $(this).data('field-value');
     if(fieldValue == undefined){
         fieldValue = 1;
     }
-    $('input[name="' + fieldName + '"]').val(fieldValue);
-    var parentForm = $(this).closest('form');
+    let parentForm = $(this).closest('form');
+    let field = parentForm.find('input[name="' + fieldName + '"]');
+    if(!field.length){
+        field = $('<input type="hidden" name="' + fieldName + '" />');
+        parentForm.append(field);
+    } 
+    field.val(fieldValue);
     parentForm.submit();
     parentForm.addClass('submitting');
 });
@@ -1156,24 +1180,12 @@ function createJSignatures(){
                 img_el.fadeIn();
                 rewrite_el.fadeIn();
             }
-
-            var error_fields = form_el.find('.field_error');
-            var has_error = (error_fields.length != 0);
-
             // After writing a stroke
             sign_el.on('change', function(e){
                 // Remove error message if there any
-                $(e.target).closest('.form_element').find('.field_error').hide();
+                $(e.target).closest('.form_element').find('.field_error').fadeOut();
                 $(e.target).closest('.form_element').removeClass('error');
-                $(e.target).removeClass('error');
             });
-
-            // ensure that error fields are shown correctly
-            if(has_error){
-                error_fields.show();
-                form_el.addClass('error');
-            }
-
             sign_el.addClass('jsignature_added');
         });
         
@@ -1251,6 +1263,7 @@ $(document).on('bindActionsToNewContent',function(){
     formatFields();
     updateOptionGroupSections();
     setPasswordValidationRules();
+    setMirrorFromField();
     $('.addr_country').trigger('change');
 });
 
@@ -1677,10 +1690,10 @@ $(document).on('change', '.addr_country', function(){
 
 //Move form view's step
 function moveFormStep(form, stepToMove) {
-    form.find('input[name="next_step"]').val(stepToMove);
     var formWrapEl = form.find('.form_body_wrap');
     var totalStep = formWrapEl.data('total-step');
     if (stepToMove > 0 && stepToMove <= totalStep) {
+        form.find('input[name="next_step"]').val(stepToMove);
         startPageLoader();
         formWrapEl.data('step', stepToMove);
         formWrapEl.removeClass (function (index, className) {
@@ -1737,6 +1750,18 @@ $('#form_step_view_wrap .hide_other_step_blocks').each(function(){
     setCurrentStepToFormBody(form, curStep);
 });
 
+$(document).on('keydown', 'form.step_form input', function (e) {
+    let code = e.keyCode || e.which;
+    let form = $(this).closest('form');
+    if (code == 13) {
+        let formWrapEl = form.find('.form_body_wrap');
+        e.preventDefault();
+        let btnToClick = formWrapEl.find('.next_form_step');
+        btnToClick.trigger('click');
+        return false;
+    }
+});
+
 function moveSlide(slideEl) {
     var curSlide = slideEl.find('.step_form_body_step.current');
     var preSlideCnt = curSlide.prevAll().length;
@@ -1770,46 +1795,37 @@ function renderRecaptcha(wrapEl) {
     }
 }
 function setSlideStepFormView() {
-//Set slide step form view
-$('#form_step_view_wrap .slide_step_form').each(function(){
-    var form = $(this).closest('form');
-    var formWrapEl = form.find('.form_body_wrap');
-    var curStep = formWrapEl.data('step');
-    setCurrentStepToFormBody(form, curStep);
-    
-    //Set initialize slide style
-    var slideWidth = form.width();
-    
-        var slideHeight = 100;//@todo set default height
-    var allSlides = form.find('.step_form_body_step');
-    $.each(allSlides, function(index, slide) {
-        if ($(slide).height() > slideHeight) {
-            //Get max height of slides
-            slideHeight = $(slide).height();
-        }
-    });
-    var slideCnt = allSlides.length;
-    
-    var slideTotalWidth = slideWidth * slideCnt;
-    var formBody = form.find('.step_form_body');
-    var formFooter = form.find('.step_form_footer');
-    var formBodyWrap = formBody.parent();
-    slideHeight = slideHeight + 30; //put some margin for uploaded files
-    formWrapEl.find('.step_form_body_step').addClass('slide').css('width', slideWidth).css('height', slideHeight);
-    formBody.addClass('slide_container');
-    formBody.css('width', slideTotalWidth);
-    formBodyWrap.addClass('slide_container_outer');
-    formBodyWrap.css('height', slideHeight + 70);
-    formFooter.css('padding-top', slideHeight);
+    //Set slide step form view
+    let stepForms = $('#form_step_view_wrap .slide_step_form');
+    for(let i=0; i<stepForms.length; i++){
+        let stepForm = stepForms.eq(i);
+        let form = stepForm.closest('form');
+        let formWrapEl = form.find('.form_body_wrap');
+        let curStep = formWrapEl.data('step');
+        setCurrentStepToFormBody(form, curStep);
 
-    moveSlide(form);
-            renderRecaptcha(form);
-            findFieldErrorsInStepFormView(form);
-});
+        //Set initialize slide style
+        let slideWidth = form.width();
+
+        let allSlides = form.find('.step_form_body_step');
+        let slideCnt = allSlides.length;
+
+        let slideTotalWidth = slideWidth * slideCnt;
+        let formBody = form.find('.step_form_body');
+        let formBodyWrap = formBody.parent();
+        formWrapEl.find('.step_form_body_step').addClass('slide').css('width', slideWidth);
+        formBody.addClass('slide_container');
+        formBody.css('width', slideTotalWidth);
+        formBodyWrap.addClass('slide_container_outer');
+
+        moveSlide(form);
+        renderRecaptcha(form);
+        findFieldErrorsInStepFormView(form);
+    }
 }
 
 function findFieldErrorsInStepFormView(form) {
-//Move to the first step that has error fields
+    //Move to the first step that has error fields
     if(form.find('.form_element.error').length){
         var errorStepBody = form.find('.form_element.error').first().closest('.step_form_body_step');
         var errorStep = errorStepBody.data('step');
@@ -2013,8 +2029,20 @@ function getFieldHTML(fieldName, fieldType, fieldSettings){
         url: url,
         data: postData
     }).done(function(data) {
-        $('#' + placeholderName).replaceWith(data.mainContent);
-        newContentLoaded();
+        let attempts = 0;
+        let attemptToReplace = function(attempts){
+            if($('#' + placeholderName).length){
+                $('#' + placeholderName).replaceWith(data.mainContent);
+                newContentLoaded();
+            } else {
+                attempts++;
+                if(attempts == 10){
+                    console.log('Could not find placeholder field [' + placeholderName + '].');
+                }
+                setTimeout(attemptToReplace(attempts), 500);
+            }
+        };
+        attemptToReplace(attempts);
     }).fail(function(data) {
         console.log('ERROR');
         console.log(data);
@@ -2137,3 +2165,29 @@ $(document).on('keyup', '.pass_to_confirm', function(){
         validatePassword(passField);
     }
 });
+
+function setMirrorFromField(){
+    let unLinkedMirrors = $('.mirror_from_field').not('.linked');
+    for(let i=0; i<unLinkedMirrors.length; i++){
+        let unLinkedMirror = unLinkedMirrors.eq(i);
+        let fieldName = unLinkedMirror.data('field-name');
+        let formId = unLinkedMirror.data('form-id');
+        let form = null;
+        if(formId === undefined || formId === null){
+            form = unLinkedMirror.closest('form');
+        } else {
+            form = $('#' + formId);
+        }
+        if(form === undefined || form === null){
+            continue;
+        }
+        let field = form.find('input[name="' + fieldName + '"]');
+        let val = field.val();
+        unLinkedMirror.html(val);
+        field.on('keyup', function(){
+            let val = $(this).val();
+            unLinkedMirror.html(val);
+        });
+        unLinkedMirror.addClass('linked');
+    }
+}

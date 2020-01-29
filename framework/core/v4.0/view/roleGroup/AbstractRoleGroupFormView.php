@@ -52,7 +52,7 @@ abstract class AbstractRoleGroupFormView extends MainWindowView {
     }
     
     protected function addSubmitBtn(){
-        $this->form->addHTML('<span class="submit_btn" title="' . Lang::getString('save') . '">' . Lang::getString('save') . '</span>');
+        $this->form->addHTML('<span class="submit_btn" title="' . Lang::getString('save') . '" tabindex="0">' . Lang::getString('save') . '</span>');
     }
     
     public function addViewBodyContent() {

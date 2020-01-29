@@ -32,24 +32,28 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
             $this->setMenuView($layoutArray['menu']);
         }
         
-        if (isset($layoutArray['breadcrumbMenu']) && is_a($layoutArray['breadcrumbMenu'], 'GI_MenuView')) {
+        if(isset($layoutArray['breadcrumbMenu']) && is_a($layoutArray['breadcrumbMenu'], 'GI_MenuView')) {
             $this->setBreadCrumbMenuView($layoutArray['breadcrumbMenu']);
         }
         
-        if (isset($layoutArray['currentUser']) && is_a($layoutArray['currentUser'], 'AbstractUser')) {
+        if(isset($layoutArray['currentUser']) && is_a($layoutArray['currentUser'], 'AbstractUser')) {
             $this->setCurrentUser($layoutArray['currentUser']);
         }
         
-        if (isset($layoutArray['userAvatar']) && is_a($layoutArray['userAvatar'], 'GI_View')) {
+        if(isset($layoutArray['userAvatar']) && is_a($layoutArray['userAvatar'], 'GI_View')) {
             $this->setUserAvatarView($layoutArray['userAvatar']);
         }
         
-        if (isset($layoutArray['listBarContent'])) {
+        if(isset($layoutArray['listBarContent'])) {
             $this->setListBarContent($layoutArray['listBarContent']);
         }
         
-        if (isset($layoutArray['targetId'])) {
+        if(isset($layoutArray['targetId'])) {
             $this->setTargetId($layoutArray['targetId']);
+        }
+        
+        if(isset($layoutArray['curMenuRef']) && !empty($this->menuView)){
+            $this->menuView->setCurMenuRef($layoutArray['curMenuRef']);
         }
     }
     
@@ -155,16 +159,8 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
     protected function addDefaultJS(){
         parent::addDefaultJS();
         
-        //Socket
-        if(ProjectConfig::openSocket()){
-            $this->addJS('resources/external/js/socket.io-2.1.1.js');
-            $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/socket/socket.js');
-            if(ProjectConfig::enableBrowserNotifications()){
-                $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/socket/socket.notify.js');
-            }
-        }
-        
         $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/forms.js');
+        $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/core.js');
         $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/layout.js');
         $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/gi_modal.js');
         $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/notes.js');
@@ -174,22 +170,32 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
         $this->addJS('resources/external/js/css-element-queries/ElementQueries.js');
         
         //Module Specific Javascript
-        if(dbConnection::isModuleInstalled('inventory')){
+        if (dbConnection::isModuleInstalled('inventory')) {
             $this->addJS('framework/modules/Inventory/' . MODULE_INVENTORY_VER . '/resources/inventory.js');
         }
-        if(dbConnection::isModuleInstalled('contact')){
+        if (dbConnection::isModuleInstalled('contact')) {
             $this->addJS('framework/modules/Contact/' . MODULE_CONTACT_VER . '/resources/contacts.js');
         }
-        if(dbConnection::isModuleInstalled('accounting')){
+        if (dbConnection::isModuleInstalled('accounting')) {
             $this->addJS('framework/modules/Accounting/' . MODULE_ACCOUNTING_VER . '/resources/accounting.js');
+            $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/global_accounting.js');
         }
         
-        $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/global_accounting.js');
+        //This calls actions in the accounting controller, which is not present w/o the accounting module
+     ///  $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/global_accounting.js');
         
         /* Google Map */
-        if (!empty(GOOGLE_API_KEY)) {
+        $googleApiKey = ProjectConfig::getGoogleAPIKey();
+        if (!empty($googleApiKey)) {
             $this->addJS('resources/js/custom_google_map.js');
-            $this->addJS('https://maps.googleapis.com/maps/api/js?key=' . GOOGLE_API_KEY.'&callback=googleMapInit', false);
+            $this->addJS('https://maps.googleapis.com/maps/api/js?key=' . $googleApiKey.'&callback=googleMapInit', false);
+        }
+    }
+    
+    protected function addDefaultCSS() {
+        parent::addDefaultCSS();
+        if (dbConnection::isModuleInstalled('contact')) {
+            $this->addCSS('framework/modules/Contact/' . MODULE_CONTACT_VER . '/resources/contacts.css');
         }
     }
     
@@ -279,6 +285,8 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
         }
         if ($this->userAvatarView) {
             $this->addHTML($this->userAvatarView->getHTMLView());
+        } elseif($this->currentUser){
+            $this->addHTML($this->currentUser->getUserAvatarHTML());
         } else {
             $this->addHTML('<span class="avatar_placeholder"><span class="icon avatar"></span></span>');
         }
@@ -297,12 +305,13 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                         ->openRightPanelWrapDiv()
                             ->openHeaderDiv()
                                 ->addLogo()
-                                ->addWarehouseFilterBtn()
+                                ->addWarehouseInfo()
                             ->closeHeaderDiv()
                         ->closeRightPanelWrapDiv()
                     ->closeTwoColPanelWrapDiv()
                     ->addMenuBtn()
                 ->closeHeaderWrapDiv()
+                ->addDevModeBanner()
                 ->addBars()
                 ->openContentWrapDiv()
                     ->openTwoColPanelWrapDiv()
@@ -338,7 +347,8 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                 ->closeContentWrapDiv()
                 ->openFooterTag()
                 ->closeFooterTag()
-            ->closePageDiv()   
+            ->closePageDiv()
+            ->addChatBar()
             ->addFooter();
         echo $this->html;
     }
@@ -478,6 +488,7 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
             'import_contacts_from_quickbooks',
             'view_qb_settings',
             'view_other_user_activity',
+            'view_settings',
         );
         if (!$hasAtLeastOneAdminPermission) {
             foreach ($adminPermissions as $adminPermission) {
@@ -489,17 +500,18 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
         }
 
         $assignedToMultipleWarehouses = AssignedToContactFactory::userAssignedToMultipleWarehouses();
+
         if($hasAtLeastOneAdminPermission || (Permission::verifyByRef('view_contacts') && $assignedToMultipleWarehouses)){
             $this->menuView->addSubMenu('main', 'admin', $this->getMenuTextWithSVGIcon('admin', 'Admin'));
             
-            $myProfileURL = GI_URLUtils::buildURL(array(
-                'controller' => 'user',
-                'action' => 'view',
-                'id' => Login::getUserId(),
-                'profile' => 1
-            ));
-        
-            $this->menuView->addMenuItem('admin', 'My Profile', $myProfileURL);
+//            $myProfileURL = GI_URLUtils::buildURL(array(
+//                'controller' => 'user',
+//                'action' => 'view',
+//                'id' => Login::getUserId(),
+//                'profile' => 1
+//            ));
+//        
+//            $this->menuView->addMenuItem('admin', 'My Profile', $myProfileURL);
             
             if(Permission::verifyByRef('view_contacts') && $assignedToMultipleWarehouses){
                 $warehouseURL = GI_URLUtils::buildURL(array(
@@ -551,7 +563,7 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                 ));
             }
 
-            if(ProjectConfig::getIsQuickbooksIntegrated() && !QBTaxCodeFactory::getTaxingUsesQBAst() && Permission::verifyByRef('view_eco_fees')) {
+            if(dbConnection::isModuleInstalled('accounting') && !QBTaxCodeFactory::getTaxingUsesQBAst() && Permission::verifyByRef('view_eco_fees')) {
                 $ecoFeesURL = GI_URLUtils::buildURL(array(
                     'controller' => 'admin',
                     'action' => 'ecoFeeIndex'
@@ -578,6 +590,15 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                             'id' => Login::getUserId(),
                 ));
                 $this->menuView->addMenuItem('admin', 'Recent Activity', $userActivityURL, array(
+                    'linkClass' => 'admin'
+                ));
+            }
+            if (Permission::verifyByRef('view_settings')) {
+                $viewSettingsURL = GI_URLUtils::buildURL(array(
+                            'controller' => 'admin',
+                            'action' => 'settingsIndex',
+                ));
+                $this->menuView->addMenuItem('admin', 'Settings', $viewSettingsURL, array(
                     'linkClass' => 'admin'
                 ));
             }
@@ -654,6 +675,34 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                     ));
 
                     $this->menuView->addMenuItem('content', 'Blog', $blogURL);
+                }
+                
+                $contentAdminPermissions = array(
+                    'view_content_tag_index'
+                );
+                $hasAtLeastOneContentAdminPermission = false;
+                foreach ($contentAdminPermissions as $contentAdminPermission) {
+                    if (Permission::verifyByRef($contentAdminPermission)) {
+                        $hasAtLeastOneContentAdminPermission = true;
+                        break;
+                    }
+                }
+
+                if($hasAtLeastOneContentAdminPermission){
+                    $this->menuView->addSubMenu('content', 'content_admin', 'Admin', '', array(
+                        'linkClass' => 'admin'
+                    ));
+
+                    if(Permission::verifyByRef('view_content_tag_index')){
+                        $tagsURL = GI_URLUtils::buildURL(array(
+                            'controller' => 'tag',
+                            'action' => 'index',
+                            'type' => 'content'
+                        ));
+                        $this->menuView->addMenuItem('content_admin', 'Tags', $tagsURL, array(
+                            'linkClass' => 'admin'
+                        ));
+                    }
                 }
             }
         }
@@ -795,6 +844,9 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
         }
     }
 
+    /**
+     * @deprecated - use separate menu items for vendor, client, etc.
+     */
     protected function addContactMenu() {
         if (dbConnection::isModuleInstalled('contact')) {
             $permissions = array(
@@ -809,19 +861,19 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
             }
             if ($hasAtLeastOnePermission) {
                 $this->menuView->addSubMenu('main', 'contacts', $this->getMenuTextWithSVGIcon('contacts', 'Contacts'));
-                $contactCatTypeRefs = ContactCatFactory::getTypesArray();
+                $contactCatTypeRefs = ContactCatFactory::getTypesArray(NULL, false, 'title', true);
                 if (isset($contactCatTypeRefs['category'])) {
                     unset($contactCatTypeRefs['category']);
                 }
-                if(ProjectConfig::useContactCatIndex()){
+                if (ProjectConfig::useContactCatIndex()) {
                     if (!empty($contactCatTypeRefs)) {
                         foreach ($contactCatTypeRefs as $typeRef => $typeTitle) {
                             $contactCat = ContactCatFactory::buildNewModel($typeRef);
                             if ($contactCat->isIndexViewable()) {
                                 $catIndexURL = GI_URLUtils::buildURL(array(
-                                    'controller' => 'contact',
-                                    'action' => 'catIndex',
-                                    'type' => $typeRef,
+                                            'controller' => 'contact',
+                                            'action' => 'catIndex',
+                                            'type' => $typeRef,
                                 ));
                                 $this->menuView->addMenuItem('contacts', $typeTitle, $catIndexURL);
                             }
@@ -829,19 +881,19 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                     }
                 } else {
                     $indContactsURL = GI_URLUtils::buildURL(array(
-                        'controller' => 'contact',
-                        'action' => 'index',
-                        'type' => 'ind',
+                                'controller' => 'contact',
+                                'action' => 'index',
+                                'type' => 'ind',
                     ));
                     $orgContactsURL = GI_URLUtils::buildURL(array(
-                        'controller' => 'contact',
-                        'action' => 'index',
-                        'type' => 'org',
+                                'controller' => 'contact',
+                                'action' => 'index',
+                                'type' => 'org',
                     ));
                     $locContactsURL = GI_URLUtils::buildURL(array(
-                        'controller' => 'contact',
-                        'action' => 'index',
-                        'type' => 'loc',
+                                'controller' => 'contact',
+                                'action' => 'index',
+                                'type' => 'loc',
                     ));
                     $this->menuView->addMenuItem('contacts', 'Individuals', $indContactsURL);
 
@@ -861,17 +913,77 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                 }
                 if ($hasEventPermission) {
                     $contactEvetnsURL = GI_URLUtils::buildURL(array(
-                        'controller' => 'contactevent',
-                        'action' => 'index',
+                                'controller' => 'contactevent',
+                                'action' => 'index',
                     ));
                     $this->menuView->addMenuItem('contacts', 'Contact History', $contactEvetnsURL);
+                }
+                $hasAtLeastOneAdminPermission = false;
+                $adminPermissions = array(
+                    'view_contact_subcats',
+                );
+                foreach ($adminPermissions as $adminPermission) {
+                    if (Permission::verifyByRef($adminPermission)) {
+                        $hasAtLeastOneAdminPermission = true;
+                        break;
+                    }
+                }
+                if ($hasAtLeastOneAdminPermission) {
+                    $this->menuView->addSubMenu('contacts', 'contacts_admin', 'Admin');
+                    if (Permission::verifyByRef('view_contact_subcats')) {
+                        $contactSubCatTagURL = GI_URLUtils::buildURL(array(
+                                    'controller' => 'tag',
+                                    'action' => 'index',
+                                    'type' => 'contact_sub_cat'
+                        ));
+                        $this->menuView->addMenuItem('contacts_admin', Lang::getString('contact_sub_category_pl'), $contactSubCatTagURL);
+                    }
                 }
             }
         }
     }
-    
-    protected function addAccountingMenu(){
-        if(dbConnection::isModuleInstalled('accounting')){
+
+    protected function addClientMenu() {
+        if (dbConnection::isModuleInstalled('contact') && Permission::verifyByRef('view_contact_client_index')) {
+            $this->menuView->addSubMenu('main', 'clients', $this->getMenuTextWithSVGIcon('contacts', 'Clients'));
+            $clientsURL = GI_URLUtils::buildURL(array(
+                        'controller' => 'contactprofile',
+                        'action' => 'index',
+                        'type' => 'client'
+            ));
+            $this->menuView->addMenuItem('clients', 'Clients', $clientsURL);
+
+            if (Permission::verifyByRef('view_c_events_index') || Permission::verifyByRef('view_c_client_events_index')) {
+
+                $contactEventsURL = GI_URLUtils::buildURL(array(
+                            'controller' => 'contactevent',
+                            'action' => 'index',
+                            'catType' => 'client',
+                ));
+                $this->menuView->addMenuItem('clients', 'Contact History', $contactEventsURL);
+            }
+        }
+    }
+
+    protected function addVendorMenu() {
+        if (dbConnection::isModuleInstalled('contact') && Permission::verifyByRef('view_contact_vendor_index')) {
+            $vendorURL = GI_URLUtils::buildURL(array(
+                        'controller' => 'contactprofile',
+                        'action' => 'index',
+                        'type' => 'vendor',
+            ));
+            $this->menuView->addMenuItem('main', $this->getMenuTextWithSVGIcon('contacts', 'Vendors'), $vendorURL);
+        }
+    }
+
+    protected function addInternalMenu() {
+        if (dbConnection::isModuleInstalled('contact') && Permission::verifyByRef('view_contact_internal_index')) {
+            $this->menuView->addMenuItem('main', $this->getMenuTextWithSVGIcon('contacts', 'My Company'));
+        }
+    }
+
+    protected function addAccountingMenu() {
+        if (dbConnection::isModuleInstalled('accounting')) {
             $accountingViewPermissions = array(
                 'view_bills',
                 'view_payments',
@@ -1109,7 +1221,9 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                                 'action' => 'index',
                                 'type' => 'purchase',
                     ));
-                    $this->menuView->addMenuItem('main', $this->getMenuTextWithSVGIcon('purchase_order', 'Purchase Orders'), $purchaseOrdersURL);
+                    $this->menuView->addMenuItem('main', $this->getMenuTextWithSVGIcon('purchase_order', 'Purchase Orders'), $purchaseOrdersURL, array(
+                        'itemRef' => 'purchase_orders'
+                    ));
                 }
                 //Receiving
                 if (Permission::verifyByRef('view_receiving_index') || Permission::verifyByRef('view_returns_index')) {
@@ -1161,6 +1275,27 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                         ));
                         $this->menuView->addMenuItem('sales_orders', 'Back Order', $backOrdersURL);
                     }
+                    
+                    $salesOrderAdminPermissions = array(
+                        'export_sales_order_reports'
+                        );
+                    $hasAtLeastOneSalesOrderAdminPermission = false;
+                    foreach ($salesOrderAdminPermissions as $salesOrderAdminPermission) {
+                        if (Permission::verifyByRef($salesOrderAdminPermission)) {
+                            $hasAtLeastOneSalesOrderAdminPermission = true;
+                            break;
+                        }
+                    }
+                    if ($hasAtLeastOneSalesOrderAdminPermission) {
+                        $this->menuView->addSubMenu('sales_orders', 'so_admin', 'Admin');
+                        if (Permission::verifyByRef('export_sales_order_reports')) {
+                            $salesOrderExportURL = GI_URLUtils::buildURL(array(
+                                        'controller' => 'order',
+                                        'action' => 'exportSalesOrderReports',
+                            ));
+                            $this->menuView->addMenuItem('so_admin', 'Exports', $salesOrderExportURL);
+                        }
+                    }
                 }
                 //Shipping
                 if (Permission::verifyByRef('view_shipping_index')) {
@@ -1185,7 +1320,10 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
     protected function addProjectsMenu() {
         if (dbConnection::isModuleInstalled('project')) {
             $permissions = array(
-                'view_projects_index'
+                'view_projects_index',
+                'view_project_templates_index',
+                'view_price_sheet_index',
+                'view_timesheets_index',
             );
             $hasAtLeastOnePermission = false;
             foreach ($permissions as $permission) {
@@ -1195,9 +1333,10 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                 }
             }
             if ($hasAtLeastOnePermission) {
+                $this->menuView->addSubMenu('main', 'projects',$this->getMenuTextWithSVGIcon('project', 'Projects'));
                 //TODO - temp - organized like this for dev.
                 if (Permission::verifyByRef('view_projects_index')) {
-                    $this->menuView->addSubMenu('main', 'projects',$this->getMenuTextWithSVGIcon('project', 'Projects'));
+                    
                     $projectsIndexURL = GI_URLUtils::buildURL(array(
                                 'controller' => 'project',
                                 'action' => 'index',
@@ -1211,15 +1350,53 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                     ));
                     $this->menuView->addMenuItem('projects', 'Work Orders List', $workOrdersIndexURL);
                 }
+                if (Permission::verifyByRef('view_project_templates_index')) {
+                    $projectTemplatesIndexURL = GI_URLUtils::buildURL(array(
+                        'controller'=>'project',
+                        'action'=>'templateIndex',
+                    ));
+                    $this->menuView->addMenuItem('projects', 'Templates', $projectTemplatesIndexURL);
+                }
+                if (Permission::verifyByRef('view_price_sheet_index')) {
+                    $priceSheetIndexURL = GI_URLUtils::buildURL(array(
+                        'controller' => 'project',
+                                'action' => 'priceSheetIndex',
+                    ));
+                    $this->menuView->addMenuItem('projects', 'Price Sheets', $priceSheetIndexURL);
+                }
+                if (Permission::verifyByRef('view_timesheets_index')) {
+                    $timesheetsIndexURL = GI_URLUtils::buildURL(array(
+                                'controller' => 'timesheet',
+                                'action' => 'index'
+                    ));
+                    $this->menuView->addMenuItem('projects', 'Timesheets', $timesheetsIndexURL);
+                }
             }
+        }
+    }
+    
+    protected function addPageDFTypeMenus(){
+        $pageDFTypes = ContentFactory::getTypesArray('page_df');
+        foreach($pageDFTypes as $pageDFTypeRef => $pageDFTypeTitle){
+            $pageDFTmp = ContentFactory::buildNewModel($pageDFTypeRef);
+            if(!$pageDFTmp || !$pageDFTmp->showMenuItem()){
+                continue;
+            }
+            /*@var $pageDFTmp AbstractContentPageDF*/
+            $pageDFTmp->setProperty('content_page_df.is_template', 1);
+            $subMenuRef = 'forms_' . $pageDFTypeRef;
+            $this->menuView->addSubMenu('main', $subMenuRef, $this->getMenuTextWithSVGIcon($pageDFTmp->getMenuItemIcon(), $pageDFTmp->getMenuItemLabel()));
+            $pageDFTmp->setUpSubMenuItems($subMenuRef, $this->menuView);
         }
     }
 
     protected function addFormsMenu() {
         if (dbConnection::isModuleInstalled('forms')) {
+            $this->addPageDFTypeMenus();
+            
             $formsPermissions = array(
                 'view_forms_index',
-                'view_assigned_forms_list'
+//                'view_assigned_forms_list'
             );
             $hasAtLeastOnePermission = false;
             foreach ($formsPermissions as $formsPermission) {
@@ -1236,12 +1413,12 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
             $this->menuView->addSubMenu('main', 'forms', $this->getMenuTextWithSVGIcon('forms', 'Forms'));
             
             if(Permission::verifyByRef('view_assigned_forms_list')){
-                $myAssDFIndexURL = GI_URLUtils::buildURL(array(
-                    'controller' => 'forms',
-                    'action' => 'assignedIndex',
-                    'userId' => Login::getUserId()
-                ));
-                $this->menuView->addMenuItem('forms', 'My Forms', $myAssDFIndexURL);
+//                $myAssDFIndexURL = GI_URLUtils::buildURL(array(
+//                    'controller' => 'forms',
+//                    'action' => 'assignedIndex',
+//                    'userId' => Login::getUserId()
+//                ));
+//                $this->menuView->addMenuItem('forms', 'My Forms', $myAssDFIndexURL);
                 if(Permission::verifyByRef('assign_form')){
                     $assDFIndexURL = GI_URLUtils::buildURL(array(
                         'controller' => 'forms',
@@ -1262,16 +1439,64 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
             }
             
             if(Permission::verifyByRef('view_feos_index')){
-                $formIndexURL = GI_URLUtils::buildURL(array(
+                $feosIndexURL = GI_URLUtils::buildURL(array(
                     'controller' => 'forms',
                     'action' => 'feosIndex',
                     'type' => 'list'
                 ));
-                $this->menuView->addMenuItem('forms', 'Option Lists', $formIndexURL, array(
+                $this->menuView->addMenuItem('forms', 'Option Lists', $feosIndexURL, array(
+                    'linkClass' => 'admin'
+                ));
+                
+                $feosTagURL = GI_URLUtils::buildURL(array(
+                    'controller' => 'tag',
+                    'action' => 'index',
+                    'type' => 'feos_option'
+                ));
+                $this->menuView->addMenuItem('forms', 'Option Groups', $feosTagURL, array(
                     'linkClass' => 'admin'
                 ));
             }
         }
+    }
+    
+    protected function addChatMenu() {
+        if (dbConnection::isModuleInstalled('chat')) {
+            $chatPermissions = array(
+                'view_active_chat_client_index'
+            );
+            $hasAtLeastOnePermission = false;
+            foreach ($chatPermissions as $chatPermission) {
+                if (Permission::verifyByRef($chatPermission)) {
+                    $chatPermissions[$chatPermission] = true;
+                    $hasAtLeastOnePermission = true;
+                    break;
+                }
+            }
+            if (!$hasAtLeastOnePermission) {
+                return;
+            }
+            
+            //@todo until we have more menu items, no sub menu is needed
+//            $this->menuView->addSubMenu('main', 'chat', $this->getMenuTextWithSVGIcon('chat', 'Chat'));
+            
+            if(Permission::verifyByRef('view_active_chat_client_index')){
+                $indexURL = GI_URLUtils::buildURL(array(
+                    'controller' => 'chat',
+                    'action' => 'activeClientIndex'
+                ));
+                $this->menuView->addMenuItem('main', $this->getMenuTextWithSVGIcon('chat', 'Chat'), $indexURL);
+                //@todo until we have more menu items, no sub menu is needed
+                $this->menuView->addMenuItem('chat', 'Active Clients', $indexURL);
+            }
+        }
+    }
+    
+    protected function addDevModeBanner(){
+        if(DEV_MODE){
+            $this->addHTML('<div id="dev_mode"></div>');
+        }
+        return $this;
     }
     
     protected function addBars(){
@@ -1291,6 +1516,24 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                 $this->addHTML($invManCountBtnBar->getHTMLView());
             }
         }
+    }
+    
+    protected function addWarehouseInfo(){
+        if(dbConnection::isModuleInstalled('inventory')){
+            $warehouse = InventoryController::getCurInvLoc();
+            $this->addHTML('<div id="warehouse_info">');
+                $filterBtn = new InvFilterWarehouseBtnView();
+                $filterBtn->setAddPaddingIfNoBtn(false);
+                $this->addHTML($filterBtn->getHTMLView());
+                if($warehouse){
+                    $this->addHTML('<span class="info_wrap">');
+                    $this->addHTML('<span class="label">' . $warehouse->getName() . '</span>');
+                    $this->addHTML('<span class="addr">' . $warehouse->getAddress() . '</span>');
+                }
+                $this->addHTML('</span>');
+            $this->addHTML('</div>');
+        }
+        return $this;
     }
 
 //    protected function addWarehouseBar(){
@@ -1321,12 +1564,10 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
     
 //    protected function addWarehouseBarBtns(){
     protected function addWarehouseFilterBtn(){
-        if(dbConnection::isModuleInstalled('inventory')){
-            $filterBtn = new InvFilterWarehouseBtnView();
-            $this->addHTML('<span class="filter_wrap">');
-            $this->addHTML($filterBtn->getHTMLView());
-            $this->addHTML('</span>');
-        }
+        $filterBtn = new InvFilterWarehouseBtnView();
+        $this->addHTML('<span class="filter_wrap">');
+        $this->addHTML($filterBtn->getHTMLView());
+        $this->addHTML('</span>');
         return $this;
     }
     
@@ -1370,5 +1611,36 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                     'action' => 'logout',
         ));
         $this->menuView->addMenuItem('main', $this->getMenuTextWithSVGIcon('logout', 'Log Out'), $logoutURL, array('linkClass' => 'login_bar_menu login_bar_menu_end'));
+    }
+    
+    protected function addRealEstateMenu() {
+        if (dbConnection::isModuleInstalled('realEstate')) {
+            if(Permission::verifyByRef('view_re_listing_index') || Permission::verifyByRef('view_modified_mls_listing_index')){
+                $this->menuView->addSubMenu('main', 'realEstate', $this->getMenuTextWithSVGIcon('real_estate', 'Real Estate'));
+                
+                if(Permission::verifyByRef('view_re_listing_index')) {
+                    $reIndexURL = GI_URLUtils::buildURL(array(
+                        'controller' => 're',
+                        'action' => 'index',
+                        'type' => 'res'
+                    ));
+                    $this->menuView->addMenuItem('realEstate', 'Real Estate', $reIndexURL, array(
+                        'linkClass' => 'admin'
+                    ));
+                }
+                
+                if(Permission::verifyByRef('view_modified_mls_listing_index')) {
+                    $mlsIndexURL = GI_URLUtils::buildURL(array(
+                        'controller' => 're',
+                        'action' => 'index',
+                        'type' => 'res_mod'
+                    ));
+                    $this->menuView->addMenuItem('realEstate', 'Modified MLS', $mlsIndexURL, array(
+                        'linkClass' => 'admin'
+                    ));
+                }
+                
+            }
+        }
     }
 }

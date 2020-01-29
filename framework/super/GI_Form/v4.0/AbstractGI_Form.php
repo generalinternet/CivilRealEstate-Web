@@ -764,7 +764,9 @@ abstract class AbstractGI_Form {
                     $fieldClass .= ' autocomp_dropdown_field';
                 }
                 
-                $finalContent = '<span class="autocomp_field_wrap">' . $autocompDropdown . '<input type="text" class="'.$fieldClass.'" name="'.$autoName.'" id="'.$autoID.'" value="'.$autoVal.'" '.$maxLengthAttr.' '.$placeHolderAttr.' '.$autoCompleteAttr.' '.$autoFocusAttr.' '.$disabledAttr.' '.$readOnlyAttr.'
+                $autocompSearchIcon = '<span class="autocomp_search_icon">' . GI_StringUtils::getSVGIcon('search', '1em', '1em') . '</span>';
+                
+                $finalContent = '<span class="autocomp_field_wrap">' . $autocompDropdown . $autocompSearchIcon . '<input type="text" class="'.$fieldClass.'" name="'.$autoName.'" id="'.$autoID.'" value="'.$autoVal.'" '.$maxLengthAttr.' '.$placeHolderAttr.' '.$autoCompleteAttr.' '.$autoFocusAttr.' '.$disabledAttr.' '.$readOnlyAttr.'
                 data-url="'.$autocompURL.'" data-rem-full="'.$autocompRemFullVal.'" data-multiple="'.$autocompMultipleVal.'" data-duplicates="'.$autocompDuplicatesVal.'" '.$autocompAppendToAttr.' data-min-length="'.$autocompMinLength.'"  data-limit="'.$autocompLimit.'" ' . $tabIndexAttr . ' ' . $fieldDataAttrString . ' /></span>';
                 $finalContent .= '<div id="'.$autoResultsID.'" class="ac_results"></div>';
                 if($autocompMultiple) $finalContent .= '<ul id="'.$autoListID.'" class="ac_list"></ul>';
@@ -1028,6 +1030,7 @@ abstract class AbstractGI_Form {
             case 'onoff':
                 if($onoffStyleAsCheckbox){
                     $showLabel = false;
+                    $formElementClass .= ' list_options';
                 }
                 if($onoffShowLabels){
                     $fieldClass .= ' slide_toggle';
@@ -1226,14 +1229,16 @@ abstract class AbstractGI_Form {
                 break;
             case 'recaptcha':
                 GI_View::setRecaptchaUsed(true);
-                if(!defined('RE_CAPTCHA_KEY') || empty(RE_CAPTCHA_KEY)){
+                $reCapKey = ProjectConfig::getReCaptchaKey();
+                if(empty($reCapKey)){
                     $this->addFormError('<mark>RE_CAPTCHA_KEY</mark> is not defined.');
                 }
-                if(!defined('RE_CAPTCHA_SECRET') || empty(RE_CAPTCHA_SECRET)){
+                $reCapSecret = ProjectConfig::getReCaptchaSecret();
+                if(empty($reCapSecret)){
                     $this->addFormError('<mark>RE_CAPTCHA_SECRET</mark> is not defined.');
                 }
                 $finalLabel = '<label for="'.$fieldID.'" class="'.$labelClass.'">'.$displayName.'</label>';
-                $finalContent = '<div class="g-recaptcha" data-sitekey="' . RE_CAPTCHA_KEY . '"></div>';
+                $finalContent = '<div class="g-recaptcha" data-sitekey="' . $reCapKey . '"></div>';
                 break;
             case 'colour':
             case 'color':
@@ -1513,7 +1518,8 @@ abstract class AbstractGI_Form {
                         }
                         break;                       
                     case 'hidden':                        
-                    case 'password':
+                    case 'password':                        
+                    case 'phone':
                     case 'text':
                     case 'textarea':
                     case 'wysiwyg':
@@ -1620,15 +1626,6 @@ abstract class AbstractGI_Form {
                                 $this->addFieldError($errorRefName,'invalid','Must be a valid email address.');
                             }
                         }
-                        break;                      
-                    case 'phone':
-                        if(empty($fieldValue) && $required && !$disabled){
-                            $this->addFieldError($errorRefName,'required','Required field.');
-                        } elseif(!empty($fieldValue)) {
-                            if(!preg_match("/^[0-9\-\(\)\/\+\s]*$/", $fieldValue)){
-                                $this->addFieldError($errorRefName,'invalid','Must be a valid phone number.');
-                            }
-                        }
                         break;
                     case 'file':
                         if(empty($fieldValue) && $required && !$disabled){
@@ -1648,7 +1645,7 @@ abstract class AbstractGI_Form {
                             $curl = curl_init();
                             curl_setopt($curl, CURLOPT_POST, 1);
                             curl_setopt($curl, CURLOPT_POSTFIELDS, array(
-                                'secret' => RE_CAPTCHA_SECRET,
+                                'secret' => ProjectConfig::getReCaptchaSecret(),
                                 'response' => $reCaptcha
                             ));
 
@@ -1687,10 +1684,7 @@ abstract class AbstractGI_Form {
                         if(empty($fieldValue) && $required && !$disabled){
                             $this->addFieldError($errorRefName,'required','Required field.');
                         } elseif(!empty($fieldValue)) {
-                            $otpValidValue = NULL;
-                            if(isset($_SESSION['otp_' . $this->getFormId()])){
-                                $otpValidValue = $_SESSION['otp_' . $this->getFormId()];
-                            }
+                            $otpValidValue = SessionService::getValue('otp_' . $this->getFormId());
                             if(strtolower($fieldValue) !== strtolower($otpValidValue)){
                                 $this->addFieldError($errorRefName,'invalid','Invalid code.');
                             }
@@ -1909,8 +1903,8 @@ abstract class AbstractGI_Form {
     
     public function addOTP($otpEmailField = '', $otpPhoneField = '', $readyToSend = false, $fieldName = 'otp', $overWriteSettings = array(), $overWriteMsgTypeSettings = array()){
         if(!$this->wasSubmitted()){
-            $_SESSION['otp_' . $this->getFormId()] = NULL;
-            $_SESSION['otp_' . $this->getFormId() . '_sent_to'] = NULL;
+            SessionService::setValue(array('otp_' . $this->getFormId()), NULL);
+            SessionService::setValue(array('otp_' . $this->getFormId() . '_sent_to'), NULL);
         }
         $otpTerm = 'OTP (One Time PIN)';
         $emailOptEnabled = false;
@@ -1985,11 +1979,14 @@ abstract class AbstractGI_Form {
             }
             if(!$this->fieldErrorCount()){
                 $togglerValue = 1;
-                $generatedOTP = NULL;
+               
                 $sendOTP = false;
-                if(isset($_SESSION['otp_' . $this->getFormId()])){
-                    $generatedOTP = $_SESSION['otp_' . $this->getFormId()];
-                }
+                //TODO - REMOVE
+                // $generatedOTP = NULL;
+//                if(isset($_SESSION['otp_' . $this->getFormId()])){
+//                    $generatedOTP = $_SESSION['otp_' . $this->getFormId()];
+//                }
+                $generatedOTP = SessionService::getValue('otp_' . $this->getFormId());
                 if(empty($generatedOTP)){
                     $length = 6;
                     $strict = true;
@@ -1999,13 +1996,11 @@ abstract class AbstractGI_Form {
                     $special = false;
                     $limitNumbers = 4;
                     $generatedOTP = GI_StringUtils::generateRandomString($length, $strict, $lowercase, $uppercase, $numbers, $special, $limitNumbers);
-                    $_SESSION['otp_' . $this->getFormId()] = $generatedOTP;
+                  //  $_SESSION['otp_' . $this->getFormId()] = $generatedOTP;
+                    SessionService::setValue(array('otp_' . $this->getFormId()), $generatedOTP);
                     $sendOTP = true;
                 }
-                $lastSentTo = NULL;
-                if(isset($_SESSION['otp_' . $this->getFormId() . '_sent_to'])){
-                    $lastSentTo = $_SESSION['otp_' . $this->getFormId() . '_sent_to'];
-                }
+                $lastSentTo = SessionService::getValue('otp_' . $this->getFormId() . '_sent_to');
                 
                 $otpResendField = $fieldName . '_resend';
                 $this->addField($otpResendField, 'hidden', array(
@@ -2024,7 +2019,7 @@ abstract class AbstractGI_Form {
                             $message = 'Hello, your ' . $otpTerm . ' is ' . $generatedOTP;
                             $sms = new GI_SMS(GI_SMS::formatNumberE164($phoneValue), $message);
                             if($sms->sendMessage()) {
-                                $_SESSION['otp_' . $this->getFormId() . '_sent_to'] = $phoneValue;
+                                SessionService::setValue('otp_' . $this->getFormId() . '_sent_to', $phoneValue);
                             }
                         }
                         break;
@@ -2040,18 +2035,19 @@ abstract class AbstractGI_Form {
                                     ->setSubject('Your ' . $otpTerm)
                                     ->useEmailView($emailView);
                             if($giEmail->send()){
-                                $_SESSION['otp_' . $this->getFormId() . '_sent_to'] = $emailValue;
+                             //   $_SESSION['otp_' . $this->getFormId() . '_sent_to'] = $emailValue;
+                                SessionService::setValue('otp_' . $this->getFormId() . '_sent_to', $emailValue);
                             }
                         }
                         break;
                 }
                 
                 if(DEV_MODE){
-                    $otpAlert = new Alert('Your ' . $otpTerm . ' is <b>' . $generatedOTP . '</b>.', 'green');
+                    $otpAlert = new Alert('Your ' . $otpTerm . ' is <b>' . $generatedOTP . '</b>', 'green');
                     AlertService::addAlert($otpAlert);
                 }
 
-                $this->addHTML('<div class="alert_message green"><p>Your ' . $otpTerm . ' has been ' . $msgTerm . ' to you, enter it below.</p><p class="sml_text">Didn’t receive one? <span class="submit_btn" data-field-name="' . $otpResendField . '" data-field-value="1">Click here</span> to re-send one.</p></div>');
+                $this->addHTML('<div class="alert_message green"><p>Your ' . $otpTerm . ' has been ' . $msgTerm . ' to you, enter it below.</p><p class="sml_text">Didn’t receive one? <span class="submit_btn" data-field-name="' . $otpResendField . '" data-field-value="1" tabindex="0">Click here</span> to re-send one.</p></div>');
             
                 $otpCheckName = $fieldName . '_check';
                 

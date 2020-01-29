@@ -3,8 +3,8 @@
  * Description of AbstractTagFactory
  *
  * @author General Internet
- * @copyright  2017 General Internet
- * @version    2.0.4
+ * @copyright  2020 General Internet
+ * @version    4.0.1
  */
 abstract class AbstractTagFactory extends GI_ModelFactory {
 
@@ -18,6 +18,21 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
             case 'inventory':
                 $model = new TagInventory($map);
                 break;
+            case 'feos_option':
+                $model = new TagFEOSOption($map);
+                break;
+            case 'contact_sub_cat':
+                $model = new TagContactSubcat($map);
+                break;
+            case 'content':
+                $model = new TagContent($map);
+                break;
+            case 'qna':
+                $model = new TagQnA($map);
+                break;
+            case 'location':
+                $model = new TagLocation($map);
+                break;
             case 'contact':
             case 'accounting_loc':
             case 'expense':
@@ -26,7 +41,6 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
             case 'income_item':
             case 'payment':
             case 'tag':
-            case 'content':
             case 'invoice_line':
             default:
                 $model = new Taggi($map);
@@ -51,6 +65,9 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
                 break;
             case 'internal':
                 $typeRefs = array('contact', 'internal');
+                break;
+            case 'contact_sub_cat':
+                $typeRefs = array('contact_sub_cat');
                 break;
             case 'accounting_loc':
                 $typeRefs = array('accounting_loc');
@@ -79,8 +96,17 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
             case 'invoice_line':
                 $typeRefs = array('invoice_line');
                 break;
+            case 'feos_option':
+                $typeRefs = array('feos_option');
+                break;
             case 'tag':
                 $typeRefs = array('tag');
+                break;
+            case 'qna':
+                $typeRefs = array('qna');
+                break;
+            case 'location':
+                $typeRefs = array('location');
                 break;
             default:
                 $typeRefs = array();
@@ -135,11 +161,11 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
 
     /**
      * @param GI_Model $model
-     * @return AbstractTag
+     * @return AbstractTag[]
      */
-    public static function getByModel(GI_Model $model, $idsAsKey = false, $dbType = 'client', $typeRef = NULL, $includingSoftDeletedLink = false){
+    public static function getByModel(GI_Model $model, $idsAsKey = false, $dbType = 'client', $typeRef = NULL, $includingSoftDeletedLink = false, $contextRef = NULL){
         $tableName = $model->getTableName();
-        $itemId = $model->getProperty('id');
+        $itemId = $model->getId();
         
         $tagTable = dbConfig::getDbPrefix($dbType) . 'tag';
         $tagSearch = static::search();
@@ -150,30 +176,37 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
         if (!empty($typeRef)) {
             $tagSearch->filterByTypeRef($typeRef);
         }
+        if(!empty($contextRef)){
+            $tagSearch->filter('TL.context_ref', $contextRef);
+        }
         if ($includingSoftDeletedLink) {
             $tagSearch->filterNotNull('TL.status');
         }
+        $tagSearch->filter('system', 0);
         $tags = $tagSearch->select($idsAsKey);
         
         return $tags;
     }
 
-    public static function linkModelAndTag(GI_Model $model, AbstractTag $tag, $dbType = 'client') {
+    public static function linkModelAndTag(GI_Model $model, AbstractTag $tag, $dbType = 'client', $contextRef = '') {
         $tableName = $model->getTableName();
-        $itemId = $model->getProperty('id');
-        $tagId = $tag->getProperty('id');
-        
+        $itemId = $model->getId();
+        $tagId = $tag->getId();
+
         $existingSearch = new GI_DataSearch('item_link_to_tag');
         $existingSearch->setDBType($dbType);
-        $existingResult = $existingSearch->filter('item_id', $itemId)
+        $existingSearch->filter('item_id', $itemId)
                 ->filter('table_name', $tableName)
                 ->filter('tag_id', $tagId)
-                ->filterNotNull('status')
-                ->select();
-        
-        if($existingResult){
+                ->filterNotNull('status');
+        if (!empty($contextRef)) {
+            $existingSearch->filter('context_ref', $contextRef);
+        }
+        $existingResult = $existingSearch->select();
+
+        if ($existingResult) {
             $tagLink = $existingResult[0];
-            if(!$tagLink->getProperty('status')){
+            if (!$tagLink->getProperty('status')) {
                 $tagLink->setProperty('status', 1);
                 return $tagLink->save();
             }
@@ -186,52 +219,37 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
             $tagLink->setProperty('table_name', $tableName);
             $tagLink->setProperty('item_id', $itemId);
             $tagLink->setProperty('tag_id', $tagId);
+            if (!empty($contextRef)) {
+                $tagLink->setProperty('context_ref', $contextRef);
+            }
             return $tagLink->save();
         }
         
         return false;
-        /*
-        $searchArray = array(
-            'table_name' => $tableName,
-            'item_id' => $itemId,
-            'tag_id' => $tagId
-        );
-        $existingDAOArray = $defaultDAOClass::getByProperties('item_link_to_tag', $searchArray);
-        if (!empty($existingDAOArray)) {
-            return true;
-        }
-        $searchArray['status'] = 0;
-        $softDeletedDAOArray = $defaultDAOClass::getByProperties('item_link_to_tag', $searchArray);
-        if (!empty($softDeletedDAOArray)) {
-            $softDeletedDAO = $softDeletedDAOArray[0];
-            $softDeletedDAO->setProperty('status', 1);
-            if ($softDeletedDAO->save()) {
-                return true;
-            }
-        }
-        $newLinkDAO = new $defaultDAOClass('item_link_to_tag');
-        $newLinkDAO->setProperty('table_name', $tableName);
-        $newLinkDAO->setProperty('item_id', $itemId);
-        $newLinkDAO->setProperty('tag_id', $tagId);
-        return $newLinkDAO->save();
-        */
     }
 
-    public static function unlinkModelAndTag(GI_Model $model, AbstractTag $tag, $dbType = 'client') {
-        $defaultDAOClass = ApplicationConfig::getProperty('defaultDAOClass');
+    public static function unlinkModelAndTag(GI_Model $model, AbstractTag $tag, $dbType = 'client', $contextRef = '') {
         $tableName = $model->getTableName();
-        $itemId = $model->getProperty('id');
-        $tagId = $tag->getProperty('id');
-        $linkDAOArray = $defaultDAOClass::getByProperties('item_link_to_tag', array(
-                    'table_name' => $tableName,
-                    'item_id' => $itemId,
-                    'tag_id' => $tagId
-        ), $dbType);
+        $itemId = $model->getId();
+        $tagId = $tag->getId();
+        $search = new GI_DataSearch('item_link_to_tag');
+        $search->setDBType($dbType);
+        $search->filter('table_name', $tableName);
+        $search->filter('item_id', $itemId);
+        $search->filter('tag_id', $tagId);
+        if (!empty($contextRef)) {
+            $search->filter('context_ref', $contextRef);
+        }
+        $linkDAOArray = $search->select();
         if (empty($linkDAOArray)) {
             return true;
         }
-        $linkDAO = $linkDAOArray[0];
-        return $linkDAO->softDelete();
+        foreach ($linkDAOArray as $linkDAO) {
+            if (!$linkDAO->softDelete()) {
+                return false;
+            }
+        }
+        return true;
     }
     
     /**
@@ -274,17 +292,17 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
     /** @return GI_DataSearch */
     public static function search() {
         $dataSearch = parent::search();
+        $tagTable = $dataSearch->prefixTableName('tag');
         $dataSearch->setSortAscending(true)
-                ->orderBy('pos', 'ASC', true);
+                ->orderBy($tagTable . '.pos', 'ASC', true);
         return $dataSearch;
     }
     
     /**
-     * @param string $valueColumn
      * @return string[]
      */
     public static function getTagOptionsArrayByTypeRef($typeRef = NULL) {
-        if (empty(static::$tagOptionsArray)) {
+     //   if (empty(static::$tagOptionsArray)) {
             $returnArray = array();
             if (empty(TagFactory::getTypeRefArray($typeRef))) {
                 //If there is no available type, return empty
@@ -299,14 +317,12 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
             $daos = $daoSearch->select();
             if (!empty($daos)) {
                 foreach ($daos as $dao) {
-                    $daoId = $dao->getProperty('id');
+                    $daoId = $dao->getId();
                     $title = $dao->getProperty('title');
                     $returnArray[$daoId] = $title;
                 }
             }
-            static::$tagOptionsArray = $returnArray;
-        }
-        return static::$tagOptionsArray;
+            return $returnArray;
     }
     
     public static function getByRef($typeRef, $idsAsKey = false, $dbType = 'client'){
@@ -334,4 +350,145 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
         $tagListFormView = new TagListFormView($form, $allTags, $existingTags);
         return $tagListFormView;
     }
+    
+    /**
+     * @param AbstractTag $tag
+     * @param AbstractTag[] $parentTags
+     * @return boolean
+     */
+    public static function adjustParentTags(AbstractTag $tag, $parentTags = array()){
+        $existingParents = static::getParentTags($tag);
+        if (empty($existingParents)) {
+            $existingParents = array();
+        }
+        $parentsToRemove = array();
+        foreach ($existingParents as $parentToRemove) {
+            $parentTagId = $parentToRemove->getId();
+            $parentsToRemove[$parentTagId] = $parentToRemove;
+        }
+        if($parentTags){
+            foreach ($parentTags as $parentTag) {
+                $parentTagId = $parentTag->getId();
+                if (isset($parentsToRemove[$parentTagId])) {
+                    unset($parentsToRemove[$parentTagId]);
+                } else {
+                    $result = static::linkChildToParent($tag, $parentTag);
+                    if (!$result) {
+                        return false;
+                    }
+                }
+            }
+        }
+        foreach ($parentsToRemove as $parentToRemove) {
+            if (!static::unlinkChildFromParent($tag, $parentToRemove)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    /**
+     * @param AbstractTag $tag
+     * @param string $dbType
+     * @return GI_DataSearch
+     */
+    public static function getParentTagSearch($tag, $dbType = 'client'){
+        $search = static::search();
+        $search->setDBType($dbType);
+        $tagTable = $search->prefixTableName('tag');
+        $search->createJoin('tag_link_to_tag', 'p_tag_id', $tagTable, 'id', 'TLTT')
+                ->filter('TLTT.status', 1);
+        $search->filter('TLTT.c_tag_id', $tag->getId());
+        return $search;
+    }
+    
+    /**
+     * @param AbstractTag $tag
+     * @param string $dbType
+     * @return AbstractTag[]
+     */
+    public static function getParentTags(AbstractTag $tag, $dbType = 'client'){
+        $tagSearch = static::getParentTagSearch($tag, $dbType);
+        $tags = $tagSearch->select();
+        
+        return $tags;
+    }
+
+    /**
+     * @param AbstractTag $tag
+     * @param AbstractTag $parentTag
+     * @param type $dbType
+     * @return boolean
+     */
+    public static function linkChildToParent(AbstractTag $tag, AbstractTag $parentTag, $dbType = 'client') {
+        $tagId = $tag->getId();
+        $parentTagId = $parentTag->getId();
+        
+        $existingSearch = new GI_DataSearch('tag_link_to_tag');
+        $existingSearch->setDBType($dbType);
+        $existingResult = $existingSearch->filter('c_tag_id', $tagId)
+                ->filter('p_tag_id', $parentTagId)
+                ->filterNotNull('status')
+                ->select();
+        
+        if($existingResult){
+            $tagLink = $existingResult[0];
+            if(!$tagLink->getProperty('status')){
+                $tagLink->setProperty('status', 1);
+                return $tagLink->save();
+            }
+            return true;
+        } else {
+            $defaultDAOClass = ApplicationConfig::getProperty('defaultDAOClass');
+            $tagLink = new $defaultDAOClass('tag_link_to_tag', array(
+                'dbType' => $dbType
+            ));
+            $tagLink->setProperty('c_tag_id', $tagId);
+            $tagLink->setProperty('p_tag_id', $parentTagId);
+            return $tagLink->save();
+        }
+        
+        return false;
+    }
+
+    /**
+     * @param AbstractTag $tag
+     * @param AbstractTag $parentTag
+     * @param string $dbType
+     * @return boolean
+     */
+    public static function unlinkChildFromParent(AbstractTag $tag, AbstractTag $parentTag, $dbType = 'client') {
+        $defaultDAOClass = ApplicationConfig::getProperty('defaultDAOClass');
+        $tagId = $tag->getId();
+        $parentTagId = $parentTag->getId();
+        $linkDAOArray = $defaultDAOClass::getByProperties('tag_link_to_tag', array(
+            'c_tag_id' => $tagId,
+            'p_tag_id' => $parentTagId
+        ), $dbType);
+        if (empty($linkDAOArray)) {
+            return true;
+        }
+        $linkDAO = $linkDAOArray[0];
+        return $linkDAO->softDelete();
+    }
+    
+    public static function getTagIdChildTree($tagId, &$childTree = array()){
+        //@todo when upgraded to MySQL 8 and MariaDB 10.2 update this method to use a CTE recursive query
+        $search = new GI_DataSearch('tag_link_to_tag');
+        $search->filter('p_tag_id', $tagId);
+        $search->setSelectColumns(array(
+            'c_tag_id'
+        ));
+        $results = $search->select();
+        $childIds = array_map('intval', array_column($results, 'c_tag_id'));
+        if(!empty($childIds)){
+            $childTree = array_merge($childTree, $childIds);
+            foreach($childIds as $childId){
+                $childTree = array_merge($childTree, static::getTagIdChildTree($childId));
+            }
+        }
+        return $childTree;
+    }
+    
 }

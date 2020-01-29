@@ -18,19 +18,6 @@ abstract class AbstractContentFileColImage extends AbstractContentFileCol {
     }
     
     /**
-     * Get a view title
-     * @param type $plural
-     * @return string
-     */
-    public function getViewTitle($plural = true) {
-        $title = 'Image';
-        if ($plural) {
-            $title .= 's';
-        }
-        return $title;
-    }
-    
-    /**
      * Get a form view
      * @param \GI_Form $form
      * @param boolean $buildForm

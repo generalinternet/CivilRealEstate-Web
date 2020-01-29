@@ -48,7 +48,8 @@ abstract class AbstractUITableRowView extends GI_View{
             $cellHoverTitle = $this->$cellHoverTitleMethodName();
         }        
         
-        $this->addHTML('<td class="' . $cssClass . '" title="' . $cellHoverTitle . '">');
+        $headerTitle = GI_Sanitize::htmlAttribute($tableCol->getHeaderTitle());
+        $this->addHTML('<td class="' . $cssClass . '" title="' . $cellHoverTitle . '" data-label="' . $headerTitle . '">');
         if($addReqContent){
             $this->addRequiredContent();
         }

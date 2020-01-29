@@ -46,7 +46,7 @@ abstract class AbstractPermissionFormView extends MainWindowView {
         
         $this->form->addHTML('</div>');
         
-        $this->form->addHTML('<span class="submit_btn" title="Save">'.Lang::getString('submit').'</span>');
+        $this->form->addHTML('<span class="submit_btn" title="Save" tabindex="0">'.Lang::getString('submit').'</span>');
     }
     
     protected function addTitleField($overWriteSettings = array()) {

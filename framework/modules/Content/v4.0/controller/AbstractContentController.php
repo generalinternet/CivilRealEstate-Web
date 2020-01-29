@@ -117,11 +117,19 @@ class AbstractContentController extends GI_Controller {
         }
         
         $view = $content->getView();
+        
+        if(isset($attributes['displayAsChild']) && $attributes['displayAsChild'] == 1){
+            $view->setDisplayAsChild(true);
+        }
+        if(isset($attributes['fromChatConvo']) && !empty($attributes['fromChatConvo']) && GI_URLUtils::isAJAX()){
+            $view->setDisplayAsChild(true);
+        }
         $returnArray = GI_Controller::getReturnArray($view);
         $returnArray['breadcrumbs'] = $content->getBreadcrumbs();
         if(GI_URLUtils::isAJAX()){
             $returnArray['jqueryAction'] = $view->getUploaderScripts();
         }
+        $returnArray['elementClass'] = 'regular_size';
         return $returnArray;
     }
     
@@ -150,8 +158,16 @@ class AbstractContentController extends GI_Controller {
         }
         
         $view = $content->getFormView($form);
+        if(isset($attributes['addToId'])){
+            $view->setAddOuterWrap(false);
+            $addToId = $attributes['addToId'];
+            $parentContent = ContentFactory::getModelById($addToId);
+            $content->setParentContent($parentContent);
+        }
         
+        $jqueryAction = NULL;
         $success = 0;
+        $redirectURL = NULL;
         if ($content->handleFormSubmission($form)) {
             $success = 1;
             $loadContent = $content;
@@ -164,8 +180,14 @@ class AbstractContentController extends GI_Controller {
             $newURLProps = $loadContent->getViewURLAttrs();
             if(GI_URLUtils::isAJAX()){
                 //Change the view to a detail view
-                $view = $loadContent->getView();
-                $redirectURL = GI_URLUtils::buildURL($newURLProps);
+                if(isset($attributes['addToId']) && isset($attributes['targetWrapId'])){
+                    $view = $content->getView();
+                    $view->setDisplayAsChild(true);
+                    $jqueryAction = 'refreshContentParentElement("' . $attributes['targetWrapId'] . '");';
+                } else {
+                    $view = $loadContent->getView();
+                    $redirectURL = GI_URLUtils::buildURL($newURLProps);
+                }
             } else {
                 GI_URLUtils::redirect($newURLProps);
             }
@@ -193,7 +215,13 @@ class AbstractContentController extends GI_Controller {
             }
             if ($success) {
                 //Set the list bar with index view to update new contact
-                $returnArray['jqueryCallbackAction'] = 'reloadInElementByTargetId("list_bar", '.$contentId.');historyPushState("reload", "'.$redirectURL.'", "main_window");';
+                if(!empty($jqueryAction)){
+                    $returnArray['jqueryAction'] = $jqueryAction;
+                } elseif(!empty($redirectURL)){
+                    $returnArray['jqueryCallbackAction'] = 'reloadInElementByTargetId("list_bar", '.$contentId.');historyPushState("reload", "'.$redirectURL.'", "main_window");';
+                }
+            } else {
+                $returnArray['jqueryCallbackAction'] = $view->getUploaderScripts();
             }
         }
         return $returnArray;
@@ -217,6 +245,22 @@ class AbstractContentController extends GI_Controller {
         if (isset($attributes['parentNumber'])) {
             $parentNumber = $attributes['parentNumber'];
             $content->setParentNumber($parentNumber);
+        }
+        
+        $parentContent = NULL;
+        if(isset($attributes['parentId'])){
+            $parentId = $attributes['parentId'];
+            $parentContent = ContentFactory::getModelById($parentId);
+        }
+        if(isset($attributes['parentTypeRef'])){
+            $parentTypeRef = $attributes['parentTypeRef'];
+            if(empty($parentContent)){
+                $parentContent = ContentFactory::buildNewModel($parentTypeRef);
+            }
+        }
+        
+        if(empty($parentContent)){
+            $content->setParentContent($parentContent);
         }
         $tmpForm = new GI_Form('tmp_form');
         $view = $content->getFormView($tmpForm, false);
@@ -261,7 +305,8 @@ class AbstractContentController extends GI_Controller {
             GI_URLUtils::redirectToAccessDenied();
         }
         
-        $form = new GI_Form('edit_content');
+        $form = new GI_Form('edit_content_' . $content->getId());
+        $form->addFormClass('gidiup');
         $view = $content->getFormView($form);
         
         $onlyBodyContent = false;
@@ -269,7 +314,13 @@ class AbstractContentController extends GI_Controller {
             $onlyBodyContent = true;
         }
         
+        if(GI_URLUtils::isAJAX() && isset($attributes['loadInModal']) && $attributes['loadInModal'] == 1){
+            $view->setAddWrap(true);
+            $view->setAddViewWrap(false);
+        }
+        
         $success = 0;
+        $ajaxReturnArray = array();
         if ($content->handleFormSubmission($form)) {
             $success = 1;
             $loadContent = $content;
@@ -281,13 +332,7 @@ class AbstractContentController extends GI_Controller {
             }
             $newURLProps = $loadContent->getViewURLAttrs();
             if(GI_URLUtils::isAJAX()){
-                //Change the view to a detail view
-                if($onlyBodyContent){
-                    $view = $content->getView();
-                } else {
-                    $view = $loadContent->getView();
-                }
-                $redirectURL = GI_URLUtils::buildURL($newURLProps);
+                $ajaxReturnArray = $content->getAJAXFormReturnArray($attributes);
             } else {
                 GI_URLUtils::redirect($newURLProps);
             }
@@ -311,17 +356,9 @@ class AbstractContentController extends GI_Controller {
             );
         }
         $returnArray['breadcrumbs'] = $breadcrumbs;
-        if(GI_URLUtils::isAJAX()){
-            $contentId = $content->getId();
-            $returnArray['success'] = $success;
-            $returnArray['autocompId'] = $contentId;
-            if (isset($attributes['refresh']) && $attributes['refresh'] = 1) {
-                $returnArray['newUrl'] = 'refresh';
-            }
-            if ($success) {
-                //Set the list bar with index view to update new contact
-                $returnArray['jqueryCallbackAction'] = 'reloadInElementByTargetId("list_bar", '.$contentId.');historyPushState("reload", "'.$redirectURL.'", "main_window");';
-            }
+        
+        foreach($ajaxReturnArray as $returnProp => $returnVal){
+            $returnArray[$returnProp] = $returnVal;
         }
         
         return $returnArray;
@@ -345,19 +382,8 @@ class AbstractContentController extends GI_Controller {
         if(!$content->isDeleteable()){
             GI_URLUtils::redirectToAccessDenied();
         }
-        $parentContent = $content->getParentContent();
-        if($parentContent){
-            $redirectProps = $parentContent->getViewURLAttrs();
-        } else {
-            $redirectProps = array(
-                'controller' => 'content',
-                'action' => 'index'
-            );
-
-            if(isset($attributes['type'])){
-                $redirectProps['type'] = $attributes['type'];
-            }
-        }
+        
+        $redirectProps = $content->getPostDeleteRedirectProps();
         
         if(isset($attributes['targetId'])){
             $redirectProps['targetId'] = $attributes['targetId'];
@@ -371,7 +397,79 @@ class AbstractContentController extends GI_Controller {
             'newUrlRedirect' => 1,
         );
         
+        if(isset($attributes['deleteFromId']) && isset($attributes['targetWrapId'])){
+            $deleteProperties['jqueryAction'] = 'refreshContentParentElement("' . $attributes['targetWrapId'] . '");';
+        }
+        
         return parent::actionDelete($attributes, $deleteProperties);
+    }
+    
+    public function actionManageEditors($attributes) {
+        if (!isset($attributes['contentId']) || empty($attributes['contentId'])) {
+            GI_URLUtils::redirectToError(2000);
+        }
+        $contentId = $attributes['contentId'];
+        $content = ContentFactory::getModelById($contentId);        
+        if (empty($content)) {
+            $deletedModel = ContentFactory::getDeletedModelById($contentId);
+            if($deletedModel){
+                return $this->actionDeletedView($attributes, $deletedModel);
+            }
+            GI_URLUtils::redirectToError(4001);
+        }
+        if (!$content->canManageEditors()) {
+            GI_URLUtils::redirectToAccessDenied();
+        }
+        $form = new GI_Form('manage_editors_form');
+        
+        $view = new ContentManageEditorsFormView($form, $content);
+        
+        if(GI_URLUtils::isAJAX()){
+            $view->setAddWrap(false);
+        }
+        $view->buildForm();
+
+        $success = 0;
+        $newURL = NULL;
+        if ($form->wasSubmitted() && $form->validate()) {
+            $editorIds = explode(',', filter_input(INPUT_POST, 'editor_ids'));
+            
+            $editors = array();
+            foreach($editorIds as $editorId){
+                if(empty($editorId)){
+                    continue;
+                }
+                $editor = UserFactory::getModelById($editorId);
+                if(!$editor){
+                    $form->addFieldError('editor_ids', 'invalid', 'Could not find editor <b>#' . $editorId . '</b>.');
+                } else {
+                    $editors[] = $editor;
+                }
+            }
+            
+            if(!$form->fieldErrorCount()){
+                if(ContentEditorFactory::adjustEditorsForContent($editors, $content)){
+                    $viewURLAttrs = $content->getViewURLAttrs();
+                    if(GI_URLUtils::isAJAX()){
+                        $success = 1;
+                        $newURL = GI_URLUtils::buildURL($viewURLAttrs);
+                    } else {
+                        GI_URLUtils::redirect($viewURLAttrs);
+                    }
+                }
+            }
+        }
+        $returnArray = static::getReturnArray($view);
+        $returnArray['breadcrumbs'] = $content->getBreadcrumbs();
+        $returnArray['breadcrumbs'][] = array(
+            'label' => 'Manage Editors',
+            'link' => GI_URLUtils::buildURL($attributes)
+        );
+        $returnArray['success'] = $success;
+        if (!empty($newURL)) {
+            $returnArray['newUrl'] = $newURL;
+        }
+        return $returnArray;
     }
     
 }

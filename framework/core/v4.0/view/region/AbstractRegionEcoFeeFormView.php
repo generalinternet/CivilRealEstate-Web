@@ -160,7 +160,7 @@ abstract class AbstractRegionEcoFeeFormView extends MainWindowView {
 
     protected function addSubmitBtn() {
         $this->form->addHTML('<br />');
-        $this->form->addHTML('<span class="submit_btn" title="Submit">Submit</span>');
+        $this->form->addHTML('<span class="submit_btn" title="Submit" tabindex="0">Submit</span>');
     }
 
     public function addViewBodyContent() {

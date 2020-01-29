@@ -15,6 +15,7 @@ abstract class GI_QBConnection {
     protected static $qbAccountsByName = array();
     protected static $franchiseId = NULL;
     protected static $qbSettingsModelsByFranchiseId = array();
+    protected static $companyInfoArray = NULL;
 
     protected function __construct() {
 
@@ -284,6 +285,36 @@ abstract class GI_QBConnection {
             return static::$qbSettingsModelsByFranchiseId[$franchiseId];
         }
         return NULL;
+    }
+    
+        public static function getCompanyInfoArray() {
+        if (is_null(static::$companyInfoArray)) {
+
+            $companyInfo = array();
+            $qbConnection = static::getInstance();
+            if (!empty($qbConnection)) {
+                $qbCompanyInfo = $qbConnection->getCompanyInfo();
+                //Company Name
+                $companyInfo['name'] = $qbCompanyInfo->CompanyName;
+                //Address (sring)
+                $address = $qbCompanyInfo->CompanyAddr->Line1;
+                $line2 = $qbCompanyInfo->CompanyAddr->Line2;
+                if (!empty($line2)) {
+                    $address .= '<br />' . $line2;
+                }
+                $city = $qbCompanyInfo->CompanyAddr->City;
+                $region = $qbCompanyInfo->CompanyAddr->CountrySubDivisionCode;
+                $postal = $qbCompanyInfo->CompanyAddr->PostalCode;
+                $address .= '<br />' . $city . ', ' . $region . ' ' . $postal;
+                $companyInfo['address'] = $address;
+                $companyInfo['phone'] = $qbCompanyInfo->PrimaryPhone->FreeFormNumber;
+                $companyInfo['website'] = $qbCompanyInfo->WebAddr->URI;
+                $companyInfo['biz_num'] = $qbCompanyInfo->EmployerId;
+            }
+
+            static::$companyInfoArray = $companyInfo;
+        }
+        return static::$companyInfoArray;
     }
 
 }
