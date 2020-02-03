@@ -61,9 +61,13 @@ class OutputPDF extends Mpdf\Mpdf{
     
     public function setViewFooter(PDFLayoutView $view){
         $footer = $view->getHTMLFooter($this);
-        if($footer){
+        if ($footer) {
             $this->SetHTMLFooter($footer);
         }
     }
-    
+
+    public function setCurMGT($curMGT) {
+        $this->curMGT = $curMGT;
+    }
+
 }

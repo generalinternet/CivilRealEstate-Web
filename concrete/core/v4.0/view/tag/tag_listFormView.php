@@ -2,5 +2,4 @@
 
 class TagListFormView extends AbstractTagListFormView {
     
-    
 }

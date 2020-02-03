@@ -14,7 +14,7 @@ set_include_path('');
 
 set_include_path('framework/modules');
 //    require_once 'Accounting/' . FRMWK_VERSION . '.0/accounting.php';
-//    require_once 'Contact/' . FRMWK_VERSION . '.0/contact.php';
+   require_once 'Contact/' . FRMWK_VERSION . '.0/contact.php';
 //    require_once 'Inventory/' . FRMWK_VERSION . '.0/inventory.php';
 //    require_once 'Invoice/' . FRMWK_VERSION . '.0/invoice.php';
     require_once 'Content/' . FRMWK_VERSION . '.0/content.php';
@@ -30,4 +30,4 @@ set_include_path('framework/modules');
     require_once 'RealEstate/' . FRMWK_VERSION . '.0/realEstate.php';
 set_include_path('');
 
-require_once 'concrete/modules/Civil/civil.php';
+// require_once 'concrete/modules/Civil/civil.php';

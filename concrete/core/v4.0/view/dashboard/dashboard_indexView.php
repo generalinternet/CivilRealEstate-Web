@@ -30,6 +30,7 @@ class DashboardIndexView extends AbstractDashboardIndexView {
     protected function addSidebarElementsBtns(){
         $this->addStaticElementPaletteBtn();
         $this->addStaticIconsBtn();
+        $this->addStaticSVGIconsBtn();
         $this->addStaticProgressBarBtn();
     }
     
@@ -55,6 +56,17 @@ class DashboardIndexView extends AbstractDashboardIndexView {
         $this->addHTML('<a href="' . $linkURL . '" title="'.$linkURLText.'" class="sidbar_btn">'.$btnText.'</a>');
     }
     
+    protected function addStaticSVGIconsBtn(){
+        $linkURL = GI_URLUtils::buildURL(array(
+                'controller' => 'static',
+                'action' => 'svgIcons',
+            ));
+        $linkURLText = 'SVG Icons';
+        $linkIcon = 'search';
+        $btnText = $this->getSidebarMenuTextWithSVGIcon($linkIcon, $linkURLText);
+        $this->addHTML('<a href="' . $linkURL . '" title="'.$linkURLText.'" class="sidbar_btn">'.$btnText.'</a>');
+    }
+    
     protected function addStaticProgressBarBtn(){
         $linkURL = GI_URLUtils::buildURL(array(
                 'controller' => 'static',
@@ -75,9 +87,21 @@ class DashboardIndexView extends AbstractDashboardIndexView {
     }
     
     protected function addSidebarLayoutBtns(){
+        $this->addStaticCatalogBtn();
         $this->addStaticTabsBtn();
         $this->addStaticColumnsBtn();
         $this->addStaticAutoColumnsBtn();
+    }
+    
+    protected function addStaticCatalogBtn(){
+        $linkURL = GI_URLUtils::buildURL(array(
+                'controller' => 'static',
+                'action' => 'catalog',
+            ));
+        $linkURLText = 'Catalog';
+        $linkIcon = 'content';
+        $btnText = $this->getSidebarMenuTextWithSVGIcon($linkIcon, $linkURLText);
+        $this->addHTML('<a href="' . $linkURL . '" title="'.$linkURLText.'" class="sidbar_btn">'.$btnText.'</a>');
     }
     
     protected function addStaticTabsBtn(){

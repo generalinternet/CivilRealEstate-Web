@@ -18,3 +18,4 @@ abstract class AbstractDashboardOrderValuesTableWidgetView extends AbstractDashb
         $this->report = AccReportFactory::buildReportObject('order_values', $dates['start'], $dates['end'], true);
     }
 }
+    

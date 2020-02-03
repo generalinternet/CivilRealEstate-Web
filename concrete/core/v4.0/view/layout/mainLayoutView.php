@@ -3,7 +3,7 @@
 class MainLayoutView extends AbstractMainLayoutView {
     
     protected function addDefaultCSS() {
-        $this->addCSS('http://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic,700,700italic,800,800italic&PT+Serif:700i');
+        $this->addCSS('https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic,700,700italic,800,800italic');
         parent::addDefaultCSS();
     }
     
@@ -30,110 +30,41 @@ class MainLayoutView extends AbstractMainLayoutView {
                 ));
             $this->menuView->addMenuItem('main', $this->getMenuTextWithSVGIcon('dashboard', 'Dashboard'), $dashboardURL);
         }
+
         $userId = Login::getUserId();
         if(!empty($userId)){
             $this->addContactMenu();
             
-//            $this->addOrdersMenu();
-//            
-//            $this->addInventoryMenu();
-//            
-//            $this->addProjectsMenu();
-//            
-//            $this->addAccountingMenu();
+            $this->addVendorMenu();
             
-            //set to true to force show the admin menu (for profile link)
-            $this->addAdminMenu(true);
+            $this->addClientMenu();
             
-            //$this->addFormsMenu();
+            $this->addOrdersMenu();
+            
+            $this->addInventoryMenu();
+            
+            $this->addProjectsMenu();
+            
+            $this->addAccountingMenu();
+            
+            $this->addRealEstateMenu();
+            
+            $this->addChatMenu();
+            
+            $this->addFormsMenu();
 
             $this->addContentMenu();
             
-            $this->addAgreementMenu();
+            $this->addAdminMenu();
+            
+            $this->addInternalMenu();
             
             $this->addAccountMenu();
         }
         return $this;
     }
     
-    protected function addContentMenu() {
-        if (dbConnection::isModuleInstalled('content')){
-            $permissions = array(
-                'view_content_index'
-            );
-            $hasAtLeastOnePermission = false;
-            foreach ($permissions as $permission) {
-                if (Permission::verifyByRef($permission)) {
-                    $hasAtLeastOnePermission = true;
-                    break;
-                }
-            }
-            if ($hasAtLeastOnePermission) {
-                $this->menuView->addSubMenu('main', 'content', $this->getMenuTextWithSVGIcon('dollars', 'Investment'));
-
-                $startInvestmentURL = GI_URLUtils::buildURL(array(
-                    'controller' => 'content',
-                    'action' => 'index',
-                    'type' => 'start'
-                ));
-                $this->menuView->addMenuItem('content', 'Start', $startInvestmentURL);
-
-                $opporInvestmentURL = GI_URLUtils::buildURL(array(
-                    'controller' => 'content',
-                    'action' => 'index',
-                    'type' => 'opportunities'
-                ));
-                $this->menuView->addMenuItem('content', 'Opportunities', $opporInvestmentURL);
-
-                $realestateURL = GI_URLUtils::buildURL(array(
-                    'controller' => 'content',
-                    'action' => 'index',
-                    'type' => 'realestate'
-                ));
-
-                $this->menuView->addMenuItem('content', 'Real Estate', $realestateURL);
-
-                $realestateInvestmentURL = GI_URLUtils::buildURL(array(
-                    'controller' => 'content',
-                    'action' => 'index',
-                    'type' => 'realestate_investment_opportunities'
-                ));
-
-                $this->menuView->addMenuItem('content', 'Real Estate Investment Opportunities', $realestateInvestmentURL);
-
-                $kidsFinanceInvestURL = GI_URLUtils::buildURL(array(
-                    'controller' => 'content',
-                    'action' => 'index',
-                    'type' => 'kids'
-                ));
-                $this->menuView->addMenuItem('content', 'Kids', $kidsFinanceInvestURL);
-                
-            }
-        }
-    }
-    
-    protected function addAgreementMenu() {
-        //@todo: permission
-        if (Permission::verifyByRef('view_content_index')) {
-            $this->menuView->addSubMenu('main', 'agreement', $this->getMenuTextWithSVGIcon('clipboard_text', 'Agreement Form'));
-
-            $agreementFormURL = GI_URLUtils::buildURL(array(
-                'controller' => 'agreement',
-                'action' => 'indexForm',
-            ));
-
-            $this->menuView->addMenuItem('agreement', 'Agreement Form', $agreementFormURL);
-            
-            $agreementItemURL = GI_URLUtils::buildURL(array(
-                'controller' => 'agreement',
-                'action' => 'indexFormItem',
-            ));
-
-            $this->menuView->addMenuItem('agreement', 'Agreement Form Items', $agreementItemURL);
-        }
-    }
-    
-    protected function addLogo($fileName = 'logo-header.png', $path="resources/media/img/logos/"){
+    protected function addLogo($fileName = 'full-logo.svg', $path="resources/media/img/logos/"){
         parent::addLogo($fileName, $path);
         return $this;
     }

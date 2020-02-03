@@ -2,5 +2,4 @@
 
 class TagFactory extends AbstractTagFactory {
 
-
 }

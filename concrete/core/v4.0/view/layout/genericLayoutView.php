@@ -39,6 +39,7 @@ class GenericLayoutView extends GI_View {
         $this->addCSS('framework/core/' . FRMWK_CORE_VER. '/resources/css/columns.min.css');
         $this->addCSS('framework/core/' . FRMWK_CORE_VER. '/resources/css/wysiwyg.min.css');
         $this->addCSS('framework/core/' . FRMWK_CORE_VER. '/resources/css/gi_ui.css');
+        $this->addCSS('framework/core/' . FRMWK_CORE_VER. '/resources/css/core.css');
         $this->addCSS('framework/core/' . FRMWK_CORE_VER. '/resources/css/main_layout.css');
     }
     
@@ -58,6 +59,7 @@ class GenericLayoutView extends GI_View {
         
         $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/forms.js');
         
+        $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/core.js');
         $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/layout.js');
         $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/gi_modal.js');
     }

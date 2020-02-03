@@ -27,7 +27,7 @@ class PDFLayoutView extends GI_View {
         $this->buildView();
     }
     
-    public function getPDFView($pdf = NULL){
+    public function getPDFView(Mpdf\Mpdf $pdf = NULL){
         return parent::getHTMLView();
     }
     
@@ -220,7 +220,7 @@ class PDFLayoutView extends GI_View {
         return $addrString;
     }
     
-    public function getHTMLHeader($pdf = NULL){
+    public function getHTMLHeader(Mpdf\Mpdf $pdf = NULL){
         $header = '<table class="header"><tr>';
         $header .= '<td class="first_col">';
         $header .= '<img src="resources/media/pdf_logo.png" height="40px"/>';
@@ -286,7 +286,7 @@ class PDFLayoutView extends GI_View {
         return '<h1>' . $this->outputTypeLabel . '</h1>';
     }
     
-    public function getHTMLFooter($pdf = NULL){
+    public function getHTMLFooter(Mpdf\Mpdf $pdf = NULL){
         $footer = '<table class="footer"><tr>';
         //@todo somehow detect page count...
         $footer .= '<td class="page_number">Page {PAGENO} of {nbpg}</td>';
