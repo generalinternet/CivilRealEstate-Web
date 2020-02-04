@@ -1,33 +1,28 @@
 <?php
-
 /**
- * Description of AbstractREDetailView
+ * Description of AbstractMLSListingDetailView
  *
  * @author General Internet
  * @copyright  2019 General Internet
  * @version    4.0.0
  */
-abstract class AbstractREDetailView extends MainWindowView {
+abstract class AbstractMLSListingDetailView extends MainWindowView {
     
-    /** @var AbstractREListing */
-    protected $reListing;
+    /** @var AbstractMLSListing */
+    protected $listing;
 
-    public function __construct(AbstractREListing $reListing) {
+    public function __construct(AbstractMLSListing $listing) {
         parent::__construct();
-        $this->reListing = $reListing;
-        
-        
-        //Set list URL
-        $this->setListBarURL($this->reListing->getListBarURL());
+        $this->listing = $listing;
         
         //Set titles
-        $title = $reListing->getViewTitle(false);
-        $title .= ' - ' . $reListing->getTitle();
+        $title = $listing->getViewTitle(false);
+        $title .= ' - ' . $listing->getTitle();
         $this->addSiteTitle($title);
         $this->setWindowTitle('<span class="inline_block">' . $title . '</span>');
         
         //Set primary view model
-        $this->setPrimaryViewModel($this->reListing);
+        $this->setPrimaryViewModel($this->listing);
     }
     
     protected function addViewBodyContent(){
@@ -49,21 +44,13 @@ abstract class AbstractREDetailView extends MainWindowView {
     
     protected function addWindowBtns() {
         $this->addEditBtn();
-        $this->addDeleteBtn();
     }
     
     protected function addEditBtn() {
-        if ($this->reListing->isEditable()) {
-            $editURL = $this->reListing->getEditURL();
-            $this->addHTML('<a href="' . $editURL . '" title="Edit" class="custom_btn" ><span class="icon_wrap"><span class="icon primary pencil"></span></span><span class="btn_text">Edit</span></a>');
-        }
-    }
-    
-    protected function addDeleteBtn() {
-        if ($this->reListing->isDeleteable()) {
-            $deleteURL = $this->reListing->getDeleteURL();
-            $this->addHTML('<a href="' . $deleteURL . '" title="Delete" class="custom_btn open_modal_form" ><span class="icon_wrap"><span class="icon primary trash"></span></span><span class="btn_text">Delete</span></a>');
-        }
+//        if ($this->listing->isEditable()) {
+//            $editURL = $this->listing->getEditURL();
+//            $this->addHTML('<a href="' . $editURL . '" title="Edit" class="custom_btn" ><span class="icon_wrap"><span class="icon primary pencil"></span></span><span class="btn_text">Edit</span></a>');
+//        }
     }
 
     protected function addGeneralInfoSection(){
@@ -71,15 +58,15 @@ abstract class AbstractREDetailView extends MainWindowView {
             $this->addHTML('<div class="content_group">');
                 $this->addHTML('<h2 class="content_group_title">Information</h2>');
                 $showMLSData = true;
-                $this->addContentBlockWithWrap($this->reListing->getListingStatusTitle(), 'Listing Status');
-                $this->addContentBlockWithWrap($this->reListing->getLinkedPropertyTypeTagTitle(), 'Property Type');
-                $this->addContentBlockWithWrap($this->reListing->getDisplayListPrice($showMLSData), 'List Price');
-                $this->addContentBlockWithWrap($this->reListing->getDisplayLotSizeSqft(), 'Lot Size');
-                $this->addContentBlockWithWrap($this->reListing->getYearBuilt(), 'Year Built');
-                if ($this->reListing->getSoldPrice() > 0) {
-                    $this->addContentBlockWithWrap($this->reListing->getDisplaySoldPrice(), 'Sold Price');
+                $this->addContentBlockWithWrap($this->listing->getListingStatusTitle(), 'Listing Status');
+                $this->addContentBlockWithWrap($this->listing->getLinkedPropertyTypeTagTitle(), 'Property Type');
+                $this->addContentBlockWithWrap($this->listing->getDisplayListPrice($showMLSData), 'List Price');
+                $this->addContentBlockWithWrap($this->listing->getDisplayLotSizeSqft(), 'Lot Size');
+                $this->addContentBlockWithWrap($this->listing->getYearBuilt(), 'Year Built');
+                if ($this->listing->getSoldPrice() > 0) {
+                    $this->addContentBlockWithWrap($this->listing->getDisplaySoldPrice(), 'Sold Price');
                 }
-                $this->addContentBlockWithWrap($this->reListing->getDisplaySoldDate(), 'Sold Date');
+                $this->addContentBlockWithWrap($this->listing->getDisplaySoldDate(), 'Sold Date');
             $this->addHTML('</div>');
         $this->addHTML('</div>');
     }
@@ -89,14 +76,14 @@ abstract class AbstractREDetailView extends MainWindowView {
             $this->addHTML('<div class="content_group">');
                 $this->addHTML('<h2 class="content_group_title">Location</h2>');
                 $showMLSData = true;
-                $this->addContentBlockWithWrap($this->reListing->getAddress($showMLSData), 'Address');
-                $this->addContentBlockWithWrap($this->reListing->getStreetName($showMLSData), 'Street Name');
-                $this->addContentBlockWithWrap($this->reListing->getPostalCode($showMLSData), 'Postal Code');
+                $this->addContentBlockWithWrap($this->listing->getAddress($showMLSData), 'Address');
+                $this->addContentBlockWithWrap($this->listing->getStreetName($showMLSData), 'Street Name');
+                $this->addContentBlockWithWrap($this->listing->getPostalCode($showMLSData), 'Postal Code');
 
-                $this->addContentBlockWithWrap($this->reListing->getCityTitle($showMLSData), 'City');
-                $this->addContentBlockWithWrap($this->reListing->getSubAreaTitle($showMLSData), 'Sub Area');
-                $this->addContentBlockWithWrap($this->reListing->getAreaTitle($showMLSData), 'Area');
-                $this->addContentBlockWithWrap($this->reListing->getProvince($showMLSData), 'Province');
+                $this->addContentBlockWithWrap($this->listing->getCityTitle($showMLSData), 'City');
+                $this->addContentBlockWithWrap($this->listing->getSubAreaTitle($showMLSData), 'Sub Area');
+                $this->addContentBlockWithWrap($this->listing->getAreaTitle($showMLSData), 'Area');
+                $this->addContentBlockWithWrap($this->listing->getProvince($showMLSData), 'Province');
             $this->addHTML('</div>');
         $this->addHTML('</div>');
     }
@@ -106,11 +93,11 @@ abstract class AbstractREDetailView extends MainWindowView {
             $this->addHTML('<div class="content_group">');
                 $this->addHTML('<h2 class="content_group_title">Public Remarks</h2>');
                 $showMLSData = true;
-                $this->addContentBlockWithWrap($this->reListing->getPublicRemarks($showMLSData));
+                $this->addContentBlockWithWrap($this->listing->getPublicRemarks($showMLSData));
             $this->addHTML('</div>');
             
             
-            $virtualTourURL = $this->reListing->getProperty('virtual_tour_url');
+            $virtualTourURL = $this->listing->getProperty('virtual_tour_url');
             if (!empty($virtualTourURL)) {
                 $this->addHTML('<div class="content_group">');
                     $this->addHTML('<h2 class="content_group_title">Virtual Tour URL</h2>');
@@ -127,7 +114,7 @@ abstract class AbstractREDetailView extends MainWindowView {
                 $this->addHTML('<div class="img_thumb_list">');
                     $width = 120;
                     $height = 80;
-                    $this->addHTML($this->reListing->getImagesHTML($width, $height));
+                    $this->addHTML($this->listing->getImagesHTML($width, $height));
                 $this->addHTML('</div>');
             $this->addHTML('</div>');
             

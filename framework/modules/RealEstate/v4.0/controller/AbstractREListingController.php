@@ -126,14 +126,14 @@ abstract class AbstractREListingController extends GI_Controller {
             GI_URLUtils::redirectToError(2000);
         }
         $id = $attributes['id'];
-        $mlsListing = MLSListingFactory::getModelById($id);
-        if (empty($mlsListing)) {
+        $listing = REListingFactory::getModelById($id);
+        if (empty($listing)) {
             GI_URLUtils::redirectToError(4001);
         }
         
-        $view = $mlsListing->getView();
+        $view = $listing->getDetailView();
         $returnArray = GI_Controller::getReturnArray($view);
-        $returnArray['breadcrumbs'] = $mlsListing->getBreadcrumbs();
+        $returnArray['breadcrumbs'] = $listing->getBreadcrumbs();
         return $returnArray;
     }
     

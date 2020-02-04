@@ -126,7 +126,10 @@ abstract class GI_ApplicationConfig {
         'forms' => array(
             'fillout'
         ),
-        'relisting' => true
+        'relisting' => true,
+        'mls' => array(
+            'view'
+        )
     );
     
     /**

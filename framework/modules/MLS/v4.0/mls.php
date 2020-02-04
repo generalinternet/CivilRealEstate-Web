@@ -43,6 +43,7 @@ require_once 'model/Factory/AbstractMLSSubAreaFactory.php';
 // Abstract Views
 require_once 'view/AbstractMLSSearchFormView.php';
 require_once 'view/AbstractMLSIndexView.php';
+require_once 'view/AbstractMLSListingDetailView.php';
 
 //*** Concrete
 $curIncludePath = get_include_path();
@@ -76,7 +77,6 @@ require_once 'model/Factory/MLSSubAreaFactory.php';
 require_once 'view/mls_searchFormView.php';
 require_once 'view/mls_indexView.php';
 //
-//require_once 'views/mls/mlsListing/mls_listingDetailView.php';
-//require_once 'views/mls/mlsListing/mls_listingItemView.php';
+require_once 'view/mls_listingDetailView.php';
 
 set_include_path($curIncludePath);

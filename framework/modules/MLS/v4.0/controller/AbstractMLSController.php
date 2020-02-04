@@ -218,4 +218,21 @@ abstract class AbstractMLSController extends GI_Controller {
         }
         return $result;
     }
+    
+    public function actionView($attributes){
+        if (!isset($attributes['id'])) {
+            GI_URLUtils::redirectToError(2000);
+        }
+        $id = $attributes['id'];
+        $listing = MLSListingFactory::getModelById($id);
+        if (empty($listing)) {
+            GI_URLUtils::redirectToError(4001);
+        }
+        
+        $view = $listing->getDetailView();
+        $returnArray = GI_Controller::getReturnArray($view);
+        $returnArray['breadcrumbs'] = $listing->getBreadcrumbs();
+        return $returnArray;
+    }
+    
 }

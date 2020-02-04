@@ -692,7 +692,7 @@ abstract class AbstractREListing extends GI_Model {
     
     public function getViewURLAttrs(){
         $urlAttributes = array(
-            'controller' => 're',
+            'controller' => 'relisting',
             'action' => 'view',
             'id' => $this->getId(),
         );

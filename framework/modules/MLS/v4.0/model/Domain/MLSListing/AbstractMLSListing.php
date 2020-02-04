@@ -361,9 +361,14 @@ abstract class AbstractMLSListing extends GI_Model {
     }
     
     /**
+     * @deprecated
      * @return \MLSListingDetailView
      */
     public function getView() {
+        return $this->getDetailView();
+    }
+    
+    public function getDetailView(){
         $detailView = new MLSListingDetailView($this);
         return $detailView;
     }
@@ -873,6 +878,18 @@ abstract class AbstractMLSListing extends GI_Model {
         return '<div class="no_img no_cover_image"></div>';
     }
     
+    public function getImagesHTML($width = 320, $height = 214, $keepRatio = true, $startWrapHTML = '', $endWrapHTML = ''){
+        $images = $this->getImages();
+        if (!empty($images)) {
+            $html = '';
+            foreach($images as $image) {
+                $html .= $this->getImageHTML($image, $width, $height, $keepRatio, $startWrapHTML, $endWrapHTML);
+            }
+            return $html;
+        }
+        return '<div class="no_img no_cover_image"></div>';
+    }
+    
     public function getImageHTML($image, $width = 320, $height = 214, $keepRatio = true, $startWrapHTML = '', $endWrapHTML = '') {
         if ($keepRatio && method_exists($image, 'getSizedViewKeepRatio')) {
             $view = $image->getSizedViewKeepRatio($width, $height);
@@ -1101,6 +1118,30 @@ abstract class AbstractMLSListing extends GI_Model {
     public function getCatalogItemView() {
         $view = new RECatalogView($this);
         return $view;
+    }
+    
+    public function getLinkedPropertyTypeTagTitle(){
+        return $this->getTypeTitle();
+    }
+    
+    public function getYearBuilt(){
+        return $this->getProperty('year');
+    }
+    
+    public function getDisplaySoldDate(){
+        return NULL;
+    }
+    
+    public function getStreetName(){
+        return $this->getProperty('street_name');
+    }
+    
+    public function getPostalCode(){
+        return $this->getProperty('postal_code');
+    }
+    
+    public function getProvince(){
+        return $this->getProperty('province');
     }
     
 }

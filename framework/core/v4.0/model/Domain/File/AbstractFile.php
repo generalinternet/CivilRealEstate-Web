@@ -471,6 +471,9 @@ abstract class AbstractFile extends GI_Model {
         }
         File::createTempDataFolders($path);
         $s3Client = S3Connection::getInstance();
+        if(empty($s3Client)){
+            return NULL;
+        }
         try {
             $result = $s3Client->getObject(array(
                 'Bucket' => $s3Bucket,
@@ -802,14 +805,16 @@ abstract class AbstractFile extends GI_Model {
             $s3Bucket = $this->getProperty('aws_s3_bucket');
             $imagePath = File::saveFileFromS3($s3Bucket, $s3Key);
 
-            list($oWidth, $oHeight) = getimagesize($imagePath);
+            if($imagePath){
+                list($oWidth, $oHeight) = getimagesize($imagePath);
 
-            $aspectRatio = $oWidth / $oHeight;
+                $aspectRatio = $oWidth / $oHeight;
 
-            if ($resizedWidth == NULL && $resizedHeight != NULL) {
-                $resizedWidth = $resizedHeight * $aspectRatio;
-            } else if ($resizedWidth != NULL && $resizedHeight == NULL) {
-                $resizedHeight = $resizedWidth / $aspectRatio;
+                if ($resizedWidth == NULL && $resizedHeight != NULL) {
+                    $resizedWidth = $resizedHeight * $aspectRatio;
+                } else if ($resizedWidth != NULL && $resizedHeight == NULL) {
+                    $resizedHeight = $resizedWidth / $aspectRatio;
+                }
             }
             $view->setDimensions($resizedWidth, $resizedHeight);
         }
