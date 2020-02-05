@@ -1,4 +1,6 @@
-.contact
+.referral
+    background: $color_dark
+    color: $color_white
     &__title
         color: $color_white
         font-weight: 500
@@ -19,10 +21,13 @@
             font-size: 1em
             text-transform: unset
     &__form-wrap
+        .referral__title
+            color: $color_dark
+            margin-bottom: 1em
         background-color: $color_grey
         padding: 2em 1.5em
         margin-bottom: 3em
-        .form_element
+    .form_element
             margin-bottom: 0em
             padding: 0.5em 1.2em
             textarea,
@@ -66,3 +71,30 @@
         padding: 0 1.5em
         hr
             margin: 1em 0
+    &__description-row
+        text-align: center
+        .referral__title
+            margin-bottom: 1.5em
+    // &__description-cols
+    // &__description-line
+    &__description-illustration
+        margin-top: 3em
+        background-image: url('../media/img/icon/love-hand.png')
+        width: 100%
+        max-height: 400px
+        height: 280px
+        background-size: 90%
+        background-position: top
+        background-repeat: no-repeat
+    &__description-col-left
+        width: 50%
+        padding-right: 1em
+        text-align: right
+        color: $color_red_primary
+        display: inline-block
+    &__description-col-right
+        width: 50%
+        display: inline-block
+        padding-left: 1em
+        text-align: left
+        color: $color_red_secondary

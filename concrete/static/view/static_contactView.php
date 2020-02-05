@@ -17,7 +17,7 @@ class StaticContactView extends GI_View{
     protected function buildForm(){
         $this->form->addHTML('<div class="contact__form-wrap">');
             $this->form->addHTML('<div class="contact__form-row contact__form-row_size_half">');
-                $this->form->addField('firts_name', 'text', array(
+                $this->form->addField('first_name', 'text', array(
                     'required' => true,
                     'placeHolder' => 'First Name*'
                 ));
