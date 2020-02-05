@@ -26,12 +26,16 @@
         letter-spacing: 3px
         line-height: 1.8em
         max-width: 33em
+        font-size: 0.8em
     &__content
-        padding: 1.5em 0
+        padding-bottom: 1.5em
         background-color: $color_grey
         height: 100%
     &__content-wrap
         padding: 1.5em 3em
+        .button
+            padding: 1.6em 4em
+            font-size: 1em
         &_bg_secondary
             background-color: $color_secondary
     &__input-wrap
@@ -65,4 +69,20 @@
         margin-right: 5px!important
     &__logos
         opacity: 0.5
-        margin-bottom: 1em
+        margin-bottom: 2em
+        max-width: 400px
+        display: block
+    &__steps
+        display: block
+        padding: 1.5em 3em
+        padding-top: calc(1.5em + 10px)
+        position: relative
+        background: $color_white
+        &::before
+            content: ''
+            width: 100%
+            height: 10px
+            left: 0
+            top: 0
+            position: absolute
+            background: radial-gradient($color_white, $color_grey)

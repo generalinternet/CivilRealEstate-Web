@@ -1,11 +1,18 @@
 .community
     &__item-wrap
-        padding: 3em 0
-        padding-left: 6em
+        padding: 3em
     &__item
         text-align: left
+        padding: 0 1.5em
+        border-radius: 50px
         &:not(:last-child)
             margin-bottom: 2em
+        &_bg_primary
+            background: $color_primary
+        &_bg_secondary
+            background: $color_secondary
+        &_bg_thirdary
+            background: $color_thirdary
     &__item-image
         width: 100%
         height: 100%
@@ -14,17 +21,11 @@
     &__item-image-wrap
         display: inline-block
         vertical-align: middle
-        margin-right: 1em
+        margin-right: 3em
         padding: .8em
         border-radius: 100%
         width: 4em
         height: 4em
-        &_bg_primary
-            background: $color_primary
-        &_bg_secondary
-            background: $color_secondary
-        &_bg_thirdary
-            background: $color_thirdary
     &__item-description
         display: inline-block
         color: $color_white
