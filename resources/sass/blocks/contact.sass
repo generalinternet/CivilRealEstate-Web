@@ -14,21 +14,24 @@
     &__button-wrap
         margin-bottom: 1em
         text-align: center
+        .button
+            padding: 2em 3em
+            text-transform: unset
     &__form-wrap
         background-color: $color_grey
-        padding: 0.5em
+        padding: 2em 1.5em
         margin-bottom: 3em
         .form_element
-            width: 33.33%
-            display: inline-block
             margin-bottom: 0em
             padding: 0.5em 1.2em
+            textarea,
             input
                 box-shadow: none!important
                 background: none!important
                 border: solid 1px #ccc!important
                 padding: 0.4em 1em!important
                 border-radius: 0!important
+                background: $color_white!important
             &:not(.checkbox_element)
                 label.main
                     display: none
@@ -44,4 +47,20 @@
                     text-shadow: none
                     border-bottom: solid 1px #ccc
                     padding-bottom: 1em
-    
+            &.textarea_element
+                textarea
+                    min-height: 7em
+    &__form-row
+        &_size_half
+            .form_element
+                display: inline-block
+                width: 50%
+                margin-bottom: 0.4em
+        &_size_full
+            .form_element
+                display: block
+                width: 100%
+    &__break-line
+        padding: 0 1.5em
+        hr
+            margin: 1em 0

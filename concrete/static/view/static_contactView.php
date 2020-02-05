@@ -16,41 +16,31 @@ class StaticContactView extends GI_View{
 
     protected function buildForm(){
         $this->form->addHTML('<div class="contact__form-wrap">');
-            $this->form->addField('firts_name', 'text', array(
-                'required' => true,
-                'placeHolder' => 'First Name*'
-            ));
-            $this->form->addField('last_name', 'text', array(
-                'required' => true,
-                'placeHolder' => 'Last Name*'
-            ));
-            $this->form->addField('email', 'email', array(
-                'required' => true,
-                'placeHolder' => 'Email*'
-            ));
-            $this->form->addField('phone', 'phone', array(
-                'required' => true,
-                'placeHolder' => 'Phone Number*'
-            ));
-            $this->form->addField('referral', 'text', array(
-                'placeHolder' => 'Referral Source'
-            ));
-            $this->form->addField('address', 'text', array(
-                'placeHolder' => 'Address'
-            ));
-            $this->form->addField('city', 'text', array(
-                'placeHolder' => 'City'
-            ));
-            $this->form->addField('province', 'text', array(
-                'placeHolder' => 'Province'
-            ));
-            $this->form->addField('postal_code', 'number', array(
-                'placeHolder' => 'Postal Code'
-            ));
-            $this->form->addField('mail_list', 'checkbox', array(
-                'displayName' => 'Check this box to signup for our mailing list'
-            ));
-            $this->form->addHTML('<p class="contact__description"><b>* Indicates a required ﬁeld</b>  |  Your information will never be shared with any third party.</p>');
+            $this->form->addHTML('<div class="contact__form-row contact__form-row_size_half">');
+                $this->form->addField('firts_name', 'text', array(
+                    'required' => true,
+                    'placeHolder' => 'First Name*'
+                ));
+                $this->form->addField('last_name', 'text', array(
+                    'required' => true,
+                    'placeHolder' => 'Last Name*'
+                ));
+                $this->form->addField('email', 'email', array(
+                    'required' => true,
+                    'placeHolder' => 'Email*'
+                ));
+                $this->form->addField('phone', 'phone', array(
+                    'required' => true,
+                    'placeHolder' => 'Phone Number*'
+                ));
+            $this->form->addHTML('</div>');
+            $this->form->addHTML('<div class="contact__form-row contact__form-row_size_full">');
+                $this->form->addField('message', 'textarea', array(
+                    'placeHolder' => 'Drop us a line. We would love to hear from you.'
+                ));
+                $this->form->addHTML('<div class="contact__break-line"><hr></div>');
+                $this->form->addHTML('<p class="contact__description"><b>* Indicates a required ﬁeld</b>  |  Your information will never be shared with any third party.</p>');
+            $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
         $this->form->addHTML('<div class="contact__button-wrap">');
             $this->form->addHTML('<span class="button button_theme_primary submit_btn">Connect with an Agent</span>');
