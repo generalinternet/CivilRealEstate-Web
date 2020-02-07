@@ -119,15 +119,27 @@ class RESearchFormView extends AbstractRESearchFormView{
 
     protected function addRangeField($title, $name){
         $this->form->addHTML('<div class="form__input form__input_type_range">');
-            $this->form->addHTML('<h4 class="form__input-title">'.$title.'</h4>');
+            $this->form->addHTML('<label class="main">'.$title.'</label>');
             $this->form->addHTML('<div class="form__input-wrap">');
-                $this->form->addField('min_'.$name, 'number', array(
-                    'class' => 'form__input form__input_type_text',
-                    'placeHolder' => 'Min'
+                $this->form->addField('min_'.$name, 'dropdown', array(
+                    'class' => 'form__input form__input_type_dropdown',
+                    'placeHolder' => 'Min',
+                    'options' => array(
+                        '100' => 100,
+                        '200' => 200,
+                        '300' => 300,
+                        '400' => 400,
+                    )
                 ));
-                $this->form->addField('max_'.$name, 'number', array(
-                    'class' => 'form__input form__input_type_text',
-                    'placeHolder' => 'Max'
+                $this->form->addField('max_'.$name, 'dropdown', array(
+                    'class' => 'form__input form__input_type_dropdown',
+                    'placeHolder' => 'Max',
+                    'options' => array(
+                        '100' => 100,
+                        '200' => 200,
+                        '300' => 300,
+                        '400' => 400,
+                    )
                 ));
             $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');

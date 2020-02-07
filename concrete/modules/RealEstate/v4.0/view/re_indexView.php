@@ -1,6 +1,7 @@
 <?php
 
 class REIndexView extends AbstractREIndexView{
+    protected $mainContentClass = "relisting__main-content";
     
     public function __construct($listings, AbstractUITableView $uiTableView, AbstractREListing $sampleListing, GI_SearchView $searchView = NULL)
     {
@@ -41,7 +42,7 @@ class REIndexView extends AbstractREIndexView{
         $this->addHTML('<div class="col-xs-12 col-md-6">');
             $this->addHTML('<p class="relisting__sortby-list">');
                 $this->addHTML('<span class="relisting__sortby-title">Sort by</span>');
-                $this->addHTML('<a href="" class="relisting__sortby-item">Relevance</a>');
+                $this->addHTML('<a href="" class="relisting__sortby-item relisting__sortby-item_selected">Relevance</a>');
                 $this->addHTML('<a href="" class="relisting__sortby-item">Price · Low to High</a>');
                 $this->addHTML('<a href="" class="relisting__sortby-item">Price · High to Low</a>');
             $this->addHTML('</p>');

@@ -1,5 +1,28 @@
 .relisting
     display: block
+    &__result-title
+        padding: 30px 0
+        font-weight: 400
+        font-size: 1.1em
+        b
+            font-weight: 500
+    &__sortby-list
+        padding: 30px 0
+        font-size: 1.1em
+        text-align: right
+    &__sortby-item
+        margin-left: 1.5em
+        font-weight: 400
+        color: $color_dark
+        &_selected
+            color: $color_primary
+            font-weight: 600
+    &__main-content
+        .view_wrap
+            padding: 0
+            background: radial-gradient(#FAFBFB, #D1D3D4)
+        #main_window_view_wrap > .view_body
+            padding: 0
 
     &-item
         width: 100%

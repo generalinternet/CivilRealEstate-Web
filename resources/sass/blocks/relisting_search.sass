@@ -1,2 +1,62 @@
 .relisting-search
     display: block
+    .form
+        &__input
+            padding: 1em 1.5em
+            background: $color_white
+            margin-bottom: 1.5em
+            box-shadow: 0 0 6px rgba(0,0,0,.2)
+            label.main
+                color: $color_dark
+                font-weight: 500
+                font-size: 1.4em
+                margin-bottom: 0.5em
+            
+            &_type_checkbox
+                .options_wrap 
+                    .checkbox_label
+                        color: $color_dark
+                    .checkbox_box
+                        background: none
+                        border: solid 1.5px $color_border_grey
+                    &>label
+                        width: 100%
+                    input[type="checkbox"]:checked + .checkbox_box
+                        background: $color_primary
+                        border-color: $color_primary
+                        &::before
+                            background-position-y: -4px!important
+                            margin-top: -7px
+            
+            &_type_dropdown
+                .selectric
+                    border: solid 1.5px $color_border_grey
+                    padding: .8em 1em
+                    background: none
+                    border-radius: 0
+                    .button
+                        display: block
+                        width: auto
+                        font-size: 12px
+                        min-width: unset
+                        padding: 0 20px
+                        &::after
+                            border-top-color: $color_primary!important
+                .label
+                    color: $color_dark
+                    .null_option
+                        color: $color_dark
+
+            &_type_range
+                .form__input
+                    box-shadow: none
+                    display: inline-block
+                    padding: 0
+                    width: 50%
+                    margin-bottom: 0
+                    & > label.main
+                        display: none
+                    &:first-child
+                        padding-right: 10px
+                    &:last-child
+                        padding-left: 10px
