@@ -20,10 +20,102 @@
     &__main-content
         .view_wrap
             padding: 0
-            background: radial-gradient(#FAFBFB, #D1D3D4)
+            background: radial-gradient(#FFFCFC, #EDECEC)
+        .view_footer
+            display: none
         #main_window_view_wrap > .view_body
             padding: 0
+    &__list-wrap
+        padding-left: 1em
 
+    // RELISTING ITEM
     &-item
         width: 100%
         display: block
+        background: $color_white
+        padding: 1.5em
+        box-shadow: 0 0 6px rgba(0,0,0,.2)
+        display: flex
+        &:not(:last-child)
+            margin-bottom: 1.5em
+        &__featured-image
+            flex: 1.2
+            .no_cover_image
+                width: 100%
+                height: 100%
+                background-image: url('../media/img/logo/header_logo.png')
+                border: solid 1px $color_border_grey
+                background-size: 70%
+                background-position: center
+                background-repeat: no-repeat
+            .img_wrap
+                position: relative
+                padding-bottom: 75%
+                img
+                    +fullparent()
+                    object-fit: cover
+                    object-position: center
+        &__main-content-wrap
+            flex: 3
+            padding-left: 1.5em
+            font-size: 0.95em
+        &__overview-wrap
+            margin-bottom: 1em
+            display: flex
+        &__title-description
+            flex: 3
+        &__title
+            font-size: 1.1em
+            margin-bottom: 1em
+            font-weight: 400
+            b
+                margin-bottom: 0.5em
+                display: block
+                font-weight: 500
+        &__other-fields
+            color: $color_subtite_grey
+        &__feature-title
+            color: $color_primary
+            display: block
+            margin-bottom: 0.5em
+        &__feature-value
+            color: $color_dark
+            display: block
+            font-weight: 500
+            .unit
+                color: $color_primary
+        &__view-button-wrap
+            flex: 2
+            text-align: right
+            .button
+                font-size: 1em
+                padding: 1em 2em
+                font-weight: 400
+        &__features-wrap
+            display: flex
+        &__square-footage
+            flex: 1
+        &__price
+            flex: 1
+            .unit
+                margin-right: 0.2em
+        &__favourite
+            flex: 1
+            position: relative
+        &__favourite-text
+            position: absolute
+            bottom: 0
+            right: 0
+            font-size: 0.9em
+            color: $color_subtite_grey
+        &__favourite-icon
+            display: inline-block
+            vertical-align: sub
+            margin-left: 5px
+            width: 20px
+            height: 21px
+            background-image: url('../media/img/icon/star.png')
+            background-size: contain
+            background-position: center
+            &_empty
+                background-image: url('../media/img/icon/star-o.png')

@@ -33,6 +33,14 @@ class REIndexView extends AbstractREIndexView{
 
             $this->addHTML('</div>');
         $this->addHTML('</section>');
+
+        $this->addLinkSection();
+    }
+
+    protected function addTable($class = ''){
+        $this->addHTML('<div class="list_table_wrap '.$class.' relisting__list-wrap">');
+        $this->addHTML($this->uiTableView->getHTMLView());
+        $this->addHTML('</div>');
     }
 
     protected function addTopTitleBar(){
@@ -47,5 +55,18 @@ class REIndexView extends AbstractREIndexView{
                 $this->addHTML('<a href="" class="relisting__sortby-item">Price · High to Low</a>');
             $this->addHTML('</p>');
         $this->addHTML('</div>');
+    }
+
+    protected function addLinkSection(){
+        $this->addHTML('<section class="section section_type_linking">');
+            $this->addHTML('<div class="container">');
+                $this->addHTML('<div class="row">');
+                    $this->addHTML('<div class="col-xs-12 col-md-8 col-md-push-2">');
+                        $this->addHTML('<h3 class="linking__title">Looking to List or Lease your property?</h3>');
+                        $this->addHTML('<div class="linking__button-wrap"><a href="" class="button button_theme_primary">Post Your Property</a></div>');
+                    $this->addHTML('</div>');
+                $this->addHTML('</div>');
+            $this->addHTML('</div>');
+        $this->addHTML('</section>');
     }
 }
