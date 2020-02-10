@@ -62,8 +62,8 @@ class PublicLayoutView extends AbstractPublicLayoutView {
                 'ref' => 'main',
                 'label' => 'about us',
                 'link' => GI_URLUtils::buildURL(array(
-                     'controller' => 'static',
-                     'action' => 'about-us',
+                    'controller' => 'static',
+                    'action' => 'referrals',
                  )),
             ],
             [
