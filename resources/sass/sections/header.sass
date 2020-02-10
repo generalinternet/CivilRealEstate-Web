@@ -8,52 +8,58 @@
         width: 100%
         max-width: 300px
         padding: 0
-    .menu_open
-        #logo
-            position: fixed
-            left: 1em
-            z-index: 4000
-            top: 1.7em
+    // .menu_open
+    //     #header #logo
+    //         opacity: 0
 
     #menu_btn
         display: block
         right: 1em
         left: unset
-        top: 2em
-        width: 2.5em
-        height: 2.5em
+        top: 1.4em
+        width: 40px
         padding: 0 0.2em
         &::before
             display: none
         &>span
             display: block
             width: 100%
-            height: 0.3em
+            height: 5px
             transition: ease .3s
             transform-origin: right
-            background: $color_primary
+            background: linear-gradient(to right, #6DCEF5, #00558E)
             &:not(:last-child)
-                margin-bottom: 0.5em
+                margin-bottom: 5px
     .menu_open
         #menu_btn
             span.top
-                transform: rotate(-45deg) translateY(1px)
+                background: $color_white
+                transform: rotate(-45deg) translate(1px, -2px)
             span.middle
                 opacity: 0
             span.bottom
-                transform: rotate(45deg) translateY(-1px)
+                background: $color_white
+                transform: rotate(45deg) translate(1px, 2px)
 
     #main_nav_wrap
+        position: fixed
+        top: 0
+        right: -100%
         display: block
         width: 100%
-        right: -100%
+        height: 100%
         overflow-x: hidden
         overflow-y: auto
         background-color: $color_dark
         touch-action: auto!important
+        transition: .5s
+    .menu_open
+        #main_nav_wrap
+            background: linear-gradient(90deg, #6DCEF5, #00558E)
+            right: 0
     .section
         &_type_header
-            padding: 1.7em 0
+            padding: 0.8em 0
 
 
 @media only screen and (max-width: 767px)
