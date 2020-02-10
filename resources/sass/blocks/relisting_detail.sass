@@ -1,0 +1,155 @@
+.relisting-detail
+    &__slider-wrap
+        overflow: hidden
+        position: relative
+    &__slider
+        position: relative
+        height: 70vh
+        min-height: 500px
+        margin-bottom: 0!important
+        .img_wrap
+            width: 100%
+            height: 100%
+            img
+                width: 100%
+                height: 100%
+                object-fit: cover
+                object-position: center
+        .slick-list,
+        .slick-track
+            height: 100%
+        .slick-dots
+            padding-bottom: 1em
+            position: absolute
+            bottom: 0
+            left: 0
+            width: 100%
+            li button:before
+                font-size: 15px
+                color: $color_white!important
+    &__slider-next,
+    &__slider-prev
+        cursor: pointer
+        position: absolute
+        top: 50%
+        padding: 1em
+        display: block
+        &::before
+            content: ''
+            display: block
+            border: solid 8px $color_thirdary
+            border-top: none
+            border-right: none
+            width: 40px
+            height: 40px
+    &__slider-prev
+        left: 0
+        padding-left: 1em
+        transform: translateY(-50%) rotate(45deg)
+    &__slider-next
+        right: 0
+        padding-right: 1em
+        transform: translateY(-50%) rotate(-135deg)
+    &__col-pad-right
+        padding-right: 2em
+        text-align: right
+    //     // images
+    &__favourite
+        font-size: 1.1em
+        padding: 1em 0
+    &__favourite-text
+        color: $color_subtite_grey
+    &__favourite-icon
+        display: inline-block
+        vertical-align: sub
+        margin-left: 5px
+        width: 20px
+        height: 21px
+        background-image: url('../media/img/icon/star.png')
+        background-size: contain
+        background-position: center
+        background-repeat: no-repeat
+        &_empty
+            background-image: url('../media/img/icon/star-o.png')
+    &__highlight-info
+        font-size: 1.1em
+    &__highlight-row
+        display: flex
+        &:not(:last-child)
+            margin-bottom: 2em
+    &__address-wrap
+        flex: 1
+    &__address
+        font-size: 1.1em
+        font-weight: 400
+        b
+            margin-bottom: 0.5em
+            display: block
+            font-weight: 500
+            font-size: 1.2em
+    &__price
+        padding-right: 4em
+        text-align: right
+        font-size: 1.3em
+        font-weight: 500
+        flex: 1
+        .unit
+            color: $color_primary
+            margin-right: 0.2em
+    //     &_type_features
+    &__feature-item
+        flex: 1
+    &__feature-title
+        color: $color_primary
+        display: block
+        margin-bottom: 0.5em
+    &__feature-value
+        color: $color_dark
+        display: block
+        font-weight: 500
+        .unit
+            color: $color_primary
+    //     .unit
+    &__contact-title,
+    &__cta-title
+        color: $color_white
+        text-align: center
+        font-weight: 500
+        margin-bottom: 2em
+    &__cta-button-wrap
+        .button:first-child
+            margin-right: 2em
+    &__info-row
+        padding-top: 2em
+        padding-bottom: 2em
+        font-size: 0.95em
+        &:not(:last-child)
+            border-bottom: solid 1px $color_secondary
+    &__info-title
+        font-size: 1.2em
+        color: $color_thirdary
+        font-weight: 400
+        padding-top: .1em
+    &__info-content
+        line-height: 1.5em
+        font-weight: 400
+    &__info-content-tag
+        width: 33.33%
+        display: inline-block
+        margin-bottom: 1em
+    &__contact-button-wrap
+        text-align: center
+        color: $color_white
+    &__contact-form-title
+        padding: 0 1em
+        font-weight: 300
+        font-size: 1.1em
+        letter-spacing: 2px
+    &__contact-form-buttons
+        margin-top: 1em
+        padding: 0 1em
+    &__contact-form-wrap
+        .contact__form-wrap
+            margin-bottom: 0
+    &__contact-left-col
+        padding: 2em 0

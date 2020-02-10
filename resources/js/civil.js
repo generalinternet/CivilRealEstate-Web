@@ -1,1 +1,234 @@
-$(document).ready((function(){NavBar.init(),HomeSlider.init(),AccreditationPreview.init(),StatusProgressBar.init(".status-progress__bar"),TimeleftCounter.init(".investment__preview-value_type_timeleft"),StickyMenu.init(),SignUpForm.init()}));var StickyMenu=function(){var ins={},toggleOnTopClass=function(){var scrollTop=$(document).scrollTop(),bodyElm=$("body");0==scrollTop?bodyElm.addClass("on-top"):bodyElm.removeClass("on-top")},initEvents=function(){toggleOnTopClass(),$(document).on("scroll",(function(event){toggleOnTopClass()}))};return ins.init=function(){initEvents()},ins}(),NavBar=function(){var ins={},component={navItemOpenClass:"open",$menuItem:$(".nav__li > .sub_menu")},handleNavItemCLick=function(e){var $thisElm=$(this);if($thisElm.hasClass("sub_menu")){var $parentLi=$thisElm.parent(".nav__li").first(),$childMenu=$parentLi.children("ul").first();if($thisElm.hasClass(component.navItemOpenClass))return $parentLi.removeClass(component.navItemOpenClass),$thisElm.removeClass(component.navItemOpenClass),void $childMenu.slideUp("slow");var $ulParent,$currentSelected=$parentLi.parents("ul").first().children("li.sub_menu."+component.navItemOpenClass);0!=$currentSelected.length&&($currentSelected.removeClass(component.navItemOpenClass),$currentSelected.children("span").removeClass(component.navItemOpenClass),$currentSelected.children("ul").slideUp()),$parentLi.addClass(component.navItemOpenClass),$thisElm.addClass(component.navItemOpenClass),$childMenu.slideDown("slow")}},handleOutFocus=function(event){var $openedSubMenu=$(".nav__li.sub_menu.open"),isNavOpened,isClickingOnNav;0!==$openedSubMenu.length&&(0!==$(event.target).closest(".nav ul").length||$openedSubMenu.each((function(indexInArray,valueOfElement){var $thisElm=$(this);$thisElm.children(".title").removeClass(component.navItemOpenClass),$thisElm.removeClass(component.navItemOpenClass),$thisElm.children("ul").slideUp("slow"),$thisElm.removeClass(component.navItemOpenClass)})))};return ins.init=function(){component.$menuItem.on("click",handleNavItemCLick),$(document).on("click",handleOutFocus)},ins}(),HomeSlider=function(){var ins={},component={sliderSection:$("#home_slider"),slider:$("#home_slider_wrap"),sliderItems:$("#home_slider_wrap > *"),sliderPrevBtnId:"#home_slider_wrap_prev",sliderNextBtnId:"#home_slider_wrap_next"},slickOptions={slidesToShow:3,infinite:!0,autoplay:!0,autoplaySpeed:15e3,slidesToScroll:1,arrows:!0,prevArrow:component.sliderPrevBtnId,nextArrow:component.sliderNextBtnId,responsive:[{breakpoint:1024,settings:{slidesToShow:2}},{breakpoint:767,settings:{slidesToShow:1}}]},reInitSlick=function(){component.slider.hasClass("slick-initialized")||component.slider.slick(slickOptions)},turnOffSlickAutoplay=function(){component.slider.slick("slickPause")},afterInitSlider=function(event,slick){$(document).on("click",".investment .youtube-embeded",turnOffSlickAutoplay),$(window).resize(reInitSlick)},setSliderSectionComponents=function(){component.sliderButtonWrap=component.sliderSection.find(".section__slider-buttons"),component.sliderSectionOffset=component.sliderSection.offset(),component.sliderSectionOffsetTop=component.sliderSectionOffset.top,component.sliderSectionOffsetBottom=component.sliderSectionOffset.top+component.sliderSection.height()},onWindowScroll=function(event){if(0!=component.sliderSection.length){var windowHeight=$(window).height(),scrollTop=$(window).scrollTop(),scrollBottom;if(scrollTop+windowHeight>component.sliderSectionOffsetTop&&scrollTop<component.sliderSectionOffsetBottom){component.sliderButtonWrap.fadeIn();var sliderSectionHeight=component.sliderSection.height()-100,buttonTopAbsolutePosition=scrollTop-component.sliderSectionOffsetTop+windowHeight/2;buttonTopAbsolutePosition>100&&buttonTopAbsolutePosition<sliderSectionHeight&&component.sliderButtonWrap.css("top",buttonTopAbsolutePosition)}else component.sliderButtonWrap.fadeOut()}};return ins.init=function(){0!=component.slider.length&&(component.slider.on("init",afterInitSlider),component.slider.slick(slickOptions),0!==component.sliderSection.length&&setSliderSectionComponents(),$(window).scroll(onWindowScroll),$(window).resize(setSliderSectionComponents))},ins}(),AccreditationPreview=function(){var ins={},component={previewElm:$(".accreditation-preview"),showMoreElm:$(".accreditation-preview__show_more"),fullContentClass:"full-content"};return ins.init=function(){0!=component.previewElm.length&&component.showMoreElm.click((function(e){e.preventDefault(),component.previewElm.toggleClass(component.fullContentClass)}))},ins}(),StatusProgressBar=function(){var ins={},component={};component.element=$(".status-progress__bar");var showProgressBar=function(){component.element.each((function(){var screenH,windowH,screenBottomH=$(document).scrollTop()+$(window).height(),proBarH=$(this).offset().top;!$(this).hasClass("animated")&&screenBottomH>proBarH&&($(this).addClass("animated"),$(this).data("origWidth",$(this).width()).width(0).animate({width:$(this).data("origWidth")},{duration:1e3,specialEasing:{width:"easeOutBounce"}}))}))},initElements=function(){component.element.each((function(){var rate=$(this).data("rate");$(this).css("width",rate+"%")}))};return ins.init=function(selectorString){void 0!==selectorString&&selectorString&&(component.element=$(selectorString)),0!=component.element.length&&(initElements(),showProgressBar(),$(document).scroll((function(){showProgressBar()})))},ins}(),TimeleftCounter=function(){var ins={},component={};component.element=$(".investment__timeleft");var initElements=function(){component.element.each((function(){var datetime=$(this).data("end-datetime"),timerEl=$(this).find(".timer");countDown(datetime,timerEl[0])}))},countDown=function(datetime,element){var countDownDate=new Date(datetime).getTime(),x=setInterval((function(){var now=(new Date).getTime(),distance=countDownDate-now,days=Math.floor(distance/864e5),unit="day";days>1&&(unit+="s"),element.innerHTML=days+" "+unit,distance<0&&(clearInterval(x),element.innerHTML="CLOSED",element.classList.add("closed"))}),1e3)};return ins.init=function(selectorString){void 0!==selectorString&&selectorString&&(component.element=$(selectorString)),initElements()},ins}(),SignUpForm=function(){var ins={},component={signatureShowErrorClass:"show-error-after-init"};component.ajaxContentWrap=$(".ajaxed_contents"),component.signUpAccreditationStepWrap=$(".sign_up_step_5"),component.signUpSignatureInputSelector="#signup .form__input_type_signature",component.signUpPhoneFieldClass=".sign_up_phone_input",component.signUpOTPMessageFieldClass=".sign_up_form_otp_msg_input",component.signUpAjaxContentWrap=$(".form_type_sign-up.ajaxed_contents"),component.stepFormWrapId="#step_form_wrap",component.signUpCompleteButtonId="#signup_form_complete_button",component.signaturePrintInputName='input[name="signature_agreentment_print_name"]',component.signatureAgreementInputName='input[name="signature_agreentment"]',component.signatureElementClass=".signature_element",component.signatureAreaClass=".jsignature_signarea ",component.fieldErrorClass=".field_error";var isSignatureStep=function(){return component.signUpAccreditationStepWrap=$(".sign_up_step_5"),0!=component.signUpAccreditationStepWrap.length},setComponents=function(){isSignatureStep()&&(component.signatureCanvas=$(".jSignature"),component.signatureSlider=component.signatureCanvas.parents(".slider_page").first())},initSignature=function(){0!=component.signUpAccreditationStepWrap.length&&0!=component.signatureCanvas.length&&0!=component.signatureSlider.length&&component.signatureSlider.hasClass("current")&&createJSignatures()},afterGoToNextStep=function(e){setComponents(),initSignature(),scrollToFormTop()},onAjaxContentFailed=function(e,returnData){if(void 0!==returnData&&void 0!==returnData.success||(window.location.href="./error"),!returnData.success){var signatureInput=$(component.signUpSignatureInputSelector);if(0==signatureInput.length)return;var errorField=signatureInput.find(component.fieldErrorClass).first();if(0==errorField.length)return;errorField.show()}},togglePhoneInput=function(){var phoneFieldElm=$(component.signUpPhoneFieldClass);phoneFieldElm.hide();var otpMessageElm=$(component.signUpOTPMessageFieldClass);if(0!=otpMessageElm.length){var otpMessageInputs,checkedInput=otpMessageElm.find("input[type='radio']").filter(":checked"),selectedVal;if(0!=checkedInput.length)if("phone"==checkedInput.val()){if(0==phoneFieldElm.length)return;phoneFieldElm.show()}}},initOtpProcess=function(){var otpMessageElm,otpMessageInputs;togglePhoneInput(),$(component.signUpOTPMessageFieldClass).find("input[type='radio']").on("change",togglePhoneInput)},scrollToFormTop=function(){if(component.signUpAjaxContentWrap=$(component.stepFormWrapId),0!=component.signUpAjaxContentWrap.length){var formOffSet=component.signUpAjaxContentWrap.offset().top,windownHeight=$(window).height(),errorFormHeight=component.signUpAjaxContentWrap.height(),animateOptions={scrollTop:parseInt(formOffSet-windownHeight/2+errorFormHeight/2)};$("html,body").animate(animateOptions,500,"swing")}},afterAjaxContentLoaded=function(){initOtpProcess()},showSignatureError=function(errorElm,errorMsg){var fieldError=errorElm.find(component.fieldErrorClass);0==fieldError.length&&(errorElm.append('<div class="field_error"></div>'),fieldError=errorElm.find(component.fieldErrorClass)),fieldError.text(errorMsg),fieldError.show(),errorElm.addClass("error")},onCompleteBtnClick=function(event){if($(this).removeClass("disabled"),isSignatureStep()){var signatureElm=component.signUpAccreditationStepWrap.find(component.signatureElementClass);if(0!=signatureElm.length){var isError=!1,signatureCheck;0==signatureElm.jSignature("getData","native").length&&(isError=!0,showSignatureError(signatureElm.find(component.signatureAreaClass),"Signature is required"));var printNameElm=signatureElm.find(component.signaturePrintInputName),printNameValue;if(0!==printNameElm.length)""==printNameElm.val().trim()&&(isError=!0,showSignatureError(printNameElm.closest(".form_element"),"Print name is required"));var agreementCheckboxElm=signatureElm.find(component.signatureAgreementInputName),realSubmitBtn;if(0!==agreementCheckboxElm.length&&(agreementCheckboxElm.is(":checked")||(isError=!0,showSignatureError(agreementCheckboxElm.closest(".form_element"),"Agreement is required"))),!isError)component.signUpAccreditationStepWrap.find(".submit_btn").trigger("click")}}},onSignatureInputsChange=function(event){var formElementParent=$(this).closest(".form_element");formElementParent.hasClass("error")&&(formElementParent.find(component.fieldErrorClass).hide(),formElementParent.removeClass("error"))},initSignatureFormVerification=function(){$(document).on("click",component.signUpCompleteButtonId,onCompleteBtnClick),$(document).on("change",component.stepFormWrapId+" .form_element input",onSignatureInputsChange)};return ins.init=function(){setComponents(),$(document).on("afterGoToNextStep",afterGoToNextStep),$(document).on("ajaxedContentsSubmitFormFail",onAjaxContentFailed),initOtpProcess(),$(document).on("ajaxContentLoaded",afterAjaxContentLoaded),initSignatureFormVerification()},ins}();
+$(document).ready(function () {
+    RelistingSlider.init();
+});
+
+var EmbeddedMap = function () {
+    var mapFrame = document.getElementById("embedded_map");
+    var mapOptions = {
+        scrollwheel: false,
+        zoom: 14,
+        styles: [{
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#f5f5f5"
+                }]
+            },
+            {
+                "elementType": "labels.icon",
+                "stylers": [{
+                    "visibility": "off"
+                }]
+            },
+            {
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#616161"
+                }]
+            },
+            {
+                "elementType": "labels.text.stroke",
+                "stylers": [{
+                    "color": "#f5f5f5"
+                }]
+            },
+            {
+                "featureType": "administrative.land_parcel",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#bdbdbd"
+                }]
+            },
+            {
+                "featureType": "poi",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#eeeeee"
+                }]
+            },
+            {
+                "featureType": "poi",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#757575"
+                }]
+            },
+            {
+                "featureType": "poi.park",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#e5e5e5"
+                }]
+            },
+            {
+                "featureType": "poi.park",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#9e9e9e"
+                }]
+            },
+            {
+                "featureType": "road",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#ffffff"
+                }]
+            },
+            {
+                "featureType": "road.arterial",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#757575"
+                }]
+            },
+            {
+                "featureType": "road.highway",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#dadada"
+                }]
+            },
+            {
+                "featureType": "road.highway",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#616161"
+                }]
+            },
+            {
+                "featureType": "road.local",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#9e9e9e"
+                }]
+            },
+            {
+                "featureType": "transit.line",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#e5e5e5"
+                }]
+            },
+            {
+                "featureType": "transit.station",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#eeeeee"
+                }]
+            },
+            {
+                "featureType": "water",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#c9c9c9"
+                }]
+            },
+            {
+                "featureType": "water",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#9e9e9e"
+                }]
+            }
+        ]
+    };
+
+    var createMap = function (lat, lng) {
+        var centerLatLng = new google.maps.LatLng(lat, lng);
+        var mapPin = {
+            url: "resources/media/img/art/icon_location_mark.png"
+        };
+        mapOptions.center = centerLatLng;
+        var map = new google.maps.Map(mapFrame, mapOptions);
+        var marker = new google.maps.Marker({
+            map: map,
+            position: centerLatLng,
+            icon: mapPin
+        });
+    };
+
+    var initMap = function () {
+
+        if (
+            !mapFrame ||
+            typeof google === 'undefined'
+        ) {
+            return;
+        }
+
+        var geocoder = new google.maps.Geocoder();
+        var address = mapFrame.dataset.address;
+
+        geocoder.geocode({
+            'address': address
+        }, function (results, status) {
+            if (status != 'OK') {
+                return;
+            }
+            var resultLatlng = results[0].geometry.location;
+            var lat = resultLatlng.lat();
+            var lng = resultLatlng.lng();
+            createMap(lat, lng);
+        });
+    };
+
+    initMap();
+}();
+
+var RelistingSlider = function () {
+    var ins = {};
+    var component = {
+        slider: $(".relisting-detail__slider"),
+        sliderItems: $(".relisting-detail__slider > *"),
+        sliderPrevBtnClass: ".relisting-detail__slider-prev",
+        sliderNextBtnClass: ".relisting-detail__slider-next",
+        nextArrowKeycode: 39,
+        prevArrowKeycode: 37,
+    };
+    var slickOptions = {
+        slidesToShow: 1,
+        infinite: true,
+        autoplay: true,
+        speed: 1000,
+        slidesToScroll: 1,
+        arrows: true,
+        dots: true,
+        prevArrow: component.sliderPrevBtnClass,
+        nextArrow: component.sliderNextBtnClass,
+        responsive: [{
+            breakpoint: 1024,
+            settings: {
+                slidesToShow: 1,
+            }
+        }, ]
+    };
+    var initArrowKeyNavigation = function(){
+        $(document)
+            .on('load', function(){
+                component.slider.focus();
+            })
+            .on('keydown', function(e){
+                var keycode = e.keyCode;
+                if(keycode != component.nextArrowKeycode && keycode != component.prevArrowKeycode){
+                    return;
+                }
+
+                component.slider.focus();
+                if(keycode == component.nextArrowKeycode){
+                    component.slider.slick('slickNext');
+                }
+                if(keycode == component.prevArrowKeycode){
+                    component.slider.slick('slickPrev');
+                }
+            })
+        ;
+    };
+    ins.init = function () {
+        if (component.slider.length == 0) {
+            return;
+        }
+        component.slider.slick(slickOptions);
+        
+        initArrowKeyNavigation();
+    };
+    return ins;
+}();
