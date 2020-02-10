@@ -33,7 +33,7 @@ class RECatalogView extends AbstractRECatalogView{
                     $this->addHTML('<span class="relisting-item__feature-value">6,410 <span class="unit">sqft</span></span>');
                 $this->addHTML('</div>');
                 $this->addHTML('<div class="relisting-item__price">');
-                    $this->addHTML('<span class="relisting-item__feature-title">Square Footage</span>');
+                    $this->addHTML('<span class="relisting-item__feature-title">Price</span>');
                     $this->addHTML('<span class="relisting-item__feature-value">');
                         $this->addListingPrice();
                     $this->addHTML('</span>');
