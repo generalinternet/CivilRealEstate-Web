@@ -30,7 +30,8 @@ class RECatalogView extends AbstractRECatalogView{
             $this->addHTML('<div class="relisting-item__features-wrap">');
                 $this->addHTML('<div class="relisting-item__square-footage">');
                     $this->addHTML('<span class="relisting-item__feature-title">Square Footage</span>');
-                    $this->addHTML('<span class="relisting-item__feature-value">6,410 <span class="unit">sqft</span></span>');
+                    $lotSize = $this->listing->getDisplayLotSizeSqft();
+                    $this->addHTML('<span class="relisting-item__feature-value">'.$lotSize.'</span>');
                 $this->addHTML('</div>');
                 $this->addHTML('<div class="relisting-item__price">');
                     $this->addHTML('<span class="relisting-item__feature-title">Price</span>');
