@@ -29,3 +29,30 @@
         margin-top: 1em
         font-size: 0.9em
         line-height: 1.5em
+@media screen and ( max-width: 768px )
+    .home-process
+        &__item-wrap
+            background: none
+            margin-bottom: 0
+            padding-bottom: 0
+        &__item
+            padding: 0
+            display: block
+            margin: auto
+            position: relative
+            max-width: 280px
+            padding: 40px 15px
+            background-size: 280px 340px
+            min-height: 340px
+            background-position: top
+            background-repeat: no-repeat
+            &_first
+                padding-bottom: 84px
+                background-image: url('../media/img/art/home-process-1-mobile.png')
+            &_second
+                top: -25px
+                padding-bottom: 84px
+                background-image: url('../media/img/art/home-process-2-mobile.png')
+            &_third
+                top: -50px
+                background-image: url('../media/img/art/home-process-3-mobile.png')

@@ -88,6 +88,9 @@
         padding: 5em 0
         .banner__title
             margin-bottom: 2em
+            font-size: 1.5em
+            text-transform: lowercase
+            line-height: 1.5em
     &_page_community
         background-image: url('../media/img/banner/family.jpg')
         +color_overlay($color_black, 0.5)
@@ -135,7 +138,8 @@
                 position: static
                 text-align: left
                 margin-top: 1em
-    
+        &_page_home
+            padding: 8em 0
     
     
 @media screen and ( max-width: 767px )
@@ -165,18 +169,18 @@
 
 
 
-@media screen and ( max-width: 480px )
-    .banner
-        // set background images for specific pages
-        &_page_my-account,
-        &_page_home
-            background-image: url('../media/img/bgs/home_mobile.jpg')
-        // &_page_opportunities
-        //     background-image: url('../media/img/bgs/opportunities.jpg')
-        &_page_about
-            background-image: url('../media/img/bgs/about_mobile.jpg')
-        // &_page_contact
-        //     background-image: url('../media/img/bgs/contact.jpg')
+// @media screen and ( max-width: 480px )
+//     .banner
+//         // set background images for specific pages
+//         &_page_my-account,
+//         &_page_home
+//             background-image: url('../media/img/bgs/home_mobile.jpg')
+//         // &_page_opportunities
+//         //     background-image: url('../media/img/bgs/opportunities.jpg')
+//         &_page_about
+//             background-image: url('../media/img/bgs/about_mobile.jpg')
+//         // &_page_contact
+//         //     background-image: url('../media/img/bgs/contact.jpg')
 
 
 
