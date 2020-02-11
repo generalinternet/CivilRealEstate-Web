@@ -120,27 +120,29 @@ class RESearchFormView extends AbstractRESearchFormView{
     protected function addRangeField($title, $name){
         $this->form->addHTML('<div class="form__input form__input_type_range">');
             $this->form->addHTML('<label class="main">'.$title.'</label>');
-            $this->form->addHTML('<div class="form__input-wrap">');
-                $this->form->addField('min_'.$name, 'dropdown', array(
-                    'class' => 'form__input form__input_type_dropdown',
-                    'placeHolder' => 'Min',
-                    'options' => array(
-                        '100' => 100,
-                        '200' => 200,
-                        '300' => 300,
-                        '400' => 400,
-                    )
-                ));
-                $this->form->addField('max_'.$name, 'dropdown', array(
-                    'class' => 'form__input form__input_type_dropdown',
-                    'placeHolder' => 'Max',
-                    'options' => array(
-                        '100' => 100,
-                        '200' => 200,
-                        '300' => 300,
-                        '400' => 400,
-                    )
-                ));
+            $this->form->addHTML('<div class="field_content">');
+                $this->form->addHTML('<div class="form__input-wrap">');
+                    $this->form->addField('min_'.$name, 'dropdown', array(
+                        'class' => 'form__input form__input_type_dropdown',
+                        'placeHolder' => 'Min',
+                        'options' => array(
+                            '100' => 100,
+                            '200' => 200,
+                            '300' => 300,
+                            '400' => 400,
+                        )
+                    ));
+                    $this->form->addField('max_'.$name, 'dropdown', array(
+                        'class' => 'form__input form__input_type_dropdown',
+                        'placeHolder' => 'Max',
+                        'options' => array(
+                            '100' => 100,
+                            '200' => 200,
+                            '300' => 300,
+                            '400' => 400,
+                        )
+                    ));
+                $this->form->addHTML('</div>');
             $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
     }

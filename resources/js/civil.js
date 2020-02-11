@@ -1,5 +1,6 @@
 $(document).ready(function () {
     RelistingSlider.init();
+    RelistingSearch.init();
 });
 
 var EmbeddedMap = function () {
@@ -230,5 +231,23 @@ var RelistingSlider = function () {
         
         initArrowKeyNavigation();
     };
+    return ins;
+}();
+
+var RelistingSearch = function (){
+    var component = {
+        searchWrapClass: '.relisting-search',
+    };
+    var ins = {};
+
+    ins.init = function() {
+        $(document).on('click', component.searchWrapClass + ' .form__input label.main', function () {
+            var parentInput = $(this).parents('.form__input').first();
+            var fieldContent = parentInput.find('.field_content').first();
+            fieldContent.slideToggle();
+            parentInput.toggleClass('open');
+        });
+    };
+
     return ins;
 }();
