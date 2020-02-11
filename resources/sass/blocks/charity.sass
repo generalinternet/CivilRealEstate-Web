@@ -86,3 +86,32 @@
             top: 0
             position: absolute
             background: radial-gradient($color_white, $color_grey)
+
+@media screen and ( max-width: 768px )
+    .charity
+        .row
+            display: block
+            margin: 0 -15px
+            overflow: hidden
+        &__banner
+            height: 20em
+        &__steps
+            &::before
+                display: none
+        &__input-wrap,
+        &__form-link
+            width: 100%
+        &__input-wrap
+            margin-bottom: 5px
+        &__form-link
+            padding: 0
+        &__checkbox-wrap
+            float: right
+        &__title
+            b
+                display: block
+                margin-bottom: .5em
+        &__logos
+            max-width: 100%
+        &__content-wrap
+            padding: 2em 15px
