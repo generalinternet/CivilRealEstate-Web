@@ -120,3 +120,66 @@
             background-repeat: no-repeat
             &_empty
                 background-image: url('../media/img/icon/star-o.png')
+
+@media screen and ( max-width: 767px )
+    .relisting
+        &__main-content
+            #real_estate_search
+                display: none
+        &__result-title,
+        &__sortby-list
+            display: none
+        &__list-wrap
+            padding: 1em 0
+
+        &-item
+            position: relative
+            padding-top: 6em
+            padding-bottom: 5em
+            display: block
+            &__main-content-wrap
+                padding-left: 0
+            &__title
+                position: absolute
+                top: 1.5em
+                left: 1.5em
+            &__view-button-wrap
+                position: absolute
+                bottom: 0
+                display: block
+                width: 100%
+                text-align: center
+                left: 0
+                padding-bottom: 1.5em
+            &__featured-image
+                width: calc(100% - 140px)
+                .no_cover_image
+                    height: 130px
+            &__features-wrap
+                width: 140px
+                padding-left: 1em
+                position: absolute
+                right: 1em
+                top: 6em
+                display: block
+                padding-top: 35px
+            &__square-footage
+                margin-bottom: 1em
+            &__square-footage,
+            &__price,
+            &__favourite
+                width: 100%
+            &__favourite
+                padding-left: 30px
+                position: absolute
+                top: 0
+                left: 10px
+            &__favourite-text
+                position: static
+                padding: 5px 0
+            &__favourite-icon
+                position: absolute
+                left: 0
+                top: 0
+            &__other-fields
+                margin-top: 1.5em
