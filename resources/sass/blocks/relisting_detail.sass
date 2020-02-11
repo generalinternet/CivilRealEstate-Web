@@ -151,5 +151,57 @@
     &__contact-form-wrap
         .contact__form-wrap
             margin-bottom: 0
-    &__contact-left-col
-        padding: 2em 0
+    &__contact-left-co
+        padding-top: 2em
+        padding-bottom: 2em
+
+@media screen and ( max-width: 768px )
+    .relisting-detail
+        &__slider-next,
+        &__slider-prev
+            &::before
+                width: 30px
+                height: 30px
+                border-width: 5px
+        &__slider
+            height: 80vh
+        &__favourite
+            margin-bottom: 0.5em
+            text-align: left
+            .relisting-item__favourite-icon
+                position: static
+        &__highlight-row
+            display: block
+        &__address-wrap
+            margin-bottom: 2em
+        &__price
+            text-align: left
+        &__feature-item
+            width: 50%
+            float: left
+            margin-bottom: 2em
+        &__cta-button-wrap,
+        &__contact-button-wrap
+            text-align: center
+            .button
+                width: 100%
+                margin-right: 0!important
+                &:not(:last-child)
+                    margin-bottom: 2em
+        &__contact-button-wrap
+            margin-bottom: 3em
+        &__info-title
+            display: block
+            margin-bottom: 2em!important
+            text-align: left
+        &__contact-form-wrap
+            .contact__form-wrap
+                padding: 2em 0
+        &__contact-form-buttons
+            .button
+                width: 100%
+                text-align: center
+                .button__icon
+                    margin-left: 3em
+        &__info-content-tag
+            width: 50%

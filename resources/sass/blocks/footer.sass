@@ -9,11 +9,16 @@
     #logo
         padding: 0
         margin: auto
-        display: block
+        display: inline-block
+
 @media only screen and (max-width: 960px)
     .footer
         #logo
             width: 80%
         &__bottom-text
-            text-align: center
             font-size: 0.8em
+
+@media only screen and (max-width: 767px)
+    .footer
+        &__bottom-text
+            text-align: center

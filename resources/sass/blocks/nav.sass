@@ -2,6 +2,9 @@
     display: block
     text-align: center
 
+    ul
+        margin: 0
+
     // elements
     &__li
         display: inline-block
@@ -63,6 +66,11 @@
                     a,span
                         color: $color_primary
 // responsive
+@media screen and ( max-width: 1199px )
+    .nav
+        &__li
+            padding: 0 1.5em
+
 @media screen and ( max-width: 991px )
     .nav
         &__li

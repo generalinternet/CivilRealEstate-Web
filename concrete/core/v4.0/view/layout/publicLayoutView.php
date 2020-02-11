@@ -206,10 +206,10 @@ class PublicLayoutView extends AbstractPublicLayoutView {
             // row
             $currentYear = date('Y');
             $this->addHTML('<div class="row">');
-                $this->addHTML('<div class="col-lg-6">');
+                $this->addHTML('<div class="col-xs-12 col-sm-5 col-lg-6 text-center">');
                 self::addLogo();
                 $this->addHTML('</div><!--.col-->');
-                $this->addHTML('<div class="col-lg-6">');
+                $this->addHTML('<div class="col-xs-12 col-sm-7 col-lg-6">');
                     $this->addHTML('<p class="footer__bottom-text">© Copyright '. SITE_TITLE . ' 2004 - '.$currentYear.'. All Rights Reserved.</p>');
                 $this->addHTML('</div><!--.col-->');
             $this->addHTML('</div><!--.row-->');
