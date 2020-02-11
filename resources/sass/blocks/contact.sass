@@ -11,6 +11,10 @@
         padding-bottom: 0.5em
         b
             color: $color_black
+        span
+            &::before
+                content: " | "
+                padding: 0 .5em
     &__button-wrap
         margin-bottom: 1em
         text-align: center
@@ -66,3 +70,24 @@
         padding: 0 1.5em
         hr
             margin: 1em 0
+
+@media screen and ( max-width: 767px )
+    .contact
+        &__title
+            font-size: 1.2em
+        &__form-row_size_half
+            .form_element
+                width: 100%
+        &__form-wrap
+            margin-bottom: 2em
+            padding: 1em 0.5em
+        &__description
+            span
+                &::before
+                    display: none
+            b
+                display: block
+        &__wrap
+            background: $color_grey
+        &__button-wrap
+            padding-bottom: 3em

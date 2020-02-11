@@ -6,6 +6,7 @@
         font-weight: 500
         text-align: center
         font-size: 1.5em
+        line-height: 1.5em
         margin-bottom: 2em
     &__description
         color: #727273
@@ -13,6 +14,10 @@
         padding-bottom: 0.5em
         b
             color: $color_black
+            span
+                &::before
+                    content: '|'
+                    padding: 0 0.5em
     &__button-wrap
         margin-bottom: 1em
         text-align: center
@@ -98,3 +103,40 @@
         padding-left: 1em
         text-align: left
         color: $color_red_secondary
+
+@media screen and ( max-width: 768px )
+    .referral
+        &__form-wrap
+            margin-bottom: 0
+            .referral__title
+                padding: 0 2em
+        &__wrap
+            background: $color_grey
+        &__description
+            span
+                display: block
+                &::before
+                    display: none
+        &__description-col-left,
+        &__description-col-right
+            width: 100%
+            padding: 0
+            text-align: center
+        &__description-col-left
+            margin-bottom: 1em
+        &__description-illustration
+            background-size: 500px 210px
+            height: 200px
+            width: 300px
+            display: block
+            margin: auto
+            margin-top: 3em
+        &__form-row_size_half
+            .form_element
+                width: 100%
+                padding: 0
+                margin-bottom: 1.5em
+                input
+                    padding: 0.8em 1em!important
+        &__button-wrap
+            padding-bottom: 3em

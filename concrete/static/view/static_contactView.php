@@ -39,7 +39,7 @@ class StaticContactView extends GI_View{
                     'placeHolder' => 'Drop us a line. We would love to hear from you.'
                 ));
                 $this->form->addHTML('<div class="contact__break-line"><hr></div>');
-                $this->form->addHTML('<p class="contact__description"><b>* Indicates a required ﬁeld</b>  |  Your information will never be shared with any third party.</p>');
+                $this->form->addHTML('<p class="contact__description"><b>* Indicates a required ﬁeld</b> <span>Your information will never be shared with any third party.</span></p>');
             $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
         $this->form->addHTML('<div class="contact__button-wrap">');
@@ -88,8 +88,8 @@ class StaticContactView extends GI_View{
             $this->addHTML('<div class="container">');
                 $this->addHTML('<div class="row">');
                     $this->addHTML('<div class="col-xs-12 col-md-10 col-md-push-1">');
+                        $this->addHTML('<h3 class="contact__title">Just start by ﬁlling out this easy form.</h3>');
                         $this->addHTML('<div class="contact__wrap">');
-                            $this->addHTML('<h3 class="contact__title">Just start by ﬁlling out this easy form.</h3>');
                             $this->addHTML($this->form->getForm());
                         $this->addHTML('</div>');
                     $this->addHTML('</div>');
