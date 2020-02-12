@@ -127,6 +127,9 @@ abstract class GI_ApplicationConfig {
             'fillout'
         ),
         'relisting' => true,
+        're' => array(
+            'index'
+        ),
         'mls' => array(
             'view'
         )

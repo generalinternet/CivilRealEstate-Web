@@ -4,6 +4,7 @@ class RESearchFormView extends AbstractRESearchFormView{
     protected $useShadowBox = false;
     protected $useBasicSearch = false;
     protected $hideAdvancedSearch = false;
+    protected $useAjax = false;
 
     public function getShadowBoxURL(){
         if(is_null($this->searchAttributes)){

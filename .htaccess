@@ -65,31 +65,23 @@ RewriteRule ^signup/$ index.php?controller=login&action=register [NC,L]
 #Remove forward slash
 RewriteRule ^(.*)/$ /$1 [L,R=301]
 
-RewriteRule ^([^/.]+)$ index.php?controller=static&action=$1 [NC,L]
-RewriteRule ^([^/.]+)/$ index.php?controller=static&action=$1 [NC,L]
-
 RewriteRule ^error/([^/.]+)$ index.php?controller=static&action=error&errorCode=$1 [NC,L]
 RewriteRule ^error/([^/.]+)/$ index.php?controller=static&action=error&errorCode=$1 [NC,L]
-
-##opportunities
-RewriteRule ^opportunities/([^/.]+)$ index.php?controller=static&action=opportunities&ref=$1 [NC,L]
-RewriteRule ^opportunities/category/([^/.]+)$ index.php?controller=static&action=opportunities&type=category&type_ref=$1 [NC,L]
 
 ##signup steps
 RewriteRule ^user/signup/([0-9]+)/([0-9]+)/([0-9]+)$ index.php?controller=user&action=signup&step=$1&ajax=$2&id=$3 [NC,L]
 RewriteRule ^user/signup/([0-9]+)/([0-9]+)$ index.php?controller=user&action=signup&step=$1&ajax=$2 [NC,L]
 RewriteRule ^user/signup/([0-9]+)$ index.php?controller=user&action=signup&step=$1 [NC,L]
 
-##my accounts
-RewriteRule ^user/weAccountEdit/([a-zA-Z0-9-z\-]+)$ index.php?controller=user&action=weAccountEdit&step=$1 [NC,L]
-RewriteRule ^user/weAccountDetail/([0-9]+)$ index.php?controller=user&action=weAccountDetail&downloadPDF=$1 [NC,L]
-
-##contact
-RewriteRule ^contact/([0-9]+)$ index.php?controller=static&action=contact&sent=$1 [NC,L]
-RewriteRule ^angelNetwork/([0-9]+)$ index.php?controller=static&action=angelNetwork&sent=$1 [NC,L]
-
 ##contact module
 RewriteRule ^contact/angelContactViewPdf/([0-9]+)$ index.php?controller=contact&action=angelContactViewPdf&userId=$1 [NC,L]
+
+
+RewriteRule ^([^/.]+)$ index.php?controller=static&action=$1 [NC,L]
+RewriteRule ^([^/.]+)/$ index.php?controller=static&action=$1 [NC,L]
+
+RewriteRule ^content/([^/.]+)/([^/.]+)$ index.php?controller=content&action=$1&ref=$2 [NC,L]
+RewriteRule ^content/([^/.]+)/([^/.]+)/$ index.php?controller=content&action=$1&ref=$2 [NC,L]
 
 RewriteRule ^([^/.]+)/([^/.]+)$ index.php?controller=$1&action=$2 [NC,L]
 RewriteRule ^([^/.]+)/([^/.]+)/$ index.php?controller=$1&action=$2 [NC,L]
@@ -97,8 +89,12 @@ RewriteRule ^([^/.]+)/([^/.]+)/$ index.php?controller=$1&action=$2 [NC,L]
 RewriteRule ^([^/.]+)/([^/.]+)/([0-9]+)$ index.php?controller=$1&action=$2&id=$3 [NC,L]
 RewriteRule ^([^/.]+)/([^/.]+)/([0-9]+)/$ index.php?controller=$1&action=$2&id=$3 [NC,L]
 
-RewriteRule ^content/([^/.]+)/([^/.]+)$ index.php?controller=content&action=$1&ref=$2 [NC,L]
-RewriteRule ^content/([^/.]+)/([^/.]+)/$ index.php?controller=content&action=$1&ref=$2 [NC,L]
+RewriteRule ^re/index/([^/.]+)/([^/.]+)$ index.php?controller=re&action=index&type=$1&queryId=$2 [NC,L]
+RewriteRule ^re/index/([^/.]+)/([^/.]+)/$ index.php?controller=re&action=index&type=$1&queryId=$2 [NC,L]
+RewriteRule ^re/index/([^/.]+)/([^/.]+)/([^/.]+)$ index.php?controller=re&action=index&type=$1&queryId=$2&ajax=$3 [NC,L]
+RewriteRule ^re/index/([^/.]+)/([^/.]+)/([^/.]+)/$ index.php?controller=re&action=index&type=$1&queryId=$2&ajax=$3 [NC,L]
+RewriteRule ^re/index/([^/.]+)/([^/.]+)/([^/.]+)/([^/.]+)$ index.php?controller=re&action=index&type=$1&queryId=$2&targetId=$3&ajax=$4 [NC,L]
+RewriteRule ^re/index/([^/.]+)/([^/.]+)/([^/.]+)/([^/.]+)/$ index.php?controller=re&action=index&type=$1&queryId=$2&targetId=$3&ajax=$4 [NC,L]
 
 
 ## UPDATE BELOW TO DOMAIN FOR WEBSITE ##
