@@ -176,7 +176,7 @@ class PublicLayoutView extends AbstractPublicLayoutView {
     }
 
     protected function addOpenLogoWrap(){
-        $this->addHTML('<div class="col-xs-12">');
+        $this->addHTML('<div class="col-xs-12 logo-bar">');
         return $this;
     }
     
@@ -186,6 +186,7 @@ class PublicLayoutView extends AbstractPublicLayoutView {
     }
 
     protected function addCloseLogoWrap(){
+        $this->addOtherWidget();
         $this->addHTML('</div>');
         return $this;
     }
@@ -400,4 +401,85 @@ class PublicLayoutView extends AbstractPublicLayoutView {
         </div>');
     }
 
+    protected $headerWidgetConfig = array(
+        'relisting' => array(
+            'index' => ['search_bar', 'user']
+        ),
+        'mls' => array(
+            'view' => ['call', 'search_icon', 'user']
+        ),
+    );
+    protected function addOtherWidget(){
+        $controller = GI_URLUtils::getController();
+        $action = GI_URLUtils::getAction();
+
+        if(!isset($this->headerWidgetConfig[$controller])){
+            return;
+        }
+
+        if(!isset($this->headerWidgetConfig[$controller][$action])){
+            return;
+        }
+        $this->addHTML('<div class="header-widget">');
+        $widgets = $this->headerWidgetConfig[$controller][$action];
+        foreach($widgets as $widget){
+            $this->addHeaderWidget($widget);
+        }
+        $this->addHTML('</div>');
+    }
+    protected function addHeaderWidget($widget){
+        switch($widget){
+            case 'search_bar':
+                $searchForm = new GI_Form('search_bar');
+                $this->addHTML('<div class="header-widget__item header-widget__item_type_search-bar">');
+                $this->addHTML('<form action="/" method="get" class="">');
+                    $this->addHTML('<div class="header-widget__search-bar-wrap">');
+                        $this->addHTML('<input type="text" class="form__input form__input_type_text" name="keyword" placeholder="Port Moody, British Columbia">');
+                        $this->addHTML('<a href="" class="button button_theme_primary">Search</a>');
+                    $this->addHTML('</div>');
+                $this->addHTML('</form>');
+                $this->addHTML('</div>');
+                break;
+
+            case 'search_icon':
+                $this->addHTML('<div class="header-widget__item header-widget__item_type_search-icon">');
+                    $relistingIndexURL = GI_URLUtils::buildCleanURL(array(
+                        'controller' => 'relisting',
+                        'action' => 'index'
+                    ));
+                    $this->addHTML('<a href="'.$relistingIndexURL.'" class="header-widget__search-link"><i class="header-widget__search-icon"></i> Search</a>');
+                $this->addHTML('</div>');
+                break;
+
+            case 'call':
+                $this->addHTML('<div class="header-widget__item header-widget__item_type_search-bar">');
+                    $this->addHTML('<a href="'.SITE_TITLE.'" class="header-widget__call-link">Call Us '.SITE_TITLE.'</a>');
+                $this->addHTML('</div>');
+                break;
+
+            case 'user':
+                if(!Login::isLoggedIn()){
+                    return;
+                }
+                $img = '<img src="resources/media/img/art/avatar.png" alt="'.SITE_TITLE.'" class="header-widget__user-avatar-img">';
+                $user = Login::getUser();
+                $avtView = $user->getUserAvatarView();
+                if(!empty($avtView)){
+                    $avtView->setSize(50, 50);
+                    $avtImg = $this->getAvatarImg();
+                }
+                $this->addHTML('<div class="header-widget__item header-widget__item_type_user">');
+                    $this->addHTML('<span class="header-widget__user-wrap">');
+                        $this->addHTML('<span class="header-widget__user-avatar">');
+                            $this->addHTML($img);
+                        $this->addHTML('</span>');
+                        $this->addHTML('<span class="header-widget__user-name">'.$user->getFullName().'<span class="header-widget__avatar-dropdown-icon"></span></span>');
+                    $this->addHTML('</span>');
+                    $this->addHTML('</div>');
+                break;
+
+            default:
+                break;
+        }
+    }
 }
