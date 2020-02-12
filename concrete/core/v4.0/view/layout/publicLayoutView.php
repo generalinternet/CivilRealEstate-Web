@@ -79,7 +79,7 @@ class PublicLayoutView extends AbstractPublicLayoutView {
                 'label' => 'contact us',
                 'link' => GI_URLUtils::buildURL(array(
                     'controller' => 'static',
-                    'action' => 'contact-us',
+                    'action' => 'contact',
                 )),
             ],
         ];

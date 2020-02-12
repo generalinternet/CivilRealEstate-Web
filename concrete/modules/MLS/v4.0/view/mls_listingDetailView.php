@@ -176,7 +176,7 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
     protected function addCTASection(){
         $contactURL = GI_URLUtils::buildCleanURL(array(
             'controller' => 'static',
-            'action' => 'contact-us'
+            'action' => 'contact'
         ));
         $this->addHTML('<div class="section section_type_listing-detail-cta section_bg_primary">');
             $this->addHTML('<div class="container">');

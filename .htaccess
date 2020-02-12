@@ -48,7 +48,8 @@ Options +FollowSymlinks
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 
-RewriteRule ^contact-us index.php?controller=static&action=contact [NC,L]
+RewriteRule ^contact/1 index.php?controller=static&action=contact&sent=1 [NC,L]
+RewriteRule ^referrals/1 index.php?controller=static&action=referrals&sent=1 [NC,L]
 
 RewriteRule ^login$ index.php?controller=login&action=index [NC,L]
 RewriteRule ^login/$ index.php?controller=login&action=index [NC,L]

@@ -1,50 +1,96 @@
 <?php
 
 class StaticController extends GI_Controller {
+
+    protected function handleSubmitedForm($attributes, $isReferralForm = false){
+        $firstName = filter_input(INPUT_POST, 'first_name');
+        $lastName = filter_input(INPUT_POST, 'last_name');
+        $email = filter_input(INPUT_POST, 'r_email');
+        $phone = filter_input(INPUT_POST, 'phone');
+        $message = filter_input(INPUT_POST, 'message');
+        
+        $emailView = new GenericEmailView();
+        if(!$isReferralForm){
+            $emailView->addParagraph('A message has been sent from your contact form.');
+        }else{
+            $emailView->addParagraph('A message has been sent from your referral form.');
+        }
+        $emailView->addLineBreak();
+
+        $emailView->startBlock()
+                ->startParagraph()
+                    ->addHTML('Name: <b>' . trim($firstName . ' ' . $lastName) . '</b><br/>')
+                    ->addHTML('Email: <b>' . $email . '</b>');
+
+        if($isReferralForm){
+            $referedBy = filter_input(INPUT_POST, 'referred_by');
+            $emailView->addHTML('Referred by: <b>' . $referedBy . '</b>');
+        }
+
+        if(!empty($phone)){
+            $emailView->addHTML('<br/>Phone: <b>' . $phone . '</b>');
+        }
+        $emailView->closeParagraph()
+                ->addParagraph(nl2br($message))
+                ->closeBlock();
+
+        $giEmail = new GI_Email();
+
+        $giEmail->addTo(SITE_EMAIL, EMAIL_TITLE)
+                ->addCC('david.kolby@generalinternet.ca', 'David Kolby')
+                ->setFrom(ProjectConfig::getServerEmailAddr(), ProjectConfig::getServerEmailName())
+                ->setSubject('Contact Form Message')
+                ->useEmailView($emailView);
+
+        if($isReferralForm){
+            $giEmail->setSubject('Referral Form Message');
+        }
+
+        if($giEmail->send()){
+            $newAttributes = $attributes;
+            $newAttributes['sent'] = 1;
+            GI_URLUtils::redirect($newAttributes);
+        }
+    }
     
     public function actionContact($attributes){
         $form = new GI_Form('contact_form');
         $form->setBotValidation(true);
-        $view = new StaticContactView($form);
+        $view = new StaticContactView($form, $attributes);
         
         if(isset($attributes['sent']) && $attributes['sent'] == 1){
             $view->setSent(true);
         }
         
         if($form->wasSubmitted() && $form->validate()){
-            $firstName = filter_input(INPUT_POST, 'first_name');
-            $lastName = filter_input(INPUT_POST, 'last_name');
-            $email = filter_input(INPUT_POST, 'r_email');
-            $phone = filter_input(INPUT_POST, 'phone');
-            $message = filter_input(INPUT_POST, 'message');
-            
-            $emailView = new GenericEmailView();
-            $emailView->addParagraph('A message has been sent from your contact form.');
-            $emailView->addLineBreak();
-
-            $emailView->startBlock()
-                    ->startParagraph()
-                        ->addHTML('Name: <b>' . trim($firstName . ' ' . $lastName) . '</b><br/>')
-                        ->addHTML('Email: <b>' . $email . '</b>');
-            if(!empty($phone)){
-                $emailView->addHTML('<br/>Phone: <b>' . $phone . '</b>');
-            }
-            $emailView->closeParagraph()
-                    ->addParagraph(nl2br($message))
-                    ->closeBlock();
-
-            $giEmail = new GI_Email();
-
-            $giEmail->addTo(SITE_EMAIL, EMAIL_TITLE)
-                    ->addCC('david.kolby@generalinternet.ca', 'David Kolby')
-                    ->setFrom(ProjectConfig::getServerEmailAddr(), ProjectConfig::getServerEmailName())
-                    ->setSubject('Contact Form Message')
-                    ->useEmailView($emailView);
-            if($giEmail->send()){
-                $newAttributes = $attributes;
-                $newAttributes['sent'] = 1;
-                GI_URLUtils::redirect($newAttributes);
-            }
+            $this->handleSubmitedForm($attributes);
+        }
+        $returnArray = GI_Controller::getReturnArray($view);
+        $breadcrumbs = array(
+            array(
+                'label' => $view->getSiteTitle(),
+                'link' => GI_URLUtils::buildURL(array(
+                    'controller' => 'static',
+                    'action' => GI_URLUtils::getAction()
+                ))
+            ),
+        );
+        $returnArray['breadcrumbs'] = $breadcrumbs;
+        return $returnArray;
+    }
+    
+    public function actionReferrals($attributes){
+        $form = new GI_Form('contact_form');
+        $form->setBotValidation(true);
+        $view = new StaticReferralsView($form, $attributes);
+        
+        if(isset($attributes['sent']) && $attributes['sent'] == 1){
+            $view->setSent(true);
+        }
+        
+        if($form->wasSubmitted() && $form->validate()){
+            $isReferralForm = true;
+            $this->handleSubmitedForm($attributes, $isReferralForm);
         }
         $returnArray = GI_Controller::getReturnArray($view);
         $breadcrumbs = array(

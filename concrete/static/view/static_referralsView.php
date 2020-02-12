@@ -3,6 +3,7 @@
 class StaticReferralsView extends GI_View{
 
     protected $form;
+    protected $isSent;
 
     public function __construct(GI_Form $referralForm = null) {
         parent::__construct();
@@ -12,6 +13,10 @@ class StaticReferralsView extends GI_View{
 
         $this->form = $referralForm;
         $this->buildForm();
+    }
+
+    public function setSent(bool $isSent){
+        $this->isSent = $isSent;
     }
 
     protected function buildForm(){
@@ -26,7 +31,7 @@ class StaticReferralsView extends GI_View{
                     'required' => true,
                     'placeHolder' => 'Last Name*'
                 ));
-                $this->form->addField('email', 'email', array(
+                $this->form->addField('r_email', 'email', array(
                     'required' => true,
                     'placeHolder' => 'Email*'
                 ));
@@ -109,19 +114,33 @@ class StaticReferralsView extends GI_View{
                                 $this->addHTML('<p class="referral__description-line">Industry, for the beneﬁt of everyone. </p>');
                             $this->addHTML('</div>');
                         $this->addHTML('</div>');
-                        $this->addHTML('<div class="referral__description-illustration" alt="'.SITE_TITLE.'"></div>');
+                        if(!$this->isSent){
+                            $this->addHTML('<div class="referral__description-illustration" alt="'.SITE_TITLE.'"></div>');
+                        }
                     $this->addHTML('</div>');
                 $this->addHTML('</div>');
 
                 $this->addHTML('<div class="row">');
                     $this->addHTML('<div class="col-xs-12 col-md-10 col-md-push-1">');
                         $this->addHTML('<div class="referral__wrap">');
-                            $this->addHTML($this->form->getForm());
+                            if(!$this->isSent){
+                                $this->addHTML($this->form->getForm());
+                            }else{
+                                $this->addHTML('<br><br>');
+                                $this->addThankyouMessage();
+                            }
                         $this->addHTML('</div>');
                     $this->addHTML('</div>');
                 $this->addHTML('</div>');
             $this->addHTML('</div>');
         $this->addHTML('</section>');
+    }
+
+    protected function addThankyouMessage(){
+        $this->addHTML('
+            <h3 class="contact__title contact__title_sent">Thank you! Your request has been sent.</h3>
+            <p class="contact__description contact__description_sent">We will get back to you as soon as posible.</p>
+        ');
     }
 
     public function beforeReturningView() {
