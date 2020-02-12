@@ -114,7 +114,7 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
                                 $featureInfo = array(
                                     [
                                         'title' => 'Square Footage',
-                                        'value' => $this->listing->getDisplayLotSizeSqft()
+                                        'value' => $this->listing->getDisplaySquareFootage()
                                     ],
                                     [
                                         'title' => 'Property Type',
@@ -208,61 +208,64 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
                         $this->addHTML('</p>');
                     $this->addHTML('</div>');
                 $this->addHTML('</div>');
-                $this->addHTML('<div class="row relisting-detail__info-row">');
-                    $this->addHTML('<div class="col-xs-12 col-md-3 relisting-detail__col-pad-right">');
-                        $this->addHTML('<h3 class="relisting-detail__info-title">Strata Info</h3>');
+                // $this->addHTML('<div class="row relisting-detail__info-row">');
+                //     $this->addHTML('<div class="col-xs-12 col-md-3 relisting-detail__col-pad-right">');
+                //         $this->addHTML('<h3 class="relisting-detail__info-title">Strata Info</h3>');
+                //     $this->addHTML('</div>');
+                //     $this->addHTML('<div class="col-xs-12 col-md-9">');
+                //         $this->addHTML('<p class="relisting-detail__info-content">');
+                //             $this->addHTML('Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam.');
+                //         $this->addHTML('</p>');
+                //     $this->addHTML('</div>');
+                // $this->addHTML('</div>');
+                $listingFeatures = $this->listing->getFeatureArr();
+                if(!empty($listingFeatures)){
+                    $this->addHTML('<div class="row relisting-detail__info-row">');
+                        $this->addHTML('<div class="col-xs-12 col-md-3 relisting-detail__col-pad-right">');
+                            $this->addHTML('<h3 class="relisting-detail__info-title">Listing Features</h3>');
+                        $this->addHTML('</div>');
+                        $this->addHTML('<div class="col-xs-12 col-md-9">');
+                            $this->addHTML('<p class="relisting-detail__info-content">');
+                                // $listingFeatures = array(
+                                //     'Bathrooms',
+                                //     'Parking',
+                                //     'Visitor Parking',
+                                //     'Storage',
+                                //     'Bike Storage',
+                                //     'Private Outdoor Space',
+                                //     'Fireplace',
+                                //     'In-suite Laundry',
+                                //     'Common Outdoor Space',
+                                //     'Cleaning Included',
+                                //     'Concièrge',
+                                //     'Pet Friendly'
+                                // );
+                                foreach($listingFeatures as $feature) {
+                                    $this->addHTML('<span class="relisting-detail__info-content-tag">'.$feature.'</span>');
+                                }
+                            $this->addHTML('</p>');
+                        $this->addHTML('</div>');
                     $this->addHTML('</div>');
-                    $this->addHTML('<div class="col-xs-12 col-md-9">');
-                        $this->addHTML('<p class="relisting-detail__info-content">');
-                            $this->addHTML('Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam.');
-                        $this->addHTML('</p>');
-                    $this->addHTML('</div>');
-                $this->addHTML('</div>');
-                $this->addHTML('<div class="row relisting-detail__info-row">');
-                    $this->addHTML('<div class="col-xs-12 col-md-3 relisting-detail__col-pad-right">');
-                        $this->addHTML('<h3 class="relisting-detail__info-title">Listing Features</h3>');
-                    $this->addHTML('</div>');
-                    $this->addHTML('<div class="col-xs-12 col-md-9">');
-                        $this->addHTML('<p class="relisting-detail__info-content">');
-                            $listingFeatures = array(
-                                'Bathrooms',
-                                'Parking',
-                                'Visitor Parking',
-                                'Storage',
-                                'Bike Storage',
-                                'Private Outdoor Space',
-                                'Fireplace',
-                                'In-suite Laundry',
-                                'Common Outdoor Space',
-                                'Cleaning Included',
-                                'Concièrge',
-                                'Pet Friendly'
-                            );
-                            foreach($listingFeatures as $feature) {
-                                $this->addHTML('<span class="relisting-detail__info-content-tag">'.$feature.'</span>');
-                            }
-                        $this->addHTML('</p>');
-                    $this->addHTML('</div>');
-                $this->addHTML('</div>');
-                $this->addHTML('<div class="row relisting-detail__info-row">');
-                    $this->addHTML('<div class="col-xs-12 col-md-3 relisting-detail__col-pad-right">');
-                        $this->addHTML('<h3 class="relisting-detail__info-title">Amenities</h3>');
-                    $this->addHTML('</div>');
-                    $this->addHTML('<div class="col-xs-12 col-md-9">');
-                        $this->addHTML('<p class="relisting-detail__info-content">');
-                            $listingFeatures = array(
-                                'Pool',
-                                'Steam',
-                                'Common Room',
-                                'Guest Suite',
-                                'Sauna',
-                            );
-                            foreach($listingFeatures as $feature) {
-                                $this->addHTML('<span class="relisting-detail__info-content-tag">'.$feature.'</span>');
-                            }
-                        $this->addHTML('</p>');
-                    $this->addHTML('</div>');
-                $this->addHTML('</div>');
+                }
+                // $this->addHTML('<div class="row relisting-detail__info-row">');
+                //     $this->addHTML('<div class="col-xs-12 col-md-3 relisting-detail__col-pad-right">');
+                //         $this->addHTML('<h3 class="relisting-detail__info-title">Amenities</h3>');
+                //     $this->addHTML('</div>');
+                //     $this->addHTML('<div class="col-xs-12 col-md-9">');
+                //         $this->addHTML('<p class="relisting-detail__info-content">');
+                //             $listingFeatures = array(
+                //                 'Pool',
+                //                 'Steam',
+                //                 'Common Room',
+                //                 'Guest Suite',
+                //                 'Sauna',
+                //             );
+                //             foreach($listingFeatures as $feature) {
+                //                 $this->addHTML('<span class="relisting-detail__info-content-tag">'.$feature.'</span>');
+                //             }
+                //         $this->addHTML('</p>');
+                //     $this->addHTML('</div>');
+                // $this->addHTML('</div>');
             $this->addHTML('</div>');
         $this->addHTML('</div>');
         return $this;

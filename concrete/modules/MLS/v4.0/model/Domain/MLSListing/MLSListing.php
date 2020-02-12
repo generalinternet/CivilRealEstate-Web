@@ -59,4 +59,13 @@ class MLSListing extends AbstractMLSListing {
         $string .= '</span>';
         return $string;
     }
+
+    public function getDisplaySquareFootage(){
+        $sqFt = $this->getProperty('floor_area_total');
+        if(empty($sqFt)){
+            $sqFt = $this->getProperty('lot_size_acres');
+        }
+        
+        return '<span class="amount">'.GI_StringUtils::formatFloat($sqFt).' <span class="unit right_unit">sq ft</span></span>';
+    }
 }
