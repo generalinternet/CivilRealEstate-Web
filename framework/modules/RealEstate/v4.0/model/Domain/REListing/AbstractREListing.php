@@ -586,14 +586,14 @@ abstract class AbstractREListing extends GI_Model {
                 ->filterIn('TL.tag_id', $tagIds);
     }
     
-//    public function getTagTypeTitle(){
-//        $tags = $this->getTags();
-//        if(empty($tags)){
-//            return false;
-//        }
-//        
-//        return $tags[0]->getProperty('title');
-//    }
+   public function getTagTypeTitle(){
+       $tags = $this->getTags();
+       if(empty($tags)){
+           return false;
+       }
+       
+       return $tags[0]->getProperty('title');
+   }
     
     public function getMLSListingAddress(){
         $mlsListing = $this->getMLSListing();

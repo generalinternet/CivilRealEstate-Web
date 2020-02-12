@@ -111,32 +111,59 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
                                 $this->addHTML('</p>');
                             $this->addHTML('</div>');
                             $this->addHTML('<div class="relisting-detail__highlight-row relisting-detail__highlight-row_type_features">');
-                                $this->addHTML('<div class="relisting-detail__feature-item">');
-                                    $this->addHTML('<span class="relisting-detail__feature-title">Square Footage</span>');
-                                    $this->addHTML('<span class="relisting-detail__feature-value">');
-                                        $lotSize = $this->listing->getDisplayLotSizeSqft();
-                                        $this->addHTML($lotSize);
-                                    $this->addHTML('</span>');
-                                $this->addHTML('</div>');
-                                $this->addHTML('<div class="relisting-detail__feature-item">');
-                                    $this->addHTML('<span class="relisting-detail__feature-title">Type</span>');
-                                    $this->addHTML('<span class="relisting-detail__feature-value">');
-                                    $type = $this->listing->getLinkedPropertyTypeTagTitle();
-                                    $this->addHTML($type);
-                                    $this->addHTML('</span>');
-                                $this->addHTML('</div>');
-                                $this->addHTML('<div class="relisting-detail__feature-item">');
-                                    $this->addHTML('<span class="relisting-detail__feature-title">Bathrooms</span>');
-                                    $this->addHTML('<span class="relisting-detail__feature-value">');
-                                        $this->addHTML('2');
-                                    $this->addHTML('</span>');
-                                $this->addHTML('</div>');
-                                $this->addHTML('<div class="relisting-detail__feature-item">');
-                                    $this->addHTML('<span class="relisting-detail__feature-title">Bedrooms</span>');
-                                    $this->addHTML('<span class="relisting-detail__feature-value">');
-                                        $this->addHTML('3');
-                                    $this->addHTML('</span>');
-                                $this->addHTML('</div>');
+                                $featureInfo = array(
+                                    [
+                                        'title' => 'Square Footage',
+                                        'value' => $this->listing->getDisplayLotSizeSqft()
+                                    ],
+                                    [
+                                        'title' => 'Property Type',
+                                        'value' =>  $this->listing->getLinkedPropertyTypeTagTitle()
+                                    ],
+                                    [
+                                        'title' => 'Bathrooms',
+                                        'value' => $this->listing->getProperty('mls_listing_res.total_bathrooms')
+                                    ],
+                                    [
+                                        'title' => 'Bedrooms',
+                                        'value' => $this->listing->getProperty('mls_listing_res.total_bedrooms')
+                                    ],
+                                    [
+                                        'title' => 'Type of Dwelling',
+                                        'value' => $this->listing->getTagTypeTitle()
+                                    ],
+                                    [
+                                        'title' => 'Area',
+                                        'value' => $this->listing->getAreaTitle()
+                                    ],
+                                    [
+                                        'title' => 'Sub Area',
+                                        'value' => $this->listing->getSubAreaTitle()
+                                    ],
+                                    [
+                                        'title' => 'MLS® Number',
+                                        'value' => $this->listing->getMLSNumber()
+                                    ],
+                                    [
+                                        'title' => 'Listing Brokerage',
+                                        'value' => $this->listing->getFirmName()
+                                    ],
+                                    [
+                                        'title' => 'Year Built',
+                                        'value' => $this->listing->getYearBuilt()
+                                    ],
+                                );
+                                foreach($featureInfo as $feature){
+                                    if(empty($feature['value'])){
+                                        continue;
+                                    }
+                                    $this->addHTML('<div class="relisting-detail__feature-item">');
+                                        $this->addHTML('<span class="relisting-detail__feature-title">'.$feature['title'].'</span>');
+                                        $this->addHTML('<span class="relisting-detail__feature-value">');
+                                            $this->addHTML($feature['value']);
+                                        $this->addHTML('</span>');
+                                    $this->addHTML('</div>');
+                                }
                             $this->addHTML('</div>');
                         $this->addHTML('</div>');
                     $this->addHTML('</div>');
@@ -147,14 +174,18 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
     }
 
     protected function addCTASection(){
+        $contactURL = GI_URLUtils::buildCleanURL(array(
+            'controller' => 'static',
+            'action' => 'contact-us'
+        ));
         $this->addHTML('<div class="section section_type_listing-detail-cta section_bg_primary">');
             $this->addHTML('<div class="container">');
                 $this->addHTML('<div class="row">');
                     $this->addHTML('<div class="col-xs-12 col-md-8 col-md-push-2">');
                         $this->addHTML('<h3 class="relisting-detail__cta-title">Want to know more?</h3> ');
                         $this->addHTML('<div class="relisting-detail__cta-button-wrap">');
-                            $this->addHTML('<a href="" class="button button_theme_thirdary">Contact Us Now</a>');
-                            $this->addHTML('<a href="" class="button button_theme_outline_white">Call Us  888.333.7777</a>');
+                            $this->addHTML('<a href="'.$contactURL.'" class="button button_theme_thirdary">Contact Us Now</a>');
+                            $this->addHTML('<a href="tel:'.SITE_PHONE.'" class="button button_theme_outline_white">Call Us '.SITE_PHONE.'</a>');
                         $this->addHTML('</div>');
                     $this->addHTML('</div>');
                 $this->addHTML('</div>');
@@ -173,7 +204,7 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
                     $this->addHTML('<div class="col-xs-12 col-md-9">');
                         $this->addHTML('<p class="relisting-detail__info-content">');
                             $listingPublicRemark = $this->listing->getPublicRemarks(true);
-                            $this->addHTML($listingPublicRemark);
+                            $this->addHTML(GI_StringUtils::nl2brHTML(GI_StringUtils::convertURLs($listingPublicRemark)));
                         $this->addHTML('</p>');
                     $this->addHTML('</div>');
                 $this->addHTML('</div>');

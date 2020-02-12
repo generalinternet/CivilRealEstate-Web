@@ -1,6 +1,14 @@
 <?php
 
 class RECatalogView extends AbstractRECatalogView{
+
+    function checkValue($val, $prefix = null, $surfix = null){
+        if(!empty($val)){
+            return $prefix . $val . $surfix;
+        }
+        
+        return null;
+    }
     
     protected function openListingWrap(){
         $this->addHTML('<div class="relisting-item">');
@@ -19,7 +27,21 @@ class RECatalogView extends AbstractRECatalogView{
                         $this->addListingTitle();
                     $this->addHTML('</div>');
                     $this->addHTML('<div class="relisting-item__other-fields">');
-                        $this->addHTML('<p>Detached, 4 Bedroom, 3 Bathrooms</p>');
+                        $otherField = [];
+                        $dwellingTypeTitle = $this->listing->getTagTypeTitle();
+                        if(!empty($dwellingTypeTitle)){
+                            $otherField[] = $dwellingTypeTitle;
+                        }
+                        $totalBedrooms = $this->listing->getProperty('mls_listing_res.total_bedrooms');
+                        if(!empty($totalBedrooms)){
+                            $otherField[] = $totalBedrooms.' Bedroom';
+                        }
+                        $totalBaths = $this->listing->getProperty('mls_listing_res.total_baths');
+                        if(!empty($totalBedrooms)){
+                            $otherField[] = $totalBaths.' Bathrooms';
+                        }
+                        $otherField = implode(', ', $otherField);
+                        $this->addHTML('<p>'.$otherField.'</p>');
                     $this->addHTML('</div>');
                     // $this->addSummary();
                 $this->addHTML('</div>');

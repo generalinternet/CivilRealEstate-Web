@@ -77,6 +77,8 @@
         display: flex
         &:not(:last-child)
             margin-bottom: 2em
+        &_type_features
+            flex-wrap: wrap
     &__address-wrap
         flex: 1
     &__address
@@ -96,9 +98,9 @@
         .unit
             color: $color_primary
             margin-right: 0.2em
-    //     &_type_features
     &__feature-item
-        flex: 1
+        width: 25%
+        margin-bottom: 2em
     &__feature-title
         color: $color_primary
         display: block

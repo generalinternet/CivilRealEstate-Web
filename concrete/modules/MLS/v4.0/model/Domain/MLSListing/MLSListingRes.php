@@ -27,23 +27,23 @@ class MLSListingRes extends AbstractMLSListingRes {
 //        return $realtor->getName();
 //    }
 //    
-//    public function getFirmName(){
-//        $firm = $this->getFirm();
-//        if(empty($firm)){
-//            return null;
-//        }
-//        
-//        return $firm->getName();
-//    }
-//    
-//    public function getTagTypeTitle(){
-//        $tags = $this->getTags();
-//        if(empty($tags)){
-//            return false;
-//        }
-//        
-//        return $tags[0]->getProperty('title');
-//    }
+   public function getFirmName(){
+       $firm = $this->getFirm();
+       if(empty($firm)){
+           return null;
+       }
+       
+       return $firm->getName();
+   }
+   
+   public function getTagTypeTitle(){
+       $tags = $this->getTags();
+       if(empty($tags)){
+           return false;
+       }
+       
+       return $tags[0]->getProperty('title');
+   }
 //    
 //    public function getModifyURL(){
 //        $url = GI_URLUtils::buildURL(array(
