@@ -8,7 +8,7 @@ class StaticReferralsView extends GI_View{
     public function __construct(GI_Form $referralForm = null) {
         parent::__construct();
         if(empty($referralForm)){
-            $referralForm = new GI_Form('referral');
+            $referralForm = new GI_Form('referral_form');
         }
 
         $this->form = $referralForm;

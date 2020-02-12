@@ -80,7 +80,7 @@ class StaticController extends GI_Controller {
     }
     
     public function actionReferrals($attributes){
-        $form = new GI_Form('contact_form');
+        $form = new GI_Form('referral_form');
         $form->setBotValidation(true);
         $view = new StaticReferralsView($form, $attributes);
         
