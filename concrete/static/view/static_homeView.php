@@ -71,7 +71,7 @@ class StaticHomeView extends GI_View{
                     $this->addHTML('</div>');
                     $this->addHTML('<div class="col-xs-12 col-md-10 col-md-push-1">');
                         $this->addHTML('<div class="row home-process__item-wrap">');
-                            $this->addHTML('<div class="col-xs-12 col-md-4">');
+                            $this->addHTML('<div class="col-xs-12 col-lg-4">');
                                 $this->addHTML('<div class="home-process__item home-process__item_first">');
                                     $this->addHTML('<h3 class="home-process__item-title">Step 1</h3>');
                                     $this->addHTML('<img src="resources/media/img/icon/glass-big.png" alt="'.SITE_TITLE.'" class="home-process__item-image"> ');
@@ -79,7 +79,7 @@ class StaticHomeView extends GI_View{
                                     $this->addHTML('<p class="home-process__item-description">Browse our easy-to-navigate platform listings. Or request a consultation to list your home for sale.</p>');
                                 $this->addHTML('</div>');
                             $this->addHTML('</div>');
-                            $this->addHTML('<div class="col-xs-12 col-md-4">');
+                            $this->addHTML('<div class="col-xs-12 col-lg-4">');
                                 $this->addHTML('<div class="home-process__item home-process__item_second">');
                                     $this->addHTML('<h3 class="home-process__item-title">Step 2</h3>');
                                     $this->addHTML('<img src="resources/media/img/icon/people-big.png" alt="'.SITE_TITLE.'" class="home-process__item-image"> ');
@@ -87,7 +87,7 @@ class StaticHomeView extends GI_View{
                                     $this->addHTML('<p class="home-process__item-description">Top MLS Realtors will connect with you and provide industry-leading realty services.</p>');
                                 $this->addHTML('</div>');
                             $this->addHTML('</div>');
-                            $this->addHTML('<div class="col-xs-12 col-md-4">');
+                            $this->addHTML('<div class="col-xs-12 col-lg-4">');
                                 $this->addHTML('<div class="home-process__item home-process__item_third">');
                                     $this->addHTML('<h3 class="home-process__item-title">Step 3</h3>');
                                     $this->addHTML('<img src="resources/media/img/icon/heart-big.png" alt="'.SITE_TITLE.'" class="home-process__item-image"> ');
