@@ -12,7 +12,7 @@
         "wisembly/elephant.io": "v3.3.1",
         "mobiledetect/mobiledetectlib": "2.8.26",
         "mandrill/mandrill": "1.0.55",
-        "mpdf/mpdf": "v7.0.0",
+        "mpdf/mpdf": "v8.0.5",
         "twilio/sdk": "5.15.1",
         "quickbooks/v3-php-sdk": "^5.0"
     }

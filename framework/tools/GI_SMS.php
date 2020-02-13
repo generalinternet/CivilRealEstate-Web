@@ -111,7 +111,7 @@ class GI_SMS{
     }
     
     public static function formatNumberE164($phoneNumber){
-        if(!isset($phoneNumber{3})) { return ''; }
+        if(!isset($phoneNumber[3])) { return ''; }
         //Strip out everything but numbers 
         $phoneNumber = preg_replace("/[^0-9]/", "", $phoneNumber);
         //Temp
