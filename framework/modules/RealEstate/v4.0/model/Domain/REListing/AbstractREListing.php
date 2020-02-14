@@ -1003,19 +1003,19 @@ abstract class AbstractREListing extends GI_Model {
     public static function addLocationFilterToDataSearch($location, GI_DataSearch $dataSearch){
         $dataSearch->filterGroup();
         //Address
-        $this->addAddressFilterToDataSearch($location, $dataSearch);
+        static::addAddressFilterToDataSearch($location, $dataSearch);
         $dataSearch->orIf();
         
         //Area
-        $this->addAreaFilterToDataSearch($location, $dataSearch);
+        static::addAreaFilterToDataSearch($location, $dataSearch);
         $dataSearch->orIf();
         
         //City
-        $this->addCityFilterToDataSearch($location, $dataSearch);
+        static::addCityFilterToDataSearch($location, $dataSearch);
         $dataSearch->orIf();
         
         //MLS Number
-        $this->addMLSNumberToDataSearch($location, $dataSearch);
+        static::addMLSNumberToDataSearch($location, $dataSearch);
         $dataSearch->orIf();
 
         $dataSearch->closeGroup();
@@ -1049,7 +1049,7 @@ abstract class AbstractREListing extends GI_Model {
                 ->select(true);
         if (!empty($cities)) {
             $cityIds = array_keys($cities);
-            $this->addCityIdsFilterToDataSearch($cityIds, $dataSearch);
+            static::addCityIdsFilterToDataSearch($cityIds, $dataSearch);
         }
     }
     

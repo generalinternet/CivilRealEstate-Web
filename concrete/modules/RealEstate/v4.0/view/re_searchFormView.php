@@ -51,7 +51,8 @@ class RESearchFormView extends AbstractRESearchFormView{
             'detached_home' => 'Detached Home',
             'apartment_condo' => 'Apartment / Condo',
             'estate_farm' => 'Estate / Farm',
-            'commercial' => 'Commercial'
+            'commercial' => 'Commercial',
+            'land' => 'Land'
         );
         $this->form->addField('property_type', 'checkbox', array(
             'class' => 'form__input form__input_type_checkbox',

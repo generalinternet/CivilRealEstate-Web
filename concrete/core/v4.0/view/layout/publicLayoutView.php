@@ -432,12 +432,15 @@ class PublicLayoutView extends AbstractPublicLayoutView {
             case 'search_bar':
                 $searchForm = new GI_Form('search_bar');
                 $this->addHTML('<div class="header-widget__item header-widget__item_type_search-bar">');
-                $this->addHTML('<form action="/" method="get" class="">');
-                    $this->addHTML('<div class="header-widget__search-bar-wrap">');
-                        $this->addHTML('<input type="text" class="form__input form__input_type_text" name="keyword" placeholder="Port Moody, British Columbia">');
-                        $this->addHTML('<a href="" class="button button_theme_primary">Search</a>');
-                    $this->addHTML('</div>');
-                $this->addHTML('</form>');
+                    $searchForm->addHTML('<div class="header-widget__search-bar-wrap">');
+                        $searchForm->addField('keyword', 'text', array(
+                            'class' => 'form__input form__input_type_text',
+                            'placeHolder' => 'Port Moody, British Columbia',
+                            'displayName' => ''
+                        ));
+                        $searchForm->addHTML('<a href="" class="submit_btn button button_theme_primary">Search</a>');
+                    $searchForm->addHTML('</div>');
+                    $this->addHTML($searchForm->getForm());
                 $this->addHTML('</div>');
                 break;
 
