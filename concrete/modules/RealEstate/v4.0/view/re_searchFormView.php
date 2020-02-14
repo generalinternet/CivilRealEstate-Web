@@ -43,7 +43,7 @@ class RESearchFormView extends AbstractRESearchFormView{
     }
     
     protected function addPriceField(){
-        $this->addRangeField('Price (in CAD)', 'price');
+        $this->addRangeField('Price (in CAD)', 'search_price');
     }
 
     protected function addPropertyTypeField(){
@@ -54,15 +54,16 @@ class RESearchFormView extends AbstractRESearchFormView{
             'commercial' => 'Commercial',
             'land' => 'Land'
         );
-        $this->form->addField('property_type', 'checkbox', array(
+        $this->form->addField('search_property_type', 'checkbox', array(
             'class' => 'form__input form__input_type_checkbox',
             'displayName' => "Property Type",
-            'options'=> $options
+            'options'=> $options,
+            'value' => $this->getQueryValue('property_type')
         ));
     }
 
     protected function addAreaField(){
-        $this->addRangeField('Area (in sqft)', 'area');
+        $this->addRangeField('Area (in sqft)', 'search_area');
     }
 
     protected function addPropertyStatusField(){
@@ -115,7 +116,7 @@ class RESearchFormView extends AbstractRESearchFormView{
         $this->form->addField('features', 'checkbox', array(
             'class' => 'form__input form__input_type_checkbox',
             'displayName' => "Features",
-            'options'=> $options
+            'options'=> $options,
         ));
     }
 
@@ -124,7 +125,7 @@ class RESearchFormView extends AbstractRESearchFormView{
             $this->form->addHTML('<label class="main">'.$title.'</label>');
             $this->form->addHTML('<div class="field_content">');
                 $this->form->addHTML('<div class="form__input-wrap">');
-                    $this->form->addField('min_'.$name, 'dropdown', array(
+                    $this->form->addField($name.'_min', 'dropdown', array(
                         'class' => 'form__input form__input_type_dropdown',
                         'placeHolder' => 'Min',
                         'options' => array(
@@ -134,7 +135,7 @@ class RESearchFormView extends AbstractRESearchFormView{
                             '400' => 400,
                         )
                     ));
-                    $this->form->addField('max_'.$name, 'dropdown', array(
+                    $this->form->addField($name.'_max', 'dropdown', array(
                         'class' => 'form__input form__input_type_dropdown',
                         'placeHolder' => 'Max',
                         'options' => array(

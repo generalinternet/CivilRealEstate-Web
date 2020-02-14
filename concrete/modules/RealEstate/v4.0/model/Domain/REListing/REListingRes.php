@@ -24,16 +24,6 @@ class REListingRes extends AbstractREListingRes {
                     ->closeGroup();
             }
         }
-
-        $reSearchForm = new GI_Form('real_estate_search');
-        if($reSearchForm->wasSubmitted() && $reSearchForm->validate()){
-            $propertyTypes = filter_input(INPUT_POST, 'property_type', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
-            if(!empty($propertyTypes)){
-                $reListingResTypeName = REListingFactory::getDbPrefix().'re_listing_res_type';
-                $dataSearch->join($reListingResTypeName, $tableName.'.re_listing_type_id', $reListingResTypeName, 'id', 'left');
-                $dataSearch->filterIn($reListingResTypeName.'.title', $propertyTypes);
-            }
-        }
     }
 
     /**
@@ -68,4 +58,48 @@ class REListingRes extends AbstractREListingRes {
         return $searchView;
     }
 
+    /**
+     * @param GI_DataSearch $dataSearch
+     * @param GI_Form $form
+     * @return boolean
+     */
+    protected static function filterSearchForm(GI_DataSearch $dataSearch, GI_Form $form = NULL){
+        $priceMin = $dataSearch->getSearchValue('price_min');
+        $priceMax = $dataSearch->getSearchValue('price_max');
+
+        if(!empty($priceMin) || !empty($priceMax)){
+            static::addPriceFilterToDataSearch($dataSearch, $priceMin, $priceMax);
+        }
+
+        $propertyType = $dataSearch->getSearchValue('property_type');
+        if(!empty($propertyType) && $propertyType != 'NULL'){
+            static::addPropertyTypeFilterToDataSearch($propertyType, $dataSearch);
+        }
+
+        $floorArea = $dataSearch->getSearchValue('floor_area');
+        if(!empty($floorArea) && $floorArea != 'NULL'){
+            static::addFloorAreaFilterToDataSearch($floorArea, $dataSearch);
+        }
+        
+        if(!is_null($form) && $form->wasSubmitted() && $form->validate()){
+
+            $priceMin = filter_input(INPUT_POST, 'search_price_min');
+            $dataSearch->setSearchValue('price_min', $priceMin);
+
+            $priceMax = filter_input(INPUT_POST, 'search_price_max');
+            $dataSearch->setSearchValue('price_max', $priceMax);
+
+            $propertyType = filter_input(INPUT_POST, 'search_property_type', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
+            $dataSearch->setSearchValue('property_type', $propertyType);
+
+            $searchAreaMin = filter_input(INPUT_POST, 'search_area_min');
+            $dataSearch->setSearchValue('floor_area', $searchAreaMin);
+
+            $searchAreaMax = filter_input(INPUT_POST, 'search_area_max');
+            $dataSearch->setSearchValue('floor_area', $searchAreaMax);
+
+        }
+
+        return true;
+    }
 }
