@@ -839,4 +839,16 @@ class GI_Time{
         return false;
     }
     
+    public static function isSameDay($dateTimeString1, $dateTimeString2) {
+        if (empty($dateTimeString1) || empty($dateTimeString2)) {
+            return false;
+        }
+        $dateTime1 = new DateTime($dateTimeString1);
+        $dateTime2 = new DateTime($dateTimeString2);
+        if ($dateTime1->format('Y-m-d') === $dateTime2->format('Y-m-d')) {
+            return true;
+        }
+        return false;
+    }
+    
 }

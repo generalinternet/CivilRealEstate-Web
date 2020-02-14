@@ -244,18 +244,28 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
     
     protected function addUserBar(){
         if (!empty($this->currentUser)) {
-            $userLink = GI_URLUtils::buildURL(array(
-                'controller' => 'user',
-                'action' => 'view',
-                'id' => Login::getUserId(),
-                'profile' => 1
-            ));
-            
+//            $userLink = GI_URLUtils::buildURL(array(
+//                'controller' => 'user',
+//                'action' => 'view',
+//                'id' => Login::getUserId(),
+//                'profile' => 1
+//            ));
+            $userLink = '';
+            $user = Login::getUser();
+            if (!empty($user)) {
+                $contactOrg = $user->getContactOrg();
+                if (!empty($contactOrg)) {
+                    $userLinkAttrs = $contactOrg->getProfileViewURLAttrs();
+                    $userLinkAttrs['tab'] = 'my_settings';
+                    $userLink = GI_URLUtils::buildURL($userLinkAttrs);
+                }
+            }
+
             $this->addHTML('<div id="user_bar">');
             $this->addHTML('<a href="' . $userLink . '">');
             $this->addHTML('<span class="user_name">' . $this->currentUser->getFullName() . '</span>');
             $this->addHTML('<span class="user_email">' . $this->currentUser->getProperty('email') . '</span>');
-            
+
             if($this->notificationCountPos == 'user_bar'){
                 $this->addNotificationCount();
             }
@@ -972,13 +982,19 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
                         'action' => 'index',
                         'type' => 'vendor',
             ));
-            $this->menuView->addMenuItem('main', $this->getMenuTextWithSVGIcon('contacts', 'Vendors'), $vendorURL);
+            $this->menuView->addMenuItem('main', $this->getMenuTextWithSVGIcon('vendor', 'Vendors'), $vendorURL);
         }
     }
 
     protected function addInternalMenu() {
         if (dbConnection::isModuleInstalled('contact') && Permission::verifyByRef('view_contact_internal_index')) {
-            $this->menuView->addMenuItem('main', $this->getMenuTextWithSVGIcon('contacts', 'My Company'));
+                        $myCompanyURL = GI_URLUtils::buildURL(array(
+                        'controller' => 'contactprofile',
+                        'action' => 'index',
+                        'type' => 'internal',
+            ));
+            
+            $this->menuView->addMenuItem('main', $this->getMenuTextWithSVGIcon('building', 'My Company'), $myCompanyURL);
         }
     }
 
@@ -1597,12 +1613,22 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
     }
     
     protected function addAccountMenu() {
-        $myProfileURL = GI_URLUtils::buildURL(array(
-                'controller' => 'user',
-                'action' => 'view',
-                'id' => Login::getUserId(),
-                'profile' => 1
-            ));
+//        $myProfileURL = GI_URLUtils::buildURL(array(
+//                'controller' => 'user',
+//                'action' => 'view',
+//                'id' => Login::getUserId(),
+//                'profile' => 1
+//            ));
+        $myProfileURL = '';
+        $user = Login::getUser();
+        if (!empty($user)) {
+            $contactOrg = $user->getContactOrg();
+            if (!empty($contactOrg)) {
+                $userLinkAttrs = $contactOrg->getProfileViewURLAttrs();
+                $userLinkAttrs['tab'] = 'my_settings';
+                $myProfileURL = GI_URLUtils::buildURL($userLinkAttrs);
+            }
+        }
 
         $this->menuView->addMenuItem('main', $this->getMenuTextWithSVGIcon('account', 'My Account'), $myProfileURL, array('linkClass' => 'login_bar_menu login_bar_menu_start'));
 

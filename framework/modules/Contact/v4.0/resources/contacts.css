@@ -10,10 +10,14 @@
 .public_profile_wrap{
     border-top: 10px solid #ccc;
 }
+.public_profile_contact_info_wrap{
+    margin-bottom: 0.5em;
+}
 .public_profile_contact_info{
     display: inline-block;
     margin-bottom: 0.5em;
 }
+.public_profile_contact_info_wrap:last-child,
 .public_profile_contact_info:last-child{
     margin-bottom: 0;
 }

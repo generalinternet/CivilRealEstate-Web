@@ -580,5 +580,17 @@ abstract class AbstractContactInd extends AbstractContact {
         }
         return false;
     }
+    
+        /** Profile */
+    public function getProfileListBarURL($otherAttributes = NULL) {
+        if (!$this->isIndexViewable()) {
+            return NULL;
+        }
+        $parentContactOrg = $this->getParentContactOrg();
+        if (empty($parentContactOrg)) {
+            return '';
+        }
+        return $parentContactOrg->getProfileListBarURL();
+    }
 
 }

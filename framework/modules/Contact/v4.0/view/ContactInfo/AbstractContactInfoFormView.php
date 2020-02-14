@@ -70,7 +70,7 @@ class AbstractContactInfoFormView extends GI_View {
         $this->form->addHTML('<div class="contact_info ' . $contactInfoClass . '">');
         $this->form->addHTML('<div class="contact_info_fields">');
         if($removable){
-            $this->form->addHTML('<span class="remove_contact_info custom_btn gray">'.GI_StringUtils::getIcon('remove_sml').'</span>');
+            $this->form->addHTML('<span class="remove_contact_info custom_btn">'.GI_StringUtils::getIcon('remove_sml').'</span>');
             $this->form->addHTML('<input name="' . $this->pType . '[]" value="' . $fieldSuffix . '" type="hidden" class="seq_count"/>');
             $this->form->addField($this->pType . '_id_' . $fieldSuffix, 'hidden', array(
                 'value' => $this->contactInfo->getId(),

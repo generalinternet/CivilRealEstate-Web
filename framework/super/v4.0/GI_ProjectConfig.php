@@ -897,7 +897,7 @@ abstract class GI_ProjectConfig {
     }
 
     public static function getStripeSecretKey() {
-        if (DEV_MODE) {
+        if (DEV_MODE || STAGING_MODE) {
             if (defined('STRIPE_SECRET_KEY')) {
                 return STRIPE_SECRET_KEY;
             }
@@ -908,7 +908,7 @@ abstract class GI_ProjectConfig {
     }
 
     public static function getStripePublishableKey() {
-        if (DEV_MODE) {
+        if (DEV_MODE || STAGING_MODE) {
             if (defined('STRIPE_PUBLISHABLE_KEY')) {
                 return STRIPE_PUBLISHABLE_KEY;
             }
@@ -959,6 +959,13 @@ abstract class GI_ProjectConfig {
             return ROOT_USER_EMAIL;
         }
         return NULL;
+    }
+
+    public static function getBypassLiveOTP() {
+        if (defined('BYPASS_LIVE_OTP')) {
+            return BYPASS_LIVE_OTP;
+        }
+        return false;
     }
 
 }

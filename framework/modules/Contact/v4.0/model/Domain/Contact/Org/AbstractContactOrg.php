@@ -41,6 +41,7 @@ abstract class AbstractContactOrg extends AbstractContact {
         $this->primaryIndividual = $contactInd;
     }
 
+    /** @return AbstractContactInd[] */
     public function getChildContactInds() {
         if (is_null($this->childContactInds)) {
             $search = ContactFactory::search();
@@ -355,10 +356,10 @@ abstract class AbstractContactOrg extends AbstractContact {
         if (empty($contactCat)) {
             return false;
         }
-        $companyName = filter_input(INPUT_POST, 'company_name');
-        $displayName = filter_input(INPUT_POST, 'display_name');
-        $firstName = filter_input(INPUT_POST, 'first_name');
-        $lastName = filter_input(INPUT_POST, 'last_name');
+        $companyName = trim(filter_input(INPUT_POST, 'company_name'));
+        $displayName = trim(filter_input(INPUT_POST, 'display_name'));
+        $firstName = trim(filter_input(INPUT_POST, 'first_name'));
+        $lastName = trim(filter_input(INPUT_POST, 'last_name'));
 
         $this->setProperty('display_name', $displayName);
         $this->setProperty('contact_org.title', $companyName);
@@ -501,20 +502,29 @@ abstract class AbstractContactOrg extends AbstractContact {
     }
 
     public function getIsViewable() {
-        if (Permission::verifyByRef('view_contacts') || $this->getProperty('uid') == Login::getUserId()) {
-            return true;
-        }
+//        if (Permission::verifyByRef('view_contacts') || $this->getProperty('uid') == Login::getUserId()) {
+//            return true;
+//        }
+//        if ($this->getIsUserLinkedToThis()) {
+//            return true;
+//        }
+//        return parent::getIsViewable();
+
         if ($this->getIsUserLinkedToThis()) {
             return true;
         }
+        $contactCat = $this->getContactCat();
+        if (!empty($contactCat)) {
+            return $contactCat->isViewable();
+        }
         return parent::getIsViewable();
     }
-    
-        public function getIsEditable() {
-            if(Permission::verifyByRef('edit_contacts') || $this->getProperty('uid') == Login::getUserId()){
-                return true;
-            }
-            if ($this->getIsUserLinkedToThis()) {
+
+    public function getIsEditable() {
+        if (Permission::verifyByRef('edit_contacts') || $this->getProperty('uid') == Login::getUserId()) {
+            return true;
+        }
+        if ($this->getIsUserLinkedToThis()) {
                 return true;
             }
             return parent::getIsEditable();

@@ -19,7 +19,9 @@ abstract class AbstractContactApplicationFormView extends MainWindowView {
         parent::__construct();
         $this->form = $form;
         $this->application = $application;
-        $this->addJS('framework/modules/Contact/v4.0/resources/application/contact_application.js');
+        $this->addJS('framework/modules/Contact/' . MODULE_CONTACT_VER . '/resources/application/contact_application.js');
+        $this->setViewWrapClass('profile_form');
+        $this->addCSS('https://cdnjs.cloudflare.com/ajax/libs/paymentfont/1.1.2/css/paymentfont.min.css');
     }
 
     public function buildForm(AbstractContactApplicationStatus $status) {
@@ -42,13 +44,18 @@ abstract class AbstractContactApplicationFormView extends MainWindowView {
 
     protected function addBackButton($label = 'back') {
         $backURL = $this->backButtonURL;
+        $preIcon = GI_StringUtils::getSVGIcon('bird_beak_left');
         if (!empty($backURL)) {
-            $this->form->addHTML('<a class="other_btn gray" href="' . $backURL. '">'.$label.'</a>');
+            $this->form->addHTML('<a class="other_btn gray" href="' . $backURL. '" title="'.ucwords($label).'">' . $preIcon . '<span class="btn_text">'.ucwords($label).'</span></a>');
         }
     }
     
     protected function addSubmitButton($label = 'next') {
-        $this->form->addHTML('<span class="submit_btn">'.$label.'</span>');
+        $postIcon = GI_StringUtils::getSVGIcon('bird_beak_right');
+//        if($label == 'Next'){
+//            $postIcon = NULL;
+//        }
+        $this->form->addHTML('<span class="submit_btn"><span class="btn_text">'.ucwords($label).'</span>' . $postIcon . '</span>');
     }
 
 

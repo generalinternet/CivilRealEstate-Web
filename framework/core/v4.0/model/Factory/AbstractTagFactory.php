@@ -194,7 +194,9 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
         $tagId = $tag->getId();
 
         $existingSearch = new GI_DataSearch('item_link_to_tag');
-        $existingSearch->setDBType($dbType);
+        if(!empty($dbType)){
+            $existingSearch->setDBType($dbType);
+        }
         $existingSearch->filter('item_id', $itemId)
                 ->filter('table_name', $tableName)
                 ->filter('tag_id', $tagId)
@@ -213,9 +215,11 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
             return true;
         } else {
             $defaultDAOClass = ApplicationConfig::getProperty('defaultDAOClass');
-            $tagLink = new $defaultDAOClass('item_link_to_tag', array(
-                'dbType' => $dbType
-            ));
+            $options = array();
+            if(!empty($dbType)){
+                $options['dbType'] = $dbType;
+            }
+            $tagLink = new $defaultDAOClass('item_link_to_tag', $options);
             $tagLink->setProperty('table_name', $tableName);
             $tagLink->setProperty('item_id', $itemId);
             $tagLink->setProperty('tag_id', $tagId);
@@ -233,7 +237,9 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
         $itemId = $model->getId();
         $tagId = $tag->getId();
         $search = new GI_DataSearch('item_link_to_tag');
-        $search->setDBType($dbType);
+        if(!empty($dbType)){
+            $search->setDBType($dbType);
+        }
         $search->filter('table_name', $tableName);
         $search->filter('item_id', $itemId);
         $search->filter('tag_id', $tagId);
@@ -255,10 +261,12 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
     /**
      * @param GI_Model $model
      * @param AbstractTag[] $tags
+     * @param string $dbType
+     * @param string $contextRef
      * @return boolean
      */
-    public static function adjustTagsOnModel(GI_Model $model, $tags = array()){
-        $existingTags = static::getByModel($model);
+    public static function adjustTagsOnModel(GI_Model $model, $tags = array(), $dbType = 'client', $contextRef = ''){
+        $existingTags = static::getByModel($model, true, $dbType, NULL, false, $contextRef);
         if (empty($existingTags)) {
             $existingTags = array();
         }
@@ -273,7 +281,7 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
                 if (isset($tagsToRemove[$tagId])) {
                     unset($tagsToRemove[$tagId]);
                 } else {
-                    $result = static::linkModelAndTag($model, $tag);
+                    $result = static::linkModelAndTag($model, $tag, $dbType, $contextRef);
                     if (!$result) {
                         return false;
                     }
@@ -281,7 +289,7 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
             }
         }
         foreach ($tagsToRemove as $tagToRemove) {
-            if (!static::unlinkModelAndTag($model, $tagToRemove)) {
+            if (!static::unlinkModelAndTag($model, $tagToRemove, $dbType, $contextRef)) {
                 return false;
             }
         }
@@ -342,12 +350,13 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
     
     /**
      * @param GI_Form $form
-     * @return TagListFormView
+     * @param GI_Model $model
+     * @param string $typeRef
+     * @return AbstractTagListFormView
      */
-    public static function getTagListFormView($form, GI_Model $model, $typeRef) {
-        $existingTags = static::getByModel($model, true);
-        $allTags = static::getByRef($typeRef);
-        $tagListFormView = new TagListFormView($form, $allTags, $existingTags);
+    public static function getTagListFormView(GI_Form $form, GI_Model $model, $typeRef) {
+        $tagListFormView = new TagListFormView($form, $model);
+        $tagListFormView->setTagType($typeRef);
         return $tagListFormView;
     }
     
@@ -474,21 +483,103 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
     }
     
     public static function getTagIdChildTree($tagId, &$childTree = array()){
-        //@todo when upgraded to MySQL 8 and MariaDB 10.2 update this method to use a CTE recursive query
-        $search = new GI_DataSearch('tag_link_to_tag');
-        $search->filter('p_tag_id', $tagId);
-        $search->setSelectColumns(array(
-            'c_tag_id'
-        ));
-        $results = $search->select();
-        $childIds = array_map('intval', array_column($results, 'c_tag_id'));
-        if(!empty($childIds)){
-            $childTree = array_merge($childTree, $childIds);
-            foreach($childIds as $childId){
-                $childTree = array_merge($childTree, static::getTagIdChildTree($childId));
+        //QUERY BELOW REQUIRES AT LEAST MYSQL 8.0
+        $dbType = static::getDBType();
+        $dbConnection = dbConnection::getInstance($dbType);
+        if(!$dbConnection){
+            return false;
+        }
+        
+        $dbPrefix = dbConfig::getDbPrefix($dbType);
+        
+        $finalQuery = 'WITH RECURSIVE TAG_LINK_CTE (c_tag_id, p_tag_id) AS (';
+	$finalQuery .= 'SELECT c_tag_id, p_tag_id ';
+	$finalQuery .= 'FROM ' . $dbPrefix . 'tag_link_to_tag ';
+	$finalQuery .= 'WHERE p_tag_id = 229 ';
+	$finalQuery .= 'UNION ALL ';
+	$finalQuery .= 'SELECT TAG_LINK.c_tag_id, TAG_LINK.p_tag_id ';
+	$finalQuery .= 'FROM ' . $dbPrefix . 'tag_link_to_tag TAG_LINK ';
+	$finalQuery .= 'INNER JOIN TAG_LINK_CTE ';
+	$finalQuery .= 'ON TAG_LINK.p_tag_id = TAG_LINK_CTE.c_tag_id ';
+	$finalQuery .= ') ';
+	$finalQuery .= 'SELECT * FROM TAG_LINK_CTE;';
+        try {
+            $req = $dbConnection->query($finalQuery);
+            $results = $req->fetch_all(MYSQLI_ASSOC);
+            $childTree = array_map('intval', array_column($results, 'c_tag_id'));
+        } catch (mysqli_sql_exception $ex) {
+            if (DEV_MODE) {
+                print_r($ex->getMessage());
+                die();
             }
+            return false;
         }
         return $childTree;
+        
+//        $search = new GI_DataSearch('tag_link_to_tag');
+//        $search->filter('p_tag_id', $tagId);
+//        $search->setSelectColumns(array(
+//            'c_tag_id'
+//        ));
+//        $results = $search->select();
+//        $childIds = array_map('intval', array_column($results, 'c_tag_id'));
+//        if(!empty($childIds)){
+//            $childTree = array_merge($childTree, $childIds);
+//            foreach($childIds as $childId){
+//                $childTree = array_merge($childTree, static::getTagIdChildTree($childId));
+//            }
+//        }
+//        return $childTree;
+    }
+    
+    public static function getTagIdParentTree($tagId, &$parentTree = array()){
+        //QUERY BELOW REQUIRES AT LEAST MYSQL 8.0
+        $dbType = static::getDBType();
+        $dbConnection = dbConnection::getInstance($dbType);
+        if(!$dbConnection){
+            return false;
+        }
+        
+        $dbPrefix = dbConfig::getDbPrefix($dbType);
+        
+        $finalQuery = 'WITH RECURSIVE TAG_LINK_CTE (c_tag_id, p_tag_id) AS (';
+	$finalQuery .= 'SELECT c_tag_id, p_tag_id ';
+	$finalQuery .= 'FROM ' . $dbPrefix . 'tag_link_to_tag ';
+	$finalQuery .= 'WHERE p_tag_id = 229 ';
+	$finalQuery .= 'UNION ALL ';
+	$finalQuery .= 'SELECT TAG_LINK.c_tag_id, TAG_LINK.p_tag_id ';
+	$finalQuery .= 'FROM ' . $dbPrefix . 'tag_link_to_tag TAG_LINK ';
+	$finalQuery .= 'INNER JOIN TAG_LINK_CTE ';
+	$finalQuery .= 'ON TAG_LINK.c_tag_id = TAG_LINK_CTE.p_tag_id ';
+	$finalQuery .= ') ';
+	$finalQuery .= 'SELECT * FROM TAG_LINK_CTE;';
+        try {
+            $req = $dbConnection->query($finalQuery);
+            $results = $req->fetch_all(MYSQLI_ASSOC);
+            $parentTree = array_map('intval', array_column($results, 'p_tag_id'));
+        } catch (mysqli_sql_exception $ex) {
+            if (DEV_MODE) {
+                print_r($ex->getMessage());
+                die();
+            }
+            return false;
+        }
+        return $parentTree;
+        
+//        $search = new GI_DataSearch('tag_link_to_tag');
+//        $search->filter('c_tag_id', $tagId);
+//        $search->setSelectColumns(array(
+//            'p_tag_id'
+//        ));
+//        $results = $search->select();
+//        $parentIds = array_map('intval', array_column($results, 'p_tag_id'));
+//        if(!empty($parentIds)){
+//            $parentTree = array_merge($parentTree, $parentIds);
+//            foreach($parentIds as $parentId){
+//                $parentTree = array_merge($parentTree, static::getTagIdParentTree($parentId));
+//            }
+//        }
+//        return $parentTree;
     }
     
 }

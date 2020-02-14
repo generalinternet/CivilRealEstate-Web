@@ -9,6 +9,7 @@
 abstract class AbstractStripePaymentProcessor extends AbstractPaymentProcessor {
 
     protected $stripeCustomerObject = NULL;
+    protected $stripeSubscriptionObjects = array();
     protected $stripeCustomerId = NULL;
     
     protected static $settingsPaymentTypeRef = 'payment_stripe';
@@ -173,11 +174,41 @@ abstract class AbstractStripePaymentProcessor extends AbstractPaymentProcessor {
             if (!$settings->save()) {
                 return false;
             }
-            
-            
+
+
             return true;
         }
         return false;
+    }
+
+    public function validateCreditCardForm(GI_Form $form) {
+        if ($this->creditCardFormValidated) {
+            return true;
+        }
+        if ($form->wasSubmitted() && $form->validate()) {
+            $errors = 0;
+            
+            $name = filter_input(INPUT_POST, 'name');
+            if (empty($name)) {
+                $form->addFieldError('name', 'required_field', 'Cardholder Name is Required');
+                $errors++;
+            }
+            
+            $postalCode = filter_input(INPUT_POST, 'addr_region');
+            if (empty($postalCode)) {
+                $form->addFieldError('addr_reqion', 'required_field', 'Postal Code is Required');
+                $errors++;
+            }
+            
+            
+            if ($errors > 0) {
+                $this->creditCardFormValidated = false;
+            } else {
+                $this->creditCardFormValidated = true;
+            }
+            
+        }
+        return $this->creditCardFormValidated;
     }
 
     protected function saveNewStripeCustomerWithCard($stripeToken, $name, $email, $settings) {
@@ -437,7 +468,10 @@ abstract class AbstractStripePaymentProcessor extends AbstractPaymentProcessor {
         return NULL;
     }
 
-    public function subscribeCustomerToPaymentPlan(AbstractSubscriptionStripe $subscription) {
+    public function subscribeCustomerToPaymentPlan(AbstractSubscriptionStripe $subscription, $trialPeriodDays = NULL) {
+        if (is_null($trialPeriodDays)) {
+            $trialPeriodDays = $subscription->getTrialPeriodDays();
+        }
         $planId = $subscription->getProperty('subscription_stripe.stripe_plan_id');
         if (empty($planId)) {
             return false;
@@ -464,6 +498,7 @@ abstract class AbstractStripePaymentProcessor extends AbstractPaymentProcessor {
                 $stripeSubscription = \Stripe\Subscription::create([
                             'customer' => $stripeCustId,
                             'items' => [['plan' => $planId]],
+                            'trial_period_days' => $trialPeriodDays,
                 ]);
             } catch (Exception $ex) {
                 return false;
@@ -471,12 +506,24 @@ abstract class AbstractStripePaymentProcessor extends AbstractPaymentProcessor {
             }
             $subId = $stripeSubscription->id;
             $subscription->setStripeSubscriptionId($contact, $subId);
-            
+
             $chargesCacheKey = $this->getChargesCacheKey();
             if (!empty($chargesCacheKey)) {
                 apcu_delete($chargesCacheKey);
             }
-            
+        } else {
+            $stripeSubId = $subscription->getStripeSubscriptionId($contact);
+            if (empty($stripeSubId)) {
+                return true;
+            }
+            try {
+                \Stripe\Subscription::update(
+                        $stripeSubId,
+                        ['cancel_at_period_end' => false]
+                );
+            } catch (Exception $ex) {
+                return false;
+            }
         }
         return true;
     }
@@ -535,15 +582,68 @@ abstract class AbstractStripePaymentProcessor extends AbstractPaymentProcessor {
             return true;
         }
         try {
-            $sripeSub = \Stripe\Subscription::retrieve(
-                            $stripeSubId
-            );
-            $sripeSub->cancel();
+            if ($subscription->isFree()) {
+                $sripeSub = \Stripe\Subscription::retrieve(
+                                $stripeSubId
+                );
+                $sripeSub->cancel();
+            } else {
+                \Stripe\Subscription::update(
+                        $stripeSubId,
+                        ['cancel_at_period_end' => true]
+                );
+            }
         } catch (Exception $ex) {
             return false;
         }
-        $subscription->setStripeSubscriptionId($contact, '');
+        //    $subscription->setStripeSubscriptionId($contact, '');
         return true;
+    }
+
+    public function getStripeSubscriptionObject(AbstractSubscriptionStripe $subscription) {
+        if (empty($this->stripeSubscriptionObjects) || !isset($this->stripeSubscriptionObjects[$subscription->getId()])) {
+            $contact = $this->getContact();
+            if (empty($contact)) {
+                return false;
+            }
+            $stripeSubId = $subscription->getStripeSubscriptionId($contact);
+            if (empty($stripeSubId)) {
+                return true;
+            }
+            try {
+                $sripeSub = \Stripe\Subscription::retrieve(
+                                $stripeSubId
+                );
+                $this->stripeSubscriptionObjects[$subscription->getId()] = $sripeSub;
+            } catch (Exception $ex) {
+                return NULL;
+            }
+        }
+        return $this->stripeSubscriptionObjects[$subscription->getId()];
+    }
+    
+    /**
+     * @param AbstractSubscriptionStripe $subscription
+     * @return DateTime[]
+     */
+    public function getStripeSubscriptionBillingPeriodDates(AbstractSubscriptionStripe $subscription) {
+        $dates = array();
+        $stripeSubscriptionObject = $this->getStripeSubscriptionObject($subscription);
+        if (!empty($stripeSubscriptionObject)) {
+            $startTimestamp = $stripeSubscriptionObject->current_period_start;
+            if (!empty($startTimestamp)) {
+                $startDateTime = new DateTime("@$startTimestamp");
+                GI_Time::getUserTimezone($startDateTime);
+                $dates['start'] = $startDateTime;
+            }
+            $endTimestamp = $stripeSubscriptionObject->current_period_end;
+            if (!empty($endTimestamp)) {
+                $endDateTime = new DateTime("@$endTimestamp");
+                GI_Time::getUserTimezone($endDateTime);
+                $dates['end'] = $endDateTime;
+            }
+        }
+        return $dates;
     }
 
     public function getChargeHistoryView() {
@@ -555,4 +655,145 @@ abstract class AbstractStripePaymentProcessor extends AbstractPaymentProcessor {
         return $view;
     }
     
+    public function getStripeEventObject($eventId) {
+        try {
+            $event = \Stripe\Event::retrieve($eventId);
+            if (!empty($event)) {
+                return $event;
+            }
+        } catch (Exception $ex) {
+            return NULL;
+        }
+        return NULL;
+    }
+
+    public function processEventData(\Stripe\Event $stripeEventObject) {
+        $custId = $stripeEventObject->data->object->customer;
+        if (!empty($custId)) {
+            $contact = $this->getContactByStripeCustomerId($custId);
+            if (empty($contact)) {
+                return false;
+            }
+            $this->setContact($contact);
+        }
+
+        $eventType = $stripeEventObject->type;
+        
+        switch ($eventType) {
+            case 'customer.deleted':
+                $contact = $this->getContact();
+                if (empty($contact)) {
+                    return;
+                }
+                $this->notifyAdminsOfBillingIssue($stripeEventObject);
+                break;
+            case 'plan.deleted':
+                $this->notifyAdminsOfBillingIssue($stripeEventObject);
+                break;
+            case 'charge.succeeded':
+                $contact = $this->getContact();
+                if (empty($contact)) {
+                    return false;
+                }
+                $chargesCacheKey = $this->getChargesCacheKey();
+                if (empty($chargesCacheKey)) {
+                    return NULL;
+                }
+                if (apcu_exists($chargesCacheKey)) {
+                    apcu_delete($chargesCacheKey);
+                }
+                $suspensionSearch = SuspensionFactory::search();
+                $suspensionSearch->filterByTypeRef('non_payment')
+                        ->filter('contact_id', $contact->getId())
+                        ->filter('active', 1)
+                       // ->filter('system', 1)
+                       ->filterGreaterThan('start_date_time', GI_Time::getDateTime());
+                $suspensionsToRemove = $suspensionSearch->select();
+                if (!empty($suspensionsToRemove)) {
+                    foreach ($suspensionsToRemove as $suspensionToRemove) {
+                        $suspensionToRemove->setOverrideDeletePermission(true);
+                        $suspensionToRemove->softDelete();
+                    }
+                }
+                break;
+            case 'charge.failed':
+                $contact = $this->getContact();
+                if (empty($contact)) {
+                    return false;
+                }
+                $suspension = SuspensionFactory::buildNewModel('non_payment');
+                $todayDateTime = new DateTime(GI_Time::getDateTime());
+                $todayDateTime->modify("+30 days"); //TODO remove/change
+                $suspension->setProperty('start_date_time', $todayDateTime->format('Y-m-d H:i:s'));
+                $suspension->setProperty('contact_id', $contact->getId());
+                $suspension->setProperty('active', 1);
+                $suspension->setProperty('system', 1);
+                $suspension->setProperty('Automated Payment Failed on ' . GI_Time::getDate() . ' Please contact support at ' . ProjectConfig::getSupportEmail() . ' immediately');
+                if (!$suspension->save()) {
+                    return false;
+                }
+                
+                //TODO - send email to customer - charge failed -  stripe may handle this
+
+                $this->notifyAdminsOfBillingIssue($stripeEventObject);
+                break;
+            default:
+                break;
+        }
+    }
+
+    protected function notifyAdminsOfBillingIssue($stripeEventObject) {
+        //TODO - use new event type
+        //send to all system admins
+
+        $eventType = $stripeEventObject->type;
+
+
+        switch ($eventType) {
+            case 'customer.deleted':
+                $event = EventFactory::getModelByRefAndTypeRef('processor_error', 'payment');
+                $event->setNotificationSubject('Immediate Attention Required');
+                //TODO - improve message
+                $event->setNotificationMessage('A customer has been manually removed from your Stripe account that still exists in your system. This will prevent the customer from being billed approriately. Please contact tech support immediately.');
+                EventService::addEvent($event);
+                break;
+            case 'plan.deleted':
+                $event = EventFactory::getModelByRefAndTypeRef('processor_error', 'payment');
+                $event->setNotificationSubject('Immediate Attention Required');
+                //TODO - improve message
+                $event->setNotificationMessage('A payment plan has been manually removed from your Stripe account that still exists in your system. This will prevent all customers with this plan from being billed approriately. Please contact tech support immediately.');
+                EventService::addEvent($event);
+                break;
+
+            case 'charge.failed':
+                $contact = $this->getContact();
+                if (empty($contact)) {
+                    return false;
+                }
+
+                break;
+            default:
+                break;
+        }
+        EventService::processEvents();
+    }
+
+    protected function getContactByStripeCustomerId($stripeCustomerId) {
+        $search = ContactFactory::search();
+        $tableName = $search->prefixTableName('contact');
+        $search->join('settings_payment', 'contact_id', $tableName, 'id', 'SP');
+        $search->join('settings_payment_stripe', 'parent_id', 'SP', 'id', 'SPS');
+        $search->filter('SPS.stripe_cust_id', $stripeCustomerId);
+        
+        $search->setItemsPerPage(1)
+                ->setPageNumber(1)
+                ->orderBy('id', 'ASC');
+        $results = $search->select();
+        if (!empty($results)) {
+            return $results[0];
+        }
+        return NULL;
+    }
+    
+
 }

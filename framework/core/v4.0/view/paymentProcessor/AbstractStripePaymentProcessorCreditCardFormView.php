@@ -13,6 +13,7 @@ abstract class AbstractStripePaymentProcessorCreditCardFormView extends Abstract
         $this->addJS("https://js.stripe.com/v3/");
         $this->addJS('framework/core/' . FRMWK_CORE_VER . '/resources/js/payments/stripe_custom.js');
         $this->addCSS('https://cdnjs.cloudflare.com/ajax/libs/paymentfont/1.1.2/css/paymentfont.min.css');
+        $this->setWindowTitle('Add Credit Card');
     }
 
     protected function buildFormBody() {
@@ -51,9 +52,12 @@ abstract class AbstractStripePaymentProcessorCreditCardFormView extends Abstract
         $this->form->addHTML('<div class="columns">');
         $this->form->addHTML('<div class="form_element">');
         $this->form->addHTML('<label for="card-exp" class="main">')
-                ->addHTML('Expiry (MM/YY)')
+                ->addHTML('Expiry')
                 ->addHTML('</label>')
-                ->addHTML('<div id="card-exp"></div>');
+                ->addHTML('<div class="field_content">')
+                ->addHTML('<div id="card-exp"></div>')
+                ->addHTML('<div class="field_description">Format MM/YY</div>')
+                ->addHTML('</div>');
         $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
     }
@@ -62,9 +66,12 @@ abstract class AbstractStripePaymentProcessorCreditCardFormView extends Abstract
         $this->form->addHTML('<div class="columns">');
         $this->form->addHTML('<div class="form_element">');
         $this->form->addHTML('<label for="card-cvc" class="main">')
-                ->addHTML('CVC (code on the back)')
+                ->addHTML('CVC')
                 ->addHTML('</label>')
-                ->addHTML('<div id="card-cvc"></div>');
+                ->addHTML('<div class="field_content">')
+                ->addHTML('<div id="card-cvc"></div>')
+                ->addHTML('<div class="field_description">Code on the back of card</div>')
+                ->addHTML('</div>');
         $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
     }

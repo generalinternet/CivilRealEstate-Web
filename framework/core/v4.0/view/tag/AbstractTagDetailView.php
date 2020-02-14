@@ -16,7 +16,7 @@ abstract class AbstractTagDetailView extends GI_View {
     protected function buildView() {
         $tagColour = $this->tag->getProperty('tag.colour');
         $tagTitle = $this->tag->getProperty('tag.title');
-        $this->addHTML('<p class="content_block tag_block" ><span class="tri" style="border-top-color: #' . $tagColour . ';"></span>'.$tagTitle.'</p>');
+        $this->addHTML('<span class="tag_item" ><span class="tri" style="border-top-color: #' . $tagColour . ';"></span>'.$tagTitle.'</span>');
     }
 
 }

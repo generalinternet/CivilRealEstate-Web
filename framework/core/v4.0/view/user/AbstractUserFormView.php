@@ -117,7 +117,14 @@ abstract class AbstractUserFormView extends MainWindowView {
             if($this->newUser){
                 $btnTitle = Lang::getString('add_user');
             }
+            $this->openHideDuringOTP();
             $this->form->addHTML('<span class="submit_btn" title="' . $btnTitle . '" tabindex="0">' . $btnTitle . '</span>');
+            $this->closeHideDuringOTP();
+            if(ProjectConfig::registerRequiresCodeConfirmation() && !Login::isLoggedIn()){
+                $this->form->openShowDuringOTP();
+                $this->form->addHTML('<span class="submit_btn" title="' . $btnTitle . '" tabindex="0">' . Lang::getString('submit') . '</span>');
+                $this->form->closeShowDuringOTP();
+            }
         }
     }
 

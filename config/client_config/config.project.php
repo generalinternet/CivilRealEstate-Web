@@ -51,7 +51,7 @@ define('ROOT_USER_EMAIL', 'admin@generalinternet.ca');
 define ('IS_WORKER_SERVER', false);
 
 /** @const boolean, whether or not to use clean urls, static websites should be set to "true" */
-define('CLEAN_URLS', true);
+define('CLEAN_URLS', false);
 
 /** @const boolean, whether or not to use bootstrap */
 define('USE_BOOTSTRAP', true);

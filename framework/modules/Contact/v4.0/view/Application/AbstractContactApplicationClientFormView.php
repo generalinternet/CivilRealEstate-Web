@@ -9,7 +9,6 @@
  */
 abstract class AbstractContactApplicationClientFormView extends AbstractContactApplicationFormView {
 
-    protected $formTitle = '';
     protected $formWrapID = '';
     protected $submitButtonLabel = '';
 
@@ -17,22 +16,22 @@ abstract class AbstractContactApplicationClientFormView extends AbstractContactA
         $ref = $status->getProperty('ref');
         switch ($ref) {
             case 'select_package':
-                $this->formTitle = '<span>1.</span>Select Package';
+                $this->setWindowTitle('Select Package');
                 $this->formWrapID = 'select_package_wrap';
                 $this->buildSelectPackageForm();
                 break;
             case 'payment_method':
-                $this->formTitle = '<span>2.</span>Payment Method';
+                $this->setWindowTitle('Payment Method');
                 $this->formWrapID = 'payment_wrap';
                 $this->buildPaymentMethodForm();
                 break;
             case 'payment':
-                $this->formTitle = '<span>3.</span>Confirm Payment';
+                $this->setWindowTitle('Confirm Payment');
                 $this->formWrapID = 'payment_wrap';
                 $this->buildConfirmPaymentForm();
                 break;
             case 'payment_results':
-                $this->formTitle = 'Payment Result';
+                $this->setWindowTitle('Payment Result');
                 $this->formWrapID = 'payment_result_wrap';
                 $this->buildPaymentResultsForm();
                 break;
@@ -92,6 +91,7 @@ abstract class AbstractContactApplicationClientFormView extends AbstractContactA
             $card = $contactOrg->getDefaultPaymentMethod();
             if (!empty($card)) {
                 $cardDetailView = new CreditCardDetailView($card);
+                $cardDetailView->setIsDefault(true);
                 $cardDetailView->setOnlyBodyContent(true);
                 $this->form->addHTML($cardDetailView->getHTMLView());
             }
@@ -136,7 +136,12 @@ abstract class AbstractContactApplicationClientFormView extends AbstractContactA
         $value = $this->application->getProperty('subscription_id');
         $subscriptionOptions = $this->application->getSubscriptionOptions();
         if (!empty($subscriptionOptions)) {
+            $setInitValue = false;
             foreach ($subscriptionOptions as $subscription) {
+                if(empty($value) && !$setInitValue){
+                    $value = $subscription->getId();
+                    $setInitValue = true;
+                }
                 $this->addSelectPackageField($subscription, $value, $fullDescription);
             }
         }
@@ -153,55 +158,30 @@ abstract class AbstractContactApplicationClientFormView extends AbstractContactA
             return;
         }
         $detailView->setOnlyBodyContent(true);
-        $this->openPackageWrap();
-        $this->form->addHTML('<h3>Selected Package</h3>');
+        $detailView->setForm($this->form);
+        $detailView->setIsSelected(true);
         $selectPackageURL = $this->application->getSelectPackageStepURL();
-        $this->form->addHTML('<a href="' . $selectPackageURL . '" title="" class="custom_btn" >' . GI_StringUtils::getIcon('edit', false) . '</span><span class="btn_text">Change</span></a>');
+        $this->form->addHTML('<div class="form_element">');
+        $this->form->addHTML('<h3>');
+        $this->form->addHTML('<span class="title">Selected Package</span>');
+        $this->form->addHTML('<a href="' . $selectPackageURL . '" title="" class="custom_btn" >' . GI_StringUtils::getSVGIcon('pencil') . '<span class="btn_text">Change</span></a>');
+        $this->form->addHTML('</h3>');
+        
         $this->form->addHTML($detailView->getHTMLView());
-        $this->closePackageWrap();
+        $this->form->addHTML('</div>');
     }
 
-    protected function addSelectPackageField(AbstractSubscription $subscription, $value, $fullDescription = true) {
-        if ($fullDescription) {
-            $wrapSubclass = 'block';
-        } else {
-            $wrapSubclass = 'tag';
+    protected function addSelectPackageField(AbstractSubscription $subscription, $value) {
+        $detailView = $subscription->getDetailView();
+        if($detailView){
+            $detailView->setForm($this->form);
+            $subscriptionId = $subscription->getId();
+            if (!empty($value) && $value == $subscriptionId) {
+                $detailView->setIsSelected(true);
+            }
+            $detailView->setOnlyBodyContent(true);
+            $this->form->addHTML($detailView->getHTMLView());
         }
-
-        $subscriptionId = $subscription->getId();
-        if (isset($value) && $value == $subscriptionId) {
-            $wrapSubclass .= ' selected ';
-        }
-
-        $this->form->addHTML('<div class="contact_application package_option ' . $wrapSubclass . '">');
-        $this->form->addHTML('<div class="content_wrap">');
-        if ($fullDescription) {
-            $this->form->addHTML('<h3>' . $subscription->getProperty('title') . '</h3>');
-            $this->form->addHTML('<p>' . $subscription->getProperty('description') . '</p>');
-        } else {
-            $this->form->addHTML('<h3>' . $subscription->getProperty('title') . '');
-            $this->form->addHTML('<span class="gi_modal_read_more" title="More Details">');
-            $this->form->addHTML('<span class="custom_btn">' . GI_StringUtils::getIcon('binoculars', false) . '</span>');
-            $this->form->addHTML('<div class="read_more_content" data-gi-modal-title="' . $subscription->getProperty('title') . '">');
-            $this->form->addHTML('<p>' . $subscription->getProperty('description') . '</p>');
-            $this->form->addHTML('</div>');
-            $this->form->addHTML('</span>');
-            $this->form->addHTML('</h3>');
-        }
-        $this->form->addHTML('<div class="value-select">');
-        $this->form->addHTML('<h4 class="value">$ ' . $subscription->getProperty('price') . '</h4>');
-        $this->form->addField('subscription_id', 'radio', array(
-            'options' => array(
-                $subscriptionId => '',
-            ),
-            'showLabel' => false,
-            'value' => $value,
-            'stayOn' => true,
-        ));
-
-        $this->form->addHTML('</div>');
-        $this->form->addHTML('</div>');
-        $this->form->addHTML('</div>');
     }
 
     protected function addPaymentProcessorSection() {
@@ -227,18 +207,21 @@ abstract class AbstractContactApplicationClientFormView extends AbstractContactA
         if (!empty($cards)) {
             foreach ($cards as $cardId => $card) {
                 $this->form->addHTML('<div class="credit_card_option">');
+                $cardView = new CreditCardDetailView($card);
+                $cardView->setOnlyBodyContent(true);
+                if($cardId == $value){
+                    $cardView->setIsDefault(true);
+                }
                 $this->form->addField('selected_card', 'radio', array(
                     'options' => array(
-                        $cardId => '',
+                        $cardId => $cardView->getHTMLView(),
                     ),
                     'value'=>$value,
                     'showLabel'=>false,
                     'fieldClass' => 'radio_toggler',
+                    'formElementClass' => 'list_options',
                     'stayOn'=>true
                 ));
-                $cardView = new CreditCardDetailView($card);
-                $cardView->setOnlyBodyContent(true);
-                $this->form->addHTML($cardView->getHTMLView());
                 $this->form->addHTML('</div>');
             }
             $this->form->addField('selected_card', 'radio', array(
@@ -289,7 +272,6 @@ abstract class AbstractContactApplicationClientFormView extends AbstractContactA
     }
 
     protected function openPackageWrap() {
-        $this->form->addHTML('<h3 class="form_title">' . $this->formTitle . '</h3>');
         $this->form->addHTML('<div class="package_wrap">');
         return $this;
     }

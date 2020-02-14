@@ -17,11 +17,7 @@ abstract class AbstractContactIndexView extends ListWindowView {
         $this->addSiteTitle('Contacts');
         $typeTitle = $this->sampleModel->getTypeTitle();
         $typeRef = $this->sampleModel->getTypeRef();
-        $windowIcon = 'contacts';
-        if(!empty($typeRef) && $typeTitle != 'Contacts'){
-            $this->addSiteTitle($typeTitle);
-            $windowIcon = 'contact_'.$typeRef;
-        }
+        $windowIcon = $this->sampleModel->getIcon();
         $this->setWindowTitle($this->sampleModel->getViewTitle());
         $this->setWindowIcon($windowIcon);
         $this->setListItemTitle($this->sampleModel->getViewTitle());

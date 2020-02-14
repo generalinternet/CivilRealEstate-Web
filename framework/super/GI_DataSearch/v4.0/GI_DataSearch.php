@@ -905,9 +905,10 @@ class GI_DataSearch extends GI_DataSearchFilterable{
         }
         
         if($leaveRaw || !count($this->joins)){
-            return $cleanColumnName;
+            return GI_Sanitize::addBackticksToColumnsInQueryString($cleanColumnName);
         } else {
-            return '`' . $tableName . '`.' . $cleanColumnName;
+            //return GI_Sanitize::addBackticksToColumnsInQueryString('`' . $tableName . '`.' . $cleanColumnName);
+            return '`' . $tableName . '`.' . GI_Sanitize::addBackticksToColumnsInQueryString($cleanColumnName);
         }
     }
 
@@ -920,6 +921,10 @@ class GI_DataSearch extends GI_DataSearchFilterable{
                 $tableName = $tableJoin->getJoinTable(true, false);
             } else {
                 $tableName = $tableAlias;
+                $prefixedTableName = $this->prefixTableName($this->getTableName());
+                if($tableAlias == $prefixedTableName){
+                    $tableName = $this->getTableName();
+                }
             }
         } else {
             $tableName = $this->getTableName();
@@ -1407,7 +1412,7 @@ class GI_DataSearch extends GI_DataSearchFilterable{
         return true;
     }
     
-    public function filterByTagId($tagId, $contextRef = NULL, $joinType = 'inner'){
+    public function filterByTagId($tagId, $contextRef = NULL, $joinType = 'inner', $inclChildren = true, $inclParents = true){
         $tableName = $this->getTableName();
         $prefixedTableName = $this->prefixTableName($tableName);
         $linkTableAlias = 'AUTO_ILTT';
@@ -1415,8 +1420,17 @@ class GI_DataSearch extends GI_DataSearchFilterable{
             $linkTableAlias = 'AUTO_ILTT_' . $this->tagTableJoins;
         }
         
-        $childTagIds = TagFactory::getTagIdChildTree($tagId);
-        $tagIds = array_merge(array((int) $tagId), $childTagIds);
+        $filterOnTagIds = array((int) $tagId);
+        
+        if($inclChildren){
+            $childTagIds = TagFactory::getTagIdChildTree($tagId);
+            $filterOnTagIds = array_merge($filterOnTagIds, $childTagIds);
+        }
+        
+        if($inclParents){
+            $parentTagIds = TagFactory::getTagIdParentTree($tagId);
+            $filterOnTagIds = array_merge($filterOnTagIds, $parentTagIds);
+        }
         
         //track the current connector for the WHERE statements connection string
         $curConnector = $this->curConnector;
@@ -1426,7 +1440,7 @@ class GI_DataSearch extends GI_DataSearchFilterable{
             $linkJoin = $this->createJoin('item_link_to_tag', 'item_id', $prefixedTableName, 'id', $linkTableAlias, $joinType)
                     ->filter($linkTableAlias . '.status', 1)
                     ->filter($linkTableAlias . '.table_name', $tableName)
-                    ->filterIn($linkTableAlias . '.tag_id', $tagIds);
+                    ->filterIn($linkTableAlias . '.tag_id', $filterOnTagIds);
             
             if(empty($contextRef)){
                 $linkJoin->filterNull($linkTableAlias . '.context_ref');
@@ -1445,19 +1459,19 @@ class GI_DataSearch extends GI_DataSearchFilterable{
         return $this;
     }
     
-    public function filterByTag(AbstractTag $tag, $contextRef = NULL){
-        return $this->filterByTagId($tag->getId(), $contextRef);
+    public function filterByTag(AbstractTag $tag, $contextRef = NULL, $joinType = 'inner', $inclChildren = true, $inclParents = true){
+        return $this->filterByTagId($tag->getId(), $contextRef, $joinType, $inclChildren, $inclParents);
     }
     
-    public function filterByTagRef($tagRef, $tagTypeRef, $contextRef = NULL){
+    public function filterByTagRef($tagRef, $tagTypeRef, $contextRef = NULL, $joinType = 'inner', $inclChildren = true, $inclParents = true){
         $tag = TagFactory::getModelByRefAndTypeRef($tagRef, $tagTypeRef);
         if(!$tag){
             return $this;
         }
-        return $this->filterByTag($tag, $contextRef);
+        return $this->filterByTag($tag, $contextRef, $joinType, $inclChildren, $inclParents);
     }
     
-    public function filterByTagIds($tagIds, $contextRef = NULL, $joinType = 'inner', $matchAll = true){
+    public function filterByTagIds($tagIds, $contextRef = NULL, $joinType = 'inner', $inclChildren = true, $inclParents = true, $matchAll = true){
         if(empty($tagIds)){
             return $this;
         }
@@ -1471,7 +1485,7 @@ class GI_DataSearch extends GI_DataSearchFilterable{
             }
         }
         foreach($tagIds as $tagId){
-            $this->filterByTagId($tagId, $contextRef, $joinType);
+            $this->filterByTagId($tagId, $contextRef, $joinType, $inclChildren, $inclParents);
         }
         if(count($tagIds) > 1){
             $this->closeGroup();

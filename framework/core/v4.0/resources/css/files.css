@@ -584,6 +584,7 @@ form .file_thumb.temp:before{
 }
 
 .uploader_container .wrap_btns{
+    margin-top: 0;
     margin-bottom: 1em;
 }
 

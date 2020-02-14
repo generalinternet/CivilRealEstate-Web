@@ -1544,7 +1544,8 @@ $(document).on('change', '.change_form_view', function (e) {
 
 /** Detect form changes **/
 $(document).on('change', 'form.detect_form_change :input', function (e) { //This detects select too
-    $(this).closest('form').data('changed', true);
+    //@todo causing too many errors commented out for now
+//    $(this).closest('form').data('changed', true);
 });
 $(document).on('autocompleteSelectItem autocompleteRemovedItem fileUploaded fileRemoved formRowAdded removeFormRow', 'form.detect_form_change', function (e) {
     $(this).data('changed', true);
@@ -1794,35 +1795,47 @@ function renderRecaptcha(wrapEl) {
         }
     }
 }
+function calculateSlideStepSize(stepForm){
+    let form = stepForm.closest('form');
+    let formWrapEl = form.find('.form_body_wrap');
+    let curStep = formWrapEl.data('step');
+    setCurrentStepToFormBody(form, curStep);
+
+    //Set initialize slide style
+    let slideWidth = form.width();
+
+    let allSlides = form.find('.step_form_body_step');
+    let slideCnt = allSlides.length;
+
+    let slideTotalWidth = slideWidth * slideCnt;
+    let formBody = form.find('.step_form_body');
+    let formBodyWrap = formBody.parent();
+    formWrapEl.find('.step_form_body_step').addClass('slide').css('width', slideWidth);
+    formBody.addClass('slide_container');
+    formBody.css('width', slideTotalWidth);
+    formBodyWrap.addClass('slide_container_outer');
+
+    moveSlide(form);
+}
 function setSlideStepFormView() {
     //Set slide step form view
     let stepForms = $('#form_step_view_wrap .slide_step_form');
     for(let i=0; i<stepForms.length; i++){
         let stepForm = stepForms.eq(i);
+        calculateSlideStepSize(stepForm);
         let form = stepForm.closest('form');
-        let formWrapEl = form.find('.form_body_wrap');
-        let curStep = formWrapEl.data('step');
-        setCurrentStepToFormBody(form, curStep);
-
-        //Set initialize slide style
-        let slideWidth = form.width();
-
-        let allSlides = form.find('.step_form_body_step');
-        let slideCnt = allSlides.length;
-
-        let slideTotalWidth = slideWidth * slideCnt;
-        let formBody = form.find('.step_form_body');
-        let formBodyWrap = formBody.parent();
-        formWrapEl.find('.step_form_body_step').addClass('slide').css('width', slideWidth);
-        formBody.addClass('slide_container');
-        formBody.css('width', slideTotalWidth);
-        formBodyWrap.addClass('slide_container_outer');
-
-        moveSlide(form);
-        renderRecaptcha(form);
+        
+//        renderRecaptcha(form);
         findFieldErrorsInStepFormView(form);
     }
 }
+$(document).on('bindActionsToWindowResized', function(){
+    let stepForms = $('#form_step_view_wrap .slide_step_form');
+    for(let i=0; i<stepForms.length; i++){
+        let stepForm = stepForms.eq(i);
+        calculateSlideStepSize(stepForm);
+    }
+});
 
 function findFieldErrorsInStepFormView(form) {
     //Move to the first step that has error fields
@@ -2191,3 +2204,17 @@ function setMirrorFromField(){
         unLinkedMirror.addClass('linked');
     }
 }
+
+$(document).on('click', '.toggle_otp', function(e){
+    e.preventDefault();
+    let form = $(this).closest('form');
+    let otpToggler = form.find('.otp_toggler input');
+    if(otpToggler.length){
+        if(otpToggler.is(':checked')){
+            otpToggler.prop('checked', false);
+        } else {
+            otpToggler.prop('checked', true);
+        }
+        otpToggler.trigger('change');
+    }
+});

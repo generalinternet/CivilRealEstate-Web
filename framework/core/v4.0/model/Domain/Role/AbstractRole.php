@@ -17,40 +17,6 @@ abstract class AbstractRole extends GI_Model {
     public function getTitle(){
         return $this->getProperty('title');
     }
-    
-    /**
-     * Builds an array of role names
-     * 
-     * @param string $type
-     * @return array an array of role title by system title key
-     */
-    public static function buildRoleNamesArray($type = 'self') {
-        $userHighestRoleRank = RoleGroup::getUserHighestRoleGroupRank($type);
-        $roleRankModels = RoleGroupFactory::search()
-                ->filterLessOrEqualTo('rank', $userHighestRoleRank)
-                ->select();
-        $roleArray = array();
-        if (!empty($roleRankModels)) {
-            foreach ($roleRankModels as $roleRank) {
-                $roleRankId = $roleRank->getProperty('id');
-                $roleModelArray = Role::getByProperties(array(
-                            'role_rank' => $roleRankId
-                ));
-                if (sizeof($roleModelArray) > 0) {
-                    array_push($roleArray, $roleModelArray[0]);
-                }
-            }
-        }
-        $namesArray = array();
-        if (!empty($roleArray)) {
-            foreach ($roleArray as $role) {
-                $title = $role->getProperty('title');
-                $systemTitle = static::buildSystemTitle($title);
-                $namesArray[$systemTitle] = $title;
-            }
-        }
-        return $namesArray;
-    }
 
     /**
      * Builds an array of role options

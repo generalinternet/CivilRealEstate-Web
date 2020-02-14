@@ -43,7 +43,7 @@ abstract class AbstractContactPaymentsDetailView extends MainWindowView {
                         'id' => $this->contact->getId(),
             ));
             $this->addHTML('<div class="right_btns">');
-            $this->addHTML('<a href="' . $addURL . '" title="Add Payment Method" class="custom_btn open_modal_form" data-modal-class="medium_sized">' . GI_StringUtils::getIcon('plus', false) . '</a>');
+            $this->addHTML('<a href="' . $addURL . '" title="Add Payment Method" class="custom_btn open_modal_form" data-modal-class="medium_sized">' . GI_StringUtils::getSVGIcon('plus') . '<span class="btn_text">Payment Method</span></a>');
             $this->addHTML('</div>');
         }
         $this->addHTML('<h3>Payment Methods</h3>');
@@ -59,17 +59,12 @@ abstract class AbstractContactPaymentsDetailView extends MainWindowView {
                 if ($id === $defaultPaymentMethod['id']) {
                     $isDefault = true;
                 }
-                $this->addHTML('<div class="flex_row">')
+                $this->addHTML('<div class="flex_row vert_center">')
                         ->addHTML('<div class="flex_col">');
-                if ($isDefault) {
-                    //TODO - something to highlight - border?
-                }
                 $view = new CreditCardDetailView($paymentMethod);
                 $view->setOnlyBodyContent(true);
+                $view->setIsDefault($isDefault);
                 $this->addHTML($view->getHTMLView());
-                if ($isDefault) {
-                    //TODO
-                }
                 $this->addHTML('</div>')
                         ->addHTML('<div class="flex_col xx_sml">');
                 if (!$isDefault && $canRemovePaymentMethod) {
@@ -77,20 +72,20 @@ abstract class AbstractContactPaymentsDetailView extends MainWindowView {
                                 'controller' => 'contactprofile',
                                 'action' => 'removePaymentMethod',
                                 'id' => $paymentMethod['id'],
-                                'cId'=>$this->contact->getId(),
+                                'cId' => $this->contact->getId(),
                     ));
-                    $this->addHTML('<a href="' . $removeURL . '" title="Remove Payment Method" class="custom_btn open_modal_form" data-modal-class="medium_sized">' . GI_StringUtils::getIcon('trash', false) . '</a>');
+                    $this->addHTML('<a href="' . $removeURL . '" title="Remove Payment Method" class="custom_btn open_modal_form" data-modal-class="medium_sized">' . GI_StringUtils::getSVGIcon('trash') . '</a>');
                 }
                 $this->addHTML('</div>')
                         ->addHTML('<div class="flex_col xx_sml">');
                 if (!$isDefault && $canChangeDefaultPaymentMethod) {
                     $setAsDefaultURL = GI_URLUtils::buildURL(array(
-                        'controller'=>'contactprofile',
-                        'action'=>'setPaymentMethodAsDefault',
-                        'id'=>$paymentMethod['id'],
-                        'cId'=>$this->contact->getId(),
+                                'controller' => 'contactprofile',
+                                'action' => 'setPaymentMethodAsDefault',
+                                'id' => $paymentMethod['id'],
+                                'cId' => $this->contact->getId(),
                     ));
-                    $this->addHTML('<a href="' . $setAsDefaultURL . '" title="Set as Default Payment Method" class="custom_btn open_modal_form" data-modal-class="medium_sized">' . GI_StringUtils::getIcon('check', false) . '</a>');
+                    $this->addHTML('<a href="' . $setAsDefaultURL . '" title="Set as Default Payment Method" class="custom_btn open_modal_form" data-modal-class="medium_sized">' . GI_StringUtils::getSVGIcon('check') . '</a>');
                 }
                 $this->addHTML('</div>')
                         ->addHTML('</div>');
@@ -102,26 +97,32 @@ abstract class AbstractContactPaymentsDetailView extends MainWindowView {
     }
 
     protected function addSubscriptionsSection() {
-        $subscriptions = $this->contact->getSubscriptions();
         $this->addHTML('<div class="contact_subscriptions">');
         $changeURL = GI_URLUtils::buildURL(array(
-            'controller'=>'contactprofile',
-            'action'=>'changeSubscription',
-            'id'=>$this->contact->getId(),
+                    'controller' => 'contactprofile',
+                    'action' => 'changeSubscription',
+                    'id' => $this->contact->getId(),
         ));
         $this->addHTML('<div class="right_btns">');
-        $this->addHTML('<a href="' .$changeURL . '" title="Change" class="custom_btn">'.GI_StringUtils::getIcon('pencil', false).'</a>');
+        $this->addHTML('<a href="' . $changeURL . '" title="Change Subscription" class="custom_btn">' . GI_StringUtils::getSVGIcon('pencil') . '<span class="btn_text">Change Subscription</span></a>');
         $this->addHTML('</div>');
-        $this->addHTML('<h3>Subscription</h3>');
-        if (!empty($subscriptions)) {
-            foreach ($subscriptions as $subscription) {
-                $view = $subscription->getDetailView();
-                $view->setOnlyBodyContent(true);
-                $this->addHTML($view->getHTMLView());
-            }
+        $this->addHTML('<h3>Current Subscription</h3>');
+        $currentContactHasSubscription = $this->contact->getCurrentContactHasSubscription();
+        if (!empty($currentContactHasSubscription)) {
+            $view = $currentContactHasSubscription->getDetailView();
+            $view->setOnlyBodyContent(true);
+            $this->addHTML($view->getHTMLView());
         } else {
             $this->addHTML('<p>No subscription found</p>');
         }
+        $upcomingContactHasSubscription = $this->contact->getUpcomingContactHasSubscription();
+        if (!empty($upcomingContactHasSubscription)) {
+            $this->addHTML('<h3>Upcoming Subscription</h3>');
+            $view = $upcomingContactHasSubscription->getDetailView();
+            $view->setOnlyBodyContent(true);
+            $this->addHTML($view->getHTMLView());
+        }
+
         $this->addHTML('</div>');
     }
 

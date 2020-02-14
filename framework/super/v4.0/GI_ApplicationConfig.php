@@ -77,6 +77,9 @@ abstract class GI_ApplicationConfig {
         ),
         'notification' => array(
             'setSocketId'
+        ),
+        'contactprofile'=>array(
+            'view'
         )
     );
     
@@ -127,9 +130,6 @@ abstract class GI_ApplicationConfig {
             'fillout'
         ),
         'relisting' => true,
-        're' => array(
-            'index'
-        ),
         'mls' => array(
             'view'
         )

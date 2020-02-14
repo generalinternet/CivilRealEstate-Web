@@ -245,8 +245,8 @@ abstract class AbstractContactCatClient extends AbstractContactCat {
 
     protected function setPropertiesFromProfilePublicProfileForm(GI_Form $form, AbstractContactOrg $contactOrg) {
         $accentColour = filter_input(INPUT_POST, 'accent_colour');
-        $businessName = filter_input(INPUT_POST, 'pub_biz_name');
-        $ownerName = filter_input(INPUT_POST, 'pub_owner_name');
+        $businessName = trim(filter_input(INPUT_POST, 'pub_biz_name'));
+        $ownerName = trim(filter_input(INPUT_POST, 'pub_owner_name'));
         $webURL = filter_input(INPUT_POST, 'pub_website_url');
         if (!empty($webURL)) {
             $webURL = GI_StringUtils::fixLink($webURL);
@@ -385,15 +385,13 @@ abstract class AbstractContactCatClient extends AbstractContactCat {
             }
             $lastStepAttrs = $contact->getChangeSubscriptionURLAttrs();
             $lastStepAttrs['step'] = 40;
-            if ($contact->doesContactHaveSubscription($subscription) && $contact->unsubscribeFromAllSubscriptions(array($subscriptionId))) {
-                GI_URLUtils::redirect($lastStepAttrs);
-            } 
+            
+            $currentSubscription = $contact->getCurrentSubscription();
 
-            if ($subscription->isFree()) {
+            if ($subscription->isFree() || (!empty($currentSubscription) && $currentSubscription->getId() == $subscriptionId)) {
                 if (!$subscription->subscribeContact($contact)) {
                     return false;
                 }
-                $contact->unsubscribeFromAllSubscriptions(array($subscriptionId));
                 GI_URLUtils::redirect($lastStepAttrs);
             }
             SessionService::setValue($this->getTargetSubscriptionCacheKey(), $subscriptionId);
@@ -473,10 +471,6 @@ abstract class AbstractContactCatClient extends AbstractContactCat {
                 return false;
             }
             if (!$subscription->subscribeContact($contact)) {
-                return false;
-            }
-            
-            if (!$contact->unsubscribeFromAllSubscriptions(array($subscription->getId()))) {
                 return false;
             }
             

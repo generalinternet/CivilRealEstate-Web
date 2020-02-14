@@ -230,6 +230,11 @@ abstract class AbstractTagController extends GI_Controller {
             $termRef = GI_Sanitize::ref($term);
             $tagSearch = TagFactory::search()
                     ->setItemsPerPage($itemLimit);
+            $pageNumber = 1;
+            if(isset($attributes['pageNumber'])){
+                $pageNumber = (int) $attributes['pageNumber'];
+                $tagSearch->setPageNumber($pageNumber);
+            }
             if (isset($attributes['type']) && !empty($attributes['type'])) {
                 $typeRefs = explode(',', $attributes['type']);
                 $tagSearch->filterGroup();
@@ -255,6 +260,9 @@ abstract class AbstractTagController extends GI_Controller {
                 $acResults = $tag->getAutocompResult($term, $valueColumn);
                 $results[] = $acResults;
             }
+            
+            $count = $tagSearch->getCount();
+            $this->addAutocompNavToResults($results, $count, $itemLimit, $pageNumber);
             
             if (isset($attributes['autocompField']) && Permission::verifyByRef('add_tags') && isset($attributes['addTag']) && $attributes['addTag']) {
                 $autocompField = $attributes['autocompField'];

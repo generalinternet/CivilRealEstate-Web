@@ -859,7 +859,10 @@ abstract class AbstractGI_Form {
                                     }
                                     $finalContent .= '<label class="'.$optDisClass.'" ' . $tabIndexAttr . '>';
                                     $boxInputHTML = '<input type="'.$type.'" name="'.$boxInputName.'" value="'.$optVal.'" '.$optDis.' '.$optChk.' class="'.$fieldClass.'" ' . $fieldDataAttrString . ' />';
-                                    $boxLabelHTML = '<span class="'.$type.'_label">'.$optLabel.'</span>';
+                                    $boxLabelHTML = '';
+                                    if(!empty($optLabel)){
+                                        $boxLabelHTML = '<span class="'.$type.'_label">'.$optLabel.'</span>';
+                                    }
                                     if($labelBeforeBox){
                                         $finalContent .= $boxLabelHTML . $boxInputHTML;
                                     } else {
@@ -894,7 +897,10 @@ abstract class AbstractGI_Form {
                                 }
                                 $finalContent .= '<label class="'.$optDisClass.'" ' . $tabIndexAttr . '>';
                                 $boxInputHTML = '<input type="'.$type.'" name="'.$boxInputName.'" value="'.$optVal.'" '.$optDis.' '.$optChk.' class="'.$fieldClass.'" ' . $fieldDataAttrString . ' />';
-                                $boxLabelHTML = '<span class="'.$type.'_label">'.$optLabel.'</span>';
+                                $boxLabelHTML = '';
+                                if(!empty($optLabel)){
+                                    $boxLabelHTML = '<span class="'.$type.'_label">'.$optLabel.'</span>';
+                                }
                                 if($labelBeforeBox){
                                     $finalContent .= $boxLabelHTML . $boxInputHTML;
                                 } else {
@@ -1946,6 +1952,7 @@ abstract class AbstractGI_Form {
         }
         
         if($emailOptEnabled && $phoneOptEnabled){
+            $this->openHideDuringOTP($fieldName);
             $otpMsgTypeName = $fieldName . '_msg_type';
             $msgTypeFieldSettings = array(
                 'displayName' => 'How would you like to receive your ' . $otpTerm,
@@ -1961,7 +1968,12 @@ abstract class AbstractGI_Form {
             );
             $msgTypeSettings = static::overWriteSettings($msgTypeFieldSettings, $overWriteMsgTypeSettings);
             $this->addField($otpMsgTypeName, 'radio', $msgTypeSettings);
+            $this->closeHideDuringOTP($fieldName);
         }
+        
+        $this->openShowDuringOTP($fieldName);
+            $this->addHTML('If you’d like to change how you receive your ' . $otpTerm .', <a href="" class="toggle_otp">click here</a>.');
+        $this->closeShowDuringOTP($fieldName);
         $togglerValue = 0;
         if($this->wasSubmitted() && $this->validate() && $readyToSend){
             if(isset($otpMsgTypeName)){
@@ -2012,10 +2024,12 @@ abstract class AbstractGI_Form {
                 if($resend){
                     $sendOTP = true;
                 }
+                $targetContactInfo = NULL;
                 switch($otpMsgType){
                     case 'phone':
                         $msgTerm = 'texted';
                         if($sendOTP || $lastSentTo !== $phoneValue){
+                            $targetContactInfo = $phoneValue;
                             $message = 'Hello, your ' . $otpTerm . ' is ' . $generatedOTP;
                             $sms = new GI_SMS(GI_SMS::formatNumberE164($phoneValue), $message);
                             if($sms->sendMessage()) {
@@ -2026,6 +2040,7 @@ abstract class AbstractGI_Form {
                     case 'email':
                         $msgTerm = 'emailed';
                         if($sendOTP || $lastSentTo !== $emailValue){
+                            $targetContactInfo = $emailValue;
                             $emailView = new GenericEmailView();
                             $emailView->addParagraph('Hello,<br/>Your ' . $otpTerm . ' is:<br/><b>' . $generatedOTP . '</b>');
                             $giEmail = new GI_Email();
@@ -2042,12 +2057,19 @@ abstract class AbstractGI_Form {
                         break;
                 }
                 
-                if(DEV_MODE){
+                if(DEV_MODE || ProjectConfig::getBypassLiveOTP()){
                     $otpAlert = new Alert('Your ' . $otpTerm . ' is <b>' . $generatedOTP . '</b>', 'green');
                     AlertService::addAlert($otpAlert);
                 }
 
-                $this->addHTML('<div class="alert_message green"><p>Your ' . $otpTerm . ' has been ' . $msgTerm . ' to you, enter it below.</p><p class="sml_text">Didn’t receive one? <span class="submit_btn" data-field-name="' . $otpResendField . '" data-field-value="1" tabindex="0">Click here</span> to re-send one.</p></div>');
+                if(empty($targetContactInfo)){
+                    $targetContactInfo = $lastSentTo;
+                }
+                if(empty($targetContactInfo)){
+                    $targetContactInfo = '[error]';
+                }
+                $this->openShowDuringOTP($fieldName);
+                $this->addHTML('<div class="alert_message green"><p>Your ' . $otpTerm . ' has been ' . $msgTerm . ' to <b>' . $targetContactInfo . '</b>, enter it below.</p><p class="sml_text">Didn’t receive one? <span class="submit_btn" data-field-name="' . $otpResendField . '" data-field-value="1" tabindex="0">Click here</span> to re-send one.</p></div>');
             
                 $otpCheckName = $fieldName . '_check';
                 
@@ -2072,13 +2094,14 @@ abstract class AbstractGI_Form {
                 $this->addField($otpCheckName, 'hidden', array(
                     'value' => 1
                 ));
+                $this->closeShowDuringOTP($fieldName);
                 
                 $this->validate();
             }
         }
         
         $this->addField($fieldName . '_toggler', 'onoff', array(
-            'formElementClass' => 'hide_on_load',
+            'formElementClass' => 'hide_on_load otp_toggler',
             'fieldClass' => 'checkbox_toggler',
             'value' => $togglerValue,
             'clearValue' => true,

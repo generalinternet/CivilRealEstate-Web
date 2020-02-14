@@ -33,6 +33,9 @@ abstract class GI_DBConnection {
             static::$instances[$type]->set_charset('utf8');
             mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
         }
+        if(dbConfig::getDbName($type) && !static::$instances[$type]->ping()){
+            trigger_error('Could not connect to database.');
+        }
         return static::$instances[$type];
     }
 

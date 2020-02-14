@@ -1222,8 +1222,9 @@ abstract class AbstractContactController extends GI_Controller {
                 $term = '';
             }
 
+            $itemLimit = ProjectConfig::getAutocompleteItemLimit();
             $contactSearch = ContactFactory::search()
-                    ->setItemsPerPage(ProjectConfig::getAutocompleteItemLimit());
+                    ->setItemsPerPage($itemLimit);
             $pageNumber = 1;
             if(isset($attributes['pageNumber'])){
                 $pageNumber = (int) $attributes['pageNumber'];
@@ -1359,9 +1360,8 @@ abstract class AbstractContactController extends GI_Controller {
                 $results[] = $itemInfo;
             }
             
-            $itemsPerPage = $contactSearch->getItemsPerPage();
             $count = $contactSearch->getCount();
-            $this->addAutocompNavToResults($results, $count, $itemsPerPage, $pageNumber);
+            $this->addAutocompNavToResults($results, $count, $itemLimit, $pageNumber);
 
             if (isset($attributes['autocompField'])) {
                 $autocompField = $attributes['autocompField'];

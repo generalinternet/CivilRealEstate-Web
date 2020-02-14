@@ -75,7 +75,7 @@ abstract class AbstractSubscriptionFactory extends GI_ModelFactory {
         $search->join('contact_has_subscription', 'subscription_id', $tableName, 'id', 'CHS');
         $search->filter('CHS.contact_id', $contact->getId());
         $search->groupBy('id')
-                ->orderBy('id', 'ASC');
+                ->orderBy('CHS.start_date_time', 'DESC');
         return $search->select();
     }
    

@@ -150,7 +150,7 @@ abstract class GI_ModelFactory extends GI_Object {
     
     protected static function buildModelArray($daoArray, $idsAsKey = false){
         $modelArray = array();
-        if (sizeof($daoArray) == 0) {
+        if (empty($daoArray)) {
             return $modelArray;
         }
         foreach ($daoArray as $primaryDAO) {
@@ -240,7 +240,7 @@ abstract class GI_ModelFactory extends GI_Object {
         return static::buildNewSingleDAOForDAOArray(static::$primaryDAOTableName, $daoArray, $typeRefs);
     }
 
-    protected static function buildModelsWithExistingPrimaryDAO($primaryDAO) {
+    protected static function buildModelsWithExistingPrimaryDAO(GI_DAO $primaryDAO = NULL) {
         $mapArray = static::buildMapsFromExistingDAOs($primaryDAO);
         if (is_null($mapArray)) {
             return NULL;
@@ -254,7 +254,7 @@ abstract class GI_ModelFactory extends GI_Object {
         return $modelArray;
     }
 
-    protected static function buildMapsFromExistingDAOs($primaryDAO) {
+    protected static function buildMapsFromExistingDAOs(GI_DAO $primaryDAO = NULL) {
         $daoArray = array();
         $bucket = array();
         $result = static::buildExistingDAOArray($primaryDAO, $daoArray, $bucket, NULL);
@@ -269,6 +269,7 @@ abstract class GI_ModelFactory extends GI_Object {
         return $mapArray;
     }
 
+    /** @return GI_DataMap */
     protected static function buildMap($daoArray, $typeRef = NULL) {
         $defaultMapEntryClass = static::getStaticPropertyValueFromChild('defaultDataMapEntryClass');
         $dataMapEntrySample = new $defaultMapEntryClass();
@@ -292,7 +293,7 @@ abstract class GI_ModelFactory extends GI_Object {
         return 'none';
     }
 
-    protected static function buildExistingDAOArray($dao, &$array, &$bucket, $lastTypeRef = NULL) {
+    protected static function buildExistingDAOArray(GI_DAO $dao = NULL, &$array = array(), &$bucket = array(), $lastTypeRef = NULL) {
         if (is_null($dao)) {
             return;
         }
@@ -833,7 +834,7 @@ abstract class GI_ModelFactory extends GI_Object {
             $currentDAOTableName = $currentDAO->getTableName();
             $currentDAOTypeTableName = $currentDAOTableName . '_type';
             $currentTypeDAOId = $currentDAO->getProperty($currentDAOTypeTableName . '_id');
-            $currentDAOTypeDAO = $defaultDAOClass::getById($currentDAOTypeTableName, $currentTypeDAOId);
+            $currentDAOTypeDAO = $defaultDAOClass::getById($currentDAOTypeTableName, $currentTypeDAOId, static::getDBType());
             $nextDAO = NULL;
             if (!empty($currentDAOTypeDAO)) {
                 $nextDAOTableName = $currentDAOTypeDAO->getProperty('table_name');

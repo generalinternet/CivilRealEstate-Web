@@ -208,6 +208,9 @@ abstract class AbstractFormStepView extends MainWindowView {
             $step = $this->curStep;
         }
         $childrenStepArray = $this->getChildrenStepArray($step);
+        if(empty($childrenStepArray)){
+            return 0;
+        }
         return count($childrenStepArray);
     }
     
@@ -496,7 +499,7 @@ abstract class AbstractFormStepView extends MainWindowView {
             } else {
                 $curStepTitle = $this->curStep;
             }
-            $this->form->addHTML('<h1 class="step_title '.$classNames.'">'.(($withStep)? ('Step '.$this->curStep).' : ':'').$curStepTitle.'</h1>');
+            $this->form->addHTML('<h2 class="step_title '.$classNames.'">'.(($withStep)? ('Step '.$this->curStep).' : ':'').$curStepTitle.'</h2>');
         }
     }
     
@@ -719,7 +722,7 @@ abstract class AbstractFormStepView extends MainWindowView {
     }
     
     protected function addPrevButtonText($buttonText) {
-        return '<span class="icon_wrap">' . GI_StringUtils::getSVGIcon('bird_beak_left') . '<span class="btn_text">'.$buttonText.'</span></span>';
+        return '<span class="icon_wrap">' . GI_StringUtils::getSVGIcon('bird_beak_left') . '</span><span class="btn_text">'.$buttonText.'</span>';
     }
 
     protected function addSubmitButton($buttonText = 'Save', $classNames = '', $otherAttributes = array()) {

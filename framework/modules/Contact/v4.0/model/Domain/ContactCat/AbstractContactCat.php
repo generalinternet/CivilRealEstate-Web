@@ -20,7 +20,9 @@ abstract class AbstractContactCat extends GI_Model {
     protected static $newUserDefaultRoleSystemTitle = 'limited_user';
     protected static $isSuspendable = false;
     protected static $applicationTypeRef = 'application';
-
+    protected $tagContextData = array();
+    /** @var AbstractTagListFormView[] */
+    protected $tagListFormViews = array();
 
     /** @return AbstractContact */
     public function getContact() {
@@ -157,9 +159,6 @@ abstract class AbstractContactCat extends GI_Model {
         
         return $contact->filterSearchForm($dataSearch, $form);
     }
-    
-    
-
     
     public static function getUITableCols() {
         $tableColArrays = array(
@@ -673,11 +672,12 @@ abstract class AbstractContactCat extends GI_Model {
             return false;
         }
         
+        if(!$contact->handleTagFormSubmission($form)){
+            return false;
+        }
+        
         return true;
     }
-
-
-
     
     public function isInternal() {
         return false;
@@ -831,8 +831,61 @@ abstract class AbstractContactCat extends GI_Model {
      * @param GI_Form $form
      * @return boolean
      */
-    protected static function filterPublicSearchForm(GI_DataSearch $dataSearch, GI_Form $form = NULL) {
-        return false;
+    public static function filterPublicSearchForm(GI_DataSearch $dataSearch, GI_Form $form = NULL) {
+        $catTypeRef = $dataSearch->getSearchValue('catTypeRef');
+        if(!empty($catTypeRef)){
+            static::addTagFilterGroupToDataSearch($catTypeRef, $dataSearch);
+        }
+        if (!is_null($form) && $form->wasSubmitted() && $form->validate()) {
+            $dataSearch->clearSearchValues();
+            $dataSearch->setSearchValue('search_type', 'advanced');
+
+            if(!empty($catTypeRef)){
+                $contactCat = ContactCatFactory::buildNewModel($catTypeRef);
+                
+                $tagContextData = $contactCat->getTagContextData();
+                foreach($tagContextData as $contextRef => $contextData){
+                    if(!isset($contextData['fieldName']) || empty($contextData['fieldName'])){
+                        continue;
+                    }
+                    $fieldName = $contextData['fieldName'];
+                    $searchFieldName = $fieldName . '_search';
+                    
+                    $tagIds = array_filter(explode(',', filter_input(INPUT_POST, $searchFieldName)));
+                    $dataSearch->setSearchValue($fieldName, $tagIds);
+                }
+            }
+        }
+
+        return true;
+    }
+    
+    public static function addTagFilterGroupToDataSearch($catTypeRef, GI_DataSearch $dataSearch, $inclChildren = true, $inclParents = true, $matchAll = false, $matchEachContextRef = true){
+        $contactCat = ContactCatFactory::buildNewModel($catTypeRef);
+        if(!$contactCat){
+            return;
+        }
+        $tagContextData = $contactCat->getTagContextData();
+        foreach($tagContextData as $contextRef => $contextData){
+            if(!isset($contextData['fieldName']) || empty($contextData['fieldName'])){
+                continue;
+            }
+            $fieldName = $contextData['fieldName'];
+            $tagIds = $dataSearch->getSearchValue($fieldName);
+            
+            if(empty($tagIds)){
+                continue;
+            }
+            $dataSearch->filterGroup()
+                    ->andIf();
+            $dataSearch->filterByTagIds($tagIds, $contextRef, 'left', $inclChildren, $inclParents, $matchAll);
+            $dataSearch->closeGroup();
+            if($matchEachContextRef){
+                $dataSearch->andIf();
+            } else {
+                $dataSearch->orIf();
+            }
+        }
     }
 
     public function isSuspendable() {
@@ -876,6 +929,152 @@ abstract class AbstractContactCat extends GI_Model {
     
     public function getApplicationTypeRef() {
         return static::$applicationTypeRef;
+    }
+    
+    public function getTagContextData(){
+        return $this->tagContextData;
+    }
+    
+    /**
+     * @param GI_Form $form
+     * @return AbstractTagListFormView[]
+     */
+    public function getTagListFormViews(GI_Form $form){
+        if(empty($this->tagListFormViews)){
+            $tagContextData = $this->getTagContextData();
+            $contact = $this->getContact();
+            if(!$contact){
+                return array();
+            }
+            foreach($tagContextData as $contextRef => $contextData){
+                $tagListFormView = TagFactory::getTagListFormView($form, $contact, $contextData['typeRef']);
+                $tagListFormView->setContextRef($contextRef);
+                if(isset($contextData['plTitle'])){
+                    $tagListFormView->setListTitle($contextData['plTitle']);
+                } elseif(isset($contextData['title'])){
+                    $tagListFormView->setListTitle($contextData['title']);
+                }
+                if(isset($contextData['fieldName'])){
+                    $tagListFormView->setFieldName($contextData['fieldName']);
+                }
+                $this->tagListFormViews[] = $tagListFormView;
+            }
+        }
+        return $this->tagListFormViews;
+    }
+    
+    public function addCustomFiltersToDataSearch(GI_DataSearch $dataSearch) {
+        $catTypeRef = $dataSearch->getSearchValue('catTypeRef');
+        if (!empty($catTypeRef) && $catTypeRef != 'category') {
+            $contactTableName = $dataSearch->prefixTableName('contact');
+            $typeRefsArray = ContactCatFactory::getTypeRefArray($catTypeRef);
+            $topLevelType = $typeRefsArray[0];
+            
+            $dataSearch->join('contact_cat', 'contact_id', $contactTableName, 'id', 'cat')
+                    ->join('contact_cat_type', 'id', 'cat', 'contact_cat_type_id', 'cat_type')
+                    ->filter('cat_type.ref', $topLevelType)
+                    ->groupBy('id');
+            if ($topLevelType === 'client') {
+                $dataSearch->join('contact_cat_client', 'parent_id', 'cat', 'id', 'client')
+                        ->join('contact_cat_client_type', 'id', 'client', 'contact_cat_client_type_id', 'client_type');
+                $dataSearch->filter('client_type.ref', $typeRefsArray[1]);
+            } else if ($topLevelType === 'vendor') {
+                $dataSearch->join('contact_cat_vendor', 'parent_id', 'cat', 'id', 'vendor')
+                        ->join('contact_cat_vendor_type', 'id', 'vendor', 'contact_cat_vendor_type_id', 'vendor_type');
+                $dataSearch->filter('vendor_type.ref', $typeRefsArray[1]);
+            }
+        }
+        $dataSearch->groupBy('id');
+    }
+    
+    public function addCustomFiltersToProfileDataSearch(GI_DataSearch $dataSearch) {
+        
+    }
+    
+    public function addCustomPublicFiltersToDataSearch(GI_DataSearch $dataSearch) {
+        $this->addCustomFiltersToDataSearch($dataSearch);
+        
+        $pending = $dataSearch->getSearchValue('pending');
+        if($pending){
+            $dataSearch->filter('pending', 1);
+        } else {
+            $dataSearch->filter('pending', 0);
+        }
+        
+        $contactTableName = $dataSearch->prefixTableName('contact');
+        
+        //suspensions
+        $currentDateTime = GI_Time::getDateTime();
+        $suspensionJoin = $dataSearch->createLeftJoin('suspension', 'contact_id', $contactTableName, 'id', 'SUSP');
+        $suspensionJoin->filter('SUSP.active', 1)
+                ->filter('SUSP.status', 1)
+                ->filterLessThan('SUSP.start_date_time', $currentDateTime);
+        
+        $suspensionJoin->filterGroup()
+                ->filterNull('SUSP.end_date_time')
+                ->orIf()
+                ->filterGreaterThan('SUSP.end_date_time', $currentDateTime)
+                ->closeGroup()
+                ->andIf();
+                
+
+        $dataSearch->ignoreStatus('SUSP');
+        
+        $suspended = $dataSearch->getSearchValue('suspended');
+        if($suspended){
+            $dataSearch->filter('SUSP.status', 1);
+        } else {
+            $dataSearch->filterNullOr('SUSP.status');
+        }
+    }
+    
+    public function addSortingToDataSearch(GI_DataSearch $dataSearch) {
+        
+    }
+    
+    public function addPublicSortingToDataSearch(GI_DataSearch $dataSearch) {
+        $this->addSortingToDataSearch($dataSearch);
+        
+        $contactTableName = $dataSearch->prefixTableName('contact');
+        if(!$dataSearch->isJoinedWithTable('HASSUB')){
+            $currentDateTime = GI_Time::getDateTime();
+            $dataSearch->createLeftJoin('contact_has_subscription', 'contact_id', $contactTableName, 'id', 'HASSUB')
+                    ->filter('HASSUB.status', 1)
+                    ->filterLessOrEqualTo('HASSUB.start_date_time', $currentDateTime)
+                    ->filterGroup()
+                    ->filterGreaterThan('HASSUB.end_date_time', $currentDateTime)
+                    ->orIf()
+                    ->filterNull('HASSUB.end_date_time')
+                    ->closeGroup()
+                    ->andIf();
+            
+            $dataSearch->ignoreStatus('HASSUB');
+        }
+        if(!$dataSearch->isJoinedWithTable('SUB')){
+            $dataSearch->createLeftJoin('subscription', 'id', 'HASSUB', 'subscription_id', 'SUB')
+                    ->filter('SUB.status', 1);
+            $dataSearch->ignoreStatus('SUB');
+        }
+        $noSubCase = $dataSearch->newCase()
+                ->filterGroup()
+                ->filterNullOr('SUB.status')
+                ->orIf()
+                ->filter('SUB.is_free', 1)
+                ->closeGroup()
+                ->andIf()
+                ->setThen(1)
+                ->setElse(0);
+        $dataSearch->orderByCase($noSubCase, 'ASC');
+        $dataSearch->orderBy('SUB.price', 'DESC');
+    }
+    
+    public function getWindowIcon(){
+        $typeRef = $this->getTypeRef();
+        $windowIcon = 'contacts';
+        if(!empty($typeRef) && $typeRef !== 'category'){
+            $windowIcon = $typeRef;
+        }
+        return $windowIcon;
     }
 
 }

@@ -9,6 +9,7 @@
 
 abstract class AbstractPaymentProcessorCreditCardFormView extends MainWindowView {
     
+    /** @var GI_Form*/
     protected $form;
     protected $formBuilt = false;
     protected $contact = NULL;

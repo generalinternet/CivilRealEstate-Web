@@ -22,7 +22,7 @@ abstract class AbstractContactSummaryView extends GI_View {
     protected function openViewWrap(){
         $viewURL = $this->contact->getViewURL();
         $name = $this->contact->getName();
-        $this->addHTML('<a href="' . $viewURL . '" class="contact_summary ajax_link" title="View ' . $name . '">');
+        $this->addHTML('<a href="' . $viewURL . '" class="contact_summary" title="View ' . $name . '">');
         return $this;
     }
     

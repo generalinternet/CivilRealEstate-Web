@@ -343,6 +343,14 @@ p .submit_btn{
     text-decoration: underline;
     vertical-align: baseline;
     display: static;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+p .submit_btn:hover{
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
 }
 .other_btn .count{
     margin-left: 0.5em;
@@ -396,6 +404,14 @@ input[type="button"].gray{
     background: #A0A0A0;
     color: #fff !important;
     border: 2px solid #A0A0A0;
+}
+
+.submit_btn.gray .svg_icon svg *,
+.reset_btn .svg_icon svg *,
+.browse_computer .svg_icon svg *,
+.other_btn.gray .svg_icon svg *,
+input[type="button"].gray .svg_icon svg *{
+   fill: #fff; 
 }
 
 .submit_btn.disabled{
@@ -768,6 +784,7 @@ fieldset.label_legend legend{
     position: relative;  
     vertical-align: top;
     display:inline-block;
+    white-space: nowrap;
 }
 
 .options_wrap label:only-child{
@@ -922,6 +939,12 @@ fieldset.label_legend legend{
     max-width: calc(100% - 32px - 2em);
 }
 
+.list_options .options_wrap label .radio_label,
+.list_options .options_wrap label .checkbox_label{
+    width: 100%;
+    max-width: calc(100% - 2em);
+}
+
 .options_wrap label .radio_label .status_box,
 .options_wrap label .checkbox_label .status_box{
     margin: 0.2em;
@@ -1001,6 +1024,18 @@ label .checkbox_box{
     text-shadow: 0px 2px 0px #fff;
     text-transform: uppercase;
     margin-top: 0.2em;
+}
+
+.gi_modal .login_actions a,
+.gi_modal .login_actions .form_element,
+.gi_modal .login_actions .field_content{
+    float: none;
+    width: 100%;
+    text-align: left;
+}
+
+.gi_modal .login_actions a{
+    margin-bottom: 1em;
 }
 
 #login_box .submit_btn{
@@ -2299,6 +2334,10 @@ input[type="checkbox"].gi_field_onoff:checked + .checkbox_box + .off_label + .on
     right: 0.8em;
     top: 0.7em;
 }
+.checkbox_element .show_hidden_desc,
+.radio_element .show_hidden_desc{
+    top: 0.3em;
+}
 .hide_hidden_desc{
     right: -12px;
     top: -12px;
@@ -2358,6 +2397,12 @@ input[type="checkbox"].gi_field_onoff:checked + .checkbox_box + .off_label + .on
 .validate_pass li:last-child,
 .validate_pass:last-child{
     margin-bottom: 0;
+}
+/***PAYMENT PROCESSING***/
+.field_content #card-number + .brand{
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 @media only screen and (max-width: 1300px) {
     #sticky_submit_bar{

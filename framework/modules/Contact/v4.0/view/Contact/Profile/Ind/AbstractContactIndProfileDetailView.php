@@ -75,7 +75,7 @@ abstract class AbstractContactIndProfileDetailView extends AbstractContactProfil
                         'action' => 'edit',
                         'id' => $this->contact->getId(),
             )); 
-            $this->addHTML('<a href="' . $editURL . '" class="custom_btn ajax_link" title="Edit '.$this->contact->getName().'">'.GI_StringUtils::getIcon('pencil').'</a>');
+            $this->addHTML('<a href="' . $editURL . '" class="custom_btn" title="Edit '.$this->contact->getName().'">'.GI_StringUtils::getIcon('pencil').'</a>');
         }
         $this->addHTML('</div>')
                 ->addHTML('</div>');

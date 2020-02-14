@@ -197,7 +197,10 @@ class GI_URLUtils {
         return NULL;
     }
 
-    public static function setLastAttributes($attributes) {
+    public static function setLastAttributes($attributes = array()) {
+        if(empty($attributes)){
+            $attributes = static::getAttributes();
+        }
         if (isset($attributes['ajax']) && $attributes['ajax'] == 1) {
             unset($attributes['ajax']);
         }
@@ -209,6 +212,9 @@ class GI_URLUtils {
     }
 
     public static function redirectToAccessDenied() {
+        if(!Login::isLoggedIn()){
+            static::setLastAttributes();
+        }
         $attributes = array(
             'controller' => 'permission',
             'action' => 'denied'

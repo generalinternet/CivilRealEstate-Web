@@ -176,6 +176,10 @@ abstract class GI_DAO extends GI_Object {
     public function getTableName() {
         return strtolower($this->tableName);
     }
+    
+    public function getDBType(){
+        return $this->dbType;
+    }
 
     public function setTypeRef($typeRef) {
         $this->typeRef = $typeRef;
@@ -213,7 +217,7 @@ abstract class GI_DAO extends GI_Object {
      * Sets the columns corresponding to the db table
      */
     protected function setCols() {
-        $dbConnect = dbConnection::getInstance($this->dbType);
+        $dbConnect = dbConnection::getInstance($this->getDBType());
         try {
             $this->commonColsType = 'full';
             if (!$this->tableHasBaseColumns()) {
@@ -235,7 +239,7 @@ abstract class GI_DAO extends GI_Object {
             if (isset(static::$colsResults[$this->tableName])) {
                 $result = static::$colsResults[$this->tableName];
             } else {
-                $sql = 'SELECT column_name, type, not_null, indexed FROM ' . dbConfig::getDbPrefix($this->dbType) . 'table_column WHERE table_id="' . $this->tableId . '"';
+                $sql = 'SELECT column_name, type, not_null, indexed FROM ' . dbConfig::getDbPrefix($this->getDBType()) . 'table_column WHERE table_id="' . $this->tableId . '"';
                 $req = $dbConnect->query($sql);
                 $result = $req->fetch_all(MYSQLI_ASSOC);
                 static::$colsResults[$this->tableName] = $result;
@@ -256,8 +260,8 @@ abstract class GI_DAO extends GI_Object {
     }
 
 //    protected function setTableId() {
-//        $dbConnect = dbConnection::getInstance($this->dbType);
-//        $sql = 'SELECT * FROM ' . dbConfig::getDbPrefix($this->dbType) . 'table WHERE system_title="' . strtolower($this->tableName) . '"';
+//        $dbConnect = dbConnection::getInstance($this->getDBType());
+//        $sql = 'SELECT * FROM ' . dbConfig::getDbPrefix($this->getDBType()) . 'table WHERE system_title="' . strtolower($this->tableName) . '"';
 //        try{
 //            $req = $dbConnect->query($sql);
 //            $result = $req->fetch_array(MYSQLI_ASSOC);
@@ -270,11 +274,16 @@ abstract class GI_DAO extends GI_Object {
 //    }
 
     protected function setTableId() {
-        $dbConnect = dbConnection::getInstance($this->dbType);
-        $sql = 'SELECT * FROM `' . dbConfig::getDbPrefix($this->dbType) . 'table` WHERE `system_title`="' . strtolower($this->tableName) . '"';
+        $dbConnect = dbConnection::getInstance($this->getDBType());
+        $sql = 'SELECT * FROM `' . dbConfig::getDbPrefix($this->getDBType()) . 'table` WHERE `system_title`="' . strtolower($this->tableName) . '"';
         try {
             $req = $dbConnect->query($sql);
             $result = $req->fetch_array(MYSQLI_ASSOC);
+            if(empty($result)){
+                echo '<pre>';
+                var_dump(debug_print_backtrace());
+                die();
+            }
             $this->tableId = $result['id'];
             $this->tableModel = TableFactory::getModelById($this->tableId);
             return true;
@@ -287,9 +296,9 @@ abstract class GI_DAO extends GI_Object {
     protected function tableHasBaseColumns(){
         if(is_null($this->tableHasBaseColumns)){
             $this->tableHasBaseColumns = true;
-            $dbConnect = dbConnection::getInstance($this->dbType);
-            if ($this->dbType !== 'master') {
-                $tableQuery = 'SELECT * FROM `' . dbConfig::getDbPrefix($this->dbType) . 'table` WHERE `id`="' . $this->tableId . '"';
+            $dbConnect = dbConnection::getInstance($this->getDBType());
+            if ($this->getDBType() !== 'master') {
+                $tableQuery = 'SELECT * FROM `' . dbConfig::getDbPrefix($this->getDBType()) . 'table` WHERE `id`="' . $this->tableId . '"';
                 $tableReq = $dbConnect->query($tableQuery);
                 $tableResult = $tableReq->fetch_all(MYSQLI_ASSOC);
                 if ($tableResult) {
@@ -319,7 +328,7 @@ abstract class GI_DAO extends GI_Object {
 
     public function getClassProperties(){
         $dao = new GenericDAO($this->tableName, array(
-            'dbType' => $this->dbType
+            'dbType' => $this->getDBType()
         ));
         return $dao->properties;
     }
@@ -653,13 +662,13 @@ abstract class GI_DAO extends GI_Object {
 
     public function delete() {
         $id = $this->properties['id'];
-        $dbConnect = dbConnection::getInstance($this->dbType);
+        $dbConnect = dbConnection::getInstance($this->getDBType());
         if ($this->tableName != 'login') {
-            $auditSql = 'DELETE FROM `' . dbConfig::getDbPrefix($this->dbType) . static::getTableName() . '_audit` WHERE `target_id`=' . $id;
+            $auditSql = 'DELETE FROM `' . dbConfig::getDbPrefix($this->getDBType()) . static::getTableName() . '_audit` WHERE `target_id`=' . $id;
         } else {
             $auditSql = NULL;
         }
-        $sql = 'DELETE FROM `' . dbConfig::getDbPrefix($this->dbType) . static::getTableName() . '` WHERE id=' . $id;
+        $sql = 'DELETE FROM `' . dbConfig::getDbPrefix($this->getDBType()) . static::getTableName() . '` WHERE id=' . $id;
         try {
             if ($auditSql) {
                 $dbConnect->query($auditSql);
@@ -679,11 +688,11 @@ abstract class GI_DAO extends GI_Object {
         return $this->save();
          */
         $id = $this->getProperty('id');
-        $dbConnect = dbConnection::getInstance($this->dbType);
+        $dbConnect = dbConnection::getInstance($this->getDBType());
         $uid = Login::getUserId(true);
         $tempInception = GI_Time::getDateTime();
         $lastModTime = GI_Time::formatToGMT($tempInception);
-        $sql = 'UPDATE `' . dbConfig::getDbPrefix($this->dbType) . static::getTableName() . '` ';
+        $sql = 'UPDATE `' . dbConfig::getDbPrefix($this->getDBType()) . static::getTableName() . '` ';
         $sql .= 'SET `status` = 0 ';
         if($this->tableHasBaseColumns()){
             $sql .= ', `last_mod` = "' . $lastModTime . '" ';
@@ -734,7 +743,7 @@ abstract class GI_DAO extends GI_Object {
     }
 
     public function prepareValue($value, $column, $ignoreBaseDateTimes = false){
-        $dbConnection = dbConnection::getInstance($this->dbType);
+        $dbConnection = dbConnection::getInstance($this->getDBType());
         $columnType = 'text';
         $columnNotNull = false;
         if(isset($this->cols[$column])){
@@ -775,12 +784,12 @@ abstract class GI_DAO extends GI_Object {
      */
 
     protected function insert() {
-        $dbConnection = dbConnection::getInstance($this->dbType);
+        $dbConnection = dbConnection::getInstance($this->getDBType());
         $columns = '';
         $values = '';
         $tempInception = NULL;
-        if ($this->dbType !== 'master') {
-            UserFactory::setDBType($this->dbType);
+        if ($this->getDBType() !== 'master') {
+            UserFactory::setDBType($this->getDBType());
             $uid = Login::getUserId(true);
             UserFactory::resetDBType();
             $tempInception = GI_Time::getDateTime();
@@ -833,18 +842,18 @@ abstract class GI_DAO extends GI_Object {
         }
         $columns = substr($columns, 1);
         $values = substr($values, 1);
-        $queryString = 'INSERT INTO `' . dbConfig::getDbPrefix($this->dbType) . $this->tableName . '` (' . $columns . ')VALUES (' . $values . ')';
+        $queryString = 'INSERT INTO `' . dbConfig::getDbPrefix($this->getDBType()) . $this->tableName . '` (' . $columns . ')VALUES (' . $values . ')';
         try {
             $dbConnection->query($queryString);
             $lastId = $dbConnection->insert_id;
             $this->properties['id'] = $lastId;
             if (!is_null($this->typeLinkTableName) && !is_null($this->typeRef)) {
                 $typeTableName = $this->tableName . '_type';
-                $typeDAO = static::getTypeDAOByRef($typeTableName, $this->typeRef, $this->dbType);
+                $typeDAO = static::getTypeDAOByRef($typeTableName, $this->typeRef, $this->getDBType());
                 if (!is_null($typeDAO)) {
                     $typeId = $typeDAO->getProperty('id');
                     $linkTableDAO = new GenericDAO($this->typeLinkTableName, array(
-                        'dbType' => $this->dbType
+                        'dbType' => $this->getDBType()
                     ));
                     $linkTableDAO->setProperty($this->tableName . '_id', $lastId);
                     $linkTableDAO->setProperty($typeTableName . '_id', $typeId);
@@ -885,14 +894,14 @@ abstract class GI_DAO extends GI_Object {
      */
 
     protected function update() {
-        $dbConnection = dbConnection::getInstance($this->dbType);
-        UserFactory::setDBType($this->dbType);
+        $dbConnection = dbConnection::getInstance($this->getDBType());
+        UserFactory::setDBType($this->getDBType());
         $uid = Login::getUserId(true);
         UserFactory::resetDBType();
         $currentTime = NULL;
         $oldColumnValues = array();
         $rowId = $this->properties['id'];
-        if ($this->dbType !== 'master') {
+        if ($this->getDBType() !== 'master') {
             if ($this->commonColsType === 'full') {
                 $rejectColumns = array(
                     'id',
@@ -918,7 +927,7 @@ abstract class GI_DAO extends GI_Object {
             $updates .= ', `' . $column . '` = ' . $this->prepareValue($value, $column, true);
         }
         $updates = substr($updates, 1);
-        $queryString = 'UPDATE `' . dbConfig::getDbPrefix($this->dbType) . $this->tableName . '` SET ' . $updates . ' WHERE `id`=' . '"' . $rowId . '"';
+        $queryString = 'UPDATE `' . dbConfig::getDbPrefix($this->getDBType()) . $this->tableName . '` SET ' . $updates . ' WHERE `id`=' . '"' . $rowId . '"';
         foreach ($oldColumnValues as $rejectColumn => $rejectedValue) {
             if (!isset($this->properties[$rejectColumn])) {
                 $this->properties[$rejectColumn] = $rejectedValue;

@@ -154,7 +154,6 @@ function stripeTokenHandler(token) {
     form.appendChild(hiddenInput);
 
     if ($('#payment_form').closest('.gi_modal').length) {
-        console.log('hey pal');
         $('#payment_form').removeClass('submitting');
         $('#payment_form').data('submitting', false);
         $('#payment_form').trigger('submit');

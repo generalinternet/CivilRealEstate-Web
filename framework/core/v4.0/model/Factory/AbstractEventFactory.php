@@ -26,6 +26,9 @@ abstract class AbstractEventFactory extends GI_ModelFactory {
             case 'qna':
                 $model = new EventQnA($map);
                 break;
+            case 'payment':
+                $model = new EventPayment($map);
+                break;
             case 'event':
             default:
                 $model = new Event($map);
@@ -47,6 +50,9 @@ abstract class AbstractEventFactory extends GI_ModelFactory {
                 break;
             case 'qna':
                 $typeRefs = array('qna');
+                break;
+            case 'payment':
+                $typeRefs = array('payment');
                 break;
             case 'event':
                 $typeRefs = array('event');

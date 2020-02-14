@@ -552,6 +552,7 @@ $(document).on('modalSubmitForm', '.search_box.use_ajax form', function(e){
 function radioToggler(toggler){
     var name = toggler.attr('name');
     var val = $('.radio_toggler[name="' + name + '"]:checked').val();
+    var toggledEvent = jQuery.Event('wasToggled');
     $('.radio_toggler_element[data-group="' + name + '"]').each(function(){
         var dataElements = $(this).data('element');
         var dataElementArray = dataElements.toString().split(",").map(function(item) {
@@ -562,9 +563,14 @@ function radioToggler(toggler){
                 visibleContentUpdate();
             });
         } else {
-            $(this).slideUp('fast');
+            if($(this).is('.init_toggled')){
+                $(this).slideUp('fast');
+            } else {
+                $(this).hide();
+            }
         }
     });
+    toggler.trigger(toggledEvent);
 }
 
 $(document).on('change', '.radio_toggler', function(){
@@ -576,6 +582,7 @@ $(document).on('change', '.radio_toggler', function(){
 function fieldElementToggler(toggler){
     var name = toggler.attr('name');
     var val = toggler.val();
+    var toggledEvent = jQuery.Event('wasToggled');
     $('.toggler_element[data-group="' + name + '"]').each(function(){
         var dataElements = $(this).data('element');
         var dataElementArray = dataElements.toString().split(",").map(function(item) {
@@ -586,9 +593,14 @@ function fieldElementToggler(toggler){
                 visibleContentUpdate();
             });
         } else {
-            $(this).slideUp('fast');
+            if($(this).is('.init_toggled')){
+                $(this).slideUp('fast');
+            } else {
+                $(this).hide();
+            }
         }
     });
+    toggler.trigger(toggledEvent);
 }
 
 $(document).on('change', '.toggler', function(){
@@ -604,7 +616,7 @@ function checkboxToggler(toggler){
         name = name.substr(0, name.indexOf('['));
     }
     var val = toggler.val();
-    
+    var toggledEvent = jQuery.Event('wasToggled');
     if(toggler.is(':checked')){
         $('.checkbox_toggler_element[data-group="' + name + '"]').each(function(){
             var dataElements = $(this).data('element');
@@ -616,7 +628,11 @@ function checkboxToggler(toggler){
                     visibleContentUpdate();
                 });
             } else if (dataElementArray.includes('NULL')) {
-                $(this).slideUp('fast');
+                if($(this).is('.init_toggled')){
+                    $(this).slideUp('fast');
+                } else {
+                    $(this).hide();
+                }
             }
         });
     } else {
@@ -637,7 +653,11 @@ function checkboxToggler(toggler){
                 }
             }
             if (chkVal && dataElementArray.includes(val)) {
-                $(this).slideUp('fast');
+                if($(this).is('.init_toggled')){
+                    $(this).slideUp('fast');
+                } else {
+                    $(this).hide();
+                }
             } else if (dataElementArray.includes('NULL')) {
                 $(this).slideDown('fast',function(){
                     visibleContentUpdate();
@@ -645,6 +665,7 @@ function checkboxToggler(toggler){
             }
         });
     }
+    toggler.trigger(toggledEvent);
 }
 
 $(document).on('change', '.checkbox_toggler', function(){

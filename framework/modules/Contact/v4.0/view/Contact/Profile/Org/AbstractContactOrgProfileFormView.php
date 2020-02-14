@@ -59,10 +59,11 @@ abstract class AbstractContactOrgProfileFormView extends AbstractContactProfileF
     }
     
     protected function buildAdvancedForm() {
-        $this->form->addHTML('<div class="auto_columns thirds">');
+        $this->form->addHTML('<div class="auto_columns halves">');
         $this->addCurrencyField();
         $this->addSubcategoryField();
         $this->form->addHTML('</div>');
+        $this->addTagListFormViews();
     }
     
     protected function addCurrencyField($overwriteSettings = array()) {

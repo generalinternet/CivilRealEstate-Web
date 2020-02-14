@@ -710,15 +710,50 @@ class GI_StringUtils{
         return true;
     }
     
+    public static function getAltSVGName($fileName){
+        $nameMatches = array(
+            'delete' => 'trash',
+            'edit' => 'pencil',
+            'add' => 'plus',
+            'subtract' => 'minus',
+            'reorder' => 'sort',
+            'close' => 'eks',
+            'remove' => 'eks',
+            'payment' => 'money',
+            'hash' => 'number',
+            'count' => 'number',
+            'time' => 'clock',
+            'credit' => 'cards',
+            'settings' => 'gear',
+            'attachment' => 'paperclip',
+            'cancel' => 'void',
+            'rate' => 'star',
+            'claim' => 'flag',
+            'calculate' => 'calculator',
+            'recalculate' => 'calculator',
+            'eye' => 'visible',
+            'hidden' => 'invisible',
+            'close_sml' => 'remove_sml',
+            'minimize' => 'contract',
+            'maximize' => 'expand'
+        );
+        if(isset($nameMatches[$fileName])){
+            return $nameMatches[$fileName];
+        }
+        return NULL;
+    }
+    
     /**
      * EnbedSVG icon's path from svg file
-     * @param type $fileName
-     * @param type $width
-     * @param type $height
-     * @param type $classNames
+     * @param string $fileName
+     * @param string $width
+     * @param string $height
+     * @param string $classNames
+     * @param boolean $customPath
+     * @param boolean $returnNullIfMissing
      * @return type
      */
-    public static function getSVGIcon($fileName, $width = '1em', $height = '1em', $classNames = '', $customPath = false){
+    public static function getSVGIcon($fileName, $width = '1em', $height = '1em', $classNames = '', $customPath = false, $returnNullIfMissing = false){
         //Find SVG file
         if($customPath){
             $svgFilePath = $fileName;
@@ -728,8 +763,18 @@ class GI_StringUtils{
             $svgFilePath = $svgDirPath.'icon_svg_'.$iconName.'.svg';
         }
         if(!file_exists($svgFilePath)){
+            $altSVGName = static::getAltSVGName($fileName);
+            if(!empty($altSVGName) && $altSVGName !== $fileName){
+                return static::getSVGIcon($altSVGName, $width, $height, $classNames, $customPath, $returnNullIfMissing);
+            }
+            if($returnNullIfMissing){
+                return NULL;
+            }
             //Default
             $svgFilePath = $svgDirPath.'icon_svg_info.svg';
+        }
+        if(substr($fileName, strlen($fileName) - strlen('_sml') ) === '_sml'){
+            $classNames .= ' sml';
         }
         return '<span class="svg_icon '.$classNames.'" style="width:'.$width.';height:'.$height.';">'.file_get_contents($svgFilePath).'</span>';
     }
@@ -854,7 +899,7 @@ class GI_StringUtils{
             'admin' => 'gear',
             'notification' => 'bell',
             'client' => 'contacts',
-            'vendor' => 'contacts',
+        //    'vendor' => 'contacts',
             'contact_warehouse' => 'warehouse',
             'category' => 'contacts',
             'internal' => 'contacts',

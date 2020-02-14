@@ -86,6 +86,16 @@ abstract class AbstractContactProfileFormView extends FormStepView {
             default:
         }
     }
-
+    
+    protected function addTagListFormViews(){
+        $tagListFormViews = $this->model->getTagListFormViews($this->form);
+        if(empty($tagListFormViews)){
+            return;
+        } else {
+            foreach($tagListFormViews as $tagListFormView){
+                $this->form->addHTML($tagListFormView->getHTMLView());
+            }
+        }
+    }
 
 }

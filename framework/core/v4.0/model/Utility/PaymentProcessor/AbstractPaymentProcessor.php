@@ -80,7 +80,7 @@ abstract class AbstractPaymentProcessor extends GI_Object {
             return true;
         }
         if ($form->wasSubmitted() && $form->validate()) {
-            
+
             
             $this->creditCardFormValidated = true;
         }

@@ -158,7 +158,7 @@ abstract class AbstractFolder extends GI_Model {
             }
         }
         if(empty($this->getProperty('user_id'))){
-            $userId = Login::getUserId();
+            $userId = Login::getUserId(true);
             $this->setProperty('user_id', $userId);
         }
         if(parent::save()){

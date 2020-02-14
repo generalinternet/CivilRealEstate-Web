@@ -3,8 +3,8 @@
  * Description of AbstractUserFactory
  *
  * @author General Internet
- * @copyright  2019 General Internet
- * @version    4.0.2
+ * @copyright  2029 General Internet
+ * @version    4.0.3
  */
 class AbstractUserFactory extends GI_ModelFactory {
     
@@ -182,6 +182,32 @@ class AbstractUserFactory extends GI_ModelFactory {
                 ->andIf()
                 ->groupBy('id');
         return $userSearch->select();
+    }
+    
+    /**
+     * 
+     * @param AbstractRole $role
+     * @param boolean $restrictedSearch filter the search to return only users the current user is permitted to contact (by role rank)
+     * @return AbstractUser[]
+     */
+    public static function getUsersByRole(AbstractRole $role, $restrictedSearch = false) {
+        if ($restrictedSearch) {
+            $search = static::searchRestricted();
+        } else {
+            $search = static::search();
+        }
+        $tableName = $search->prefixTableName('user');
+        $search->join('user_link_to_role', 'user_id', $tableName, 'id', 'USERLINK');
+        $search->filter('USERLINK.role_id', $role->getId());
+        
+        $search->groupBy('id')
+                ->orderBy('id', 'ASC');
+        
+        $results = $search->select();
+        if (!empty($results)) {
+            return $results;
+        }
+        return NULL;
     }
     
     public static function getSystemUser() {

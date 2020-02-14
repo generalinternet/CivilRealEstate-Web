@@ -57,7 +57,14 @@ abstract class AbstractContact extends GI_Model {
     protected $paymentSettings = array();
     protected $isSuspended = NULL;
     protected $subscriptions = NULL;
+    protected $currentSubscription = NULL;
+    protected $currentContactHasSubscription = NULL;
+    protected $upcomingSubscription = NULL;
+    protected $upcomingContactHasSubscription = NULL;
     protected $application = NULL;
+    protected $tagContextData = array();
+    /** @var AbstractTagListFormView[] */
+    protected $tagListFormViews = array();
     
     public function setDefaultContactCatTypeRef($defaultContactCatTypeRef){
         $this->defaultContactCatTypeRef = $defaultContactCatTypeRef;
@@ -610,63 +617,34 @@ abstract class AbstractContact extends GI_Model {
      * @param GI_Form $form
      * @return boolean
      */
-    protected function handleTagFormSubmission(GI_Form $form) {
-        if ($form->wasSubmitted()) {
-            /** Commented out because outdated **/
-            /*
-            $allTags = $this->getAllTags();
-            $preExistingTags = $this->getTags();
-            $submittedTags = array();
-            foreach ($allTags as $allTag) {
-                $allTagId = $allTag->getProperty('id');
-                $tagInput = filter_input(INPUT_POST, 'tag_' . $allTagId);
-                if (!empty($tagInput)) {
-                    $submittedTags[$allTagId] = $allTag;
-                }
-            }
-            foreach ($submittedTags as $key => $submittedTag) {
-                if (isset($preExistingTags[$key])) {
-                    unset($preExistingTags[$key]);
-                    unset($submittedTags[$key]);
-                }
-            }
-            foreach ($preExistingTags as $preExistingTag) {
-                if (!$preExistingTag->getIsSystem() && !$this->removeTag($preExistingTag)) {
-                    return false;
-                }
-            }
-            foreach ($submittedTags as $tagToAdd) {
-                if (!$this->addTag($tagToAdd)) {
-                    return false;
-                }
-            }
-             */
-            
-            //Get submmited tags
-            $submittedTagIds = $this->getContactTagIdArray($form);
-            //Get ids from DB
-            $preExistingTags = $this->getTags();
-            foreach ($submittedTagIds as $submittedTagId) {
-                if (isset($preExistingTags[$submittedTagId])) {
-                    unset($preExistingTags[$submittedTagId]);
-                    unset($submittedTagIds[$submittedTagId]);
-                }
-            }
-            foreach ($preExistingTags as $preExistingTag) {
-                if (!$preExistingTag->getIsSystem() && !$this->removeTag($preExistingTag)) {
-                    return false;
-                }
-            }
-            foreach ($submittedTagIds as $tagIdToAdd) {
-                $tagToAdd = TagFactory::getModelById($tagIdToAdd);
-                if (!$this->addTag($tagToAdd)) {
-                    return false;
-                }
-            }
-            
-       }
-        return true;
-    }
+//    protected function handleTagFormSubmission(GI_Form $form) {
+//        if ($form->wasSubmitted()) {
+//            
+//            //Get submmited tags
+//            $submittedTagIds = $this->getContactTagIdArray($form);
+//            //Get ids from DB
+//            $preExistingTags = $this->getTags();
+//            foreach ($submittedTagIds as $submittedTagId) {
+//                if (isset($preExistingTags[$submittedTagId])) {
+//                    unset($preExistingTags[$submittedTagId]);
+//                    unset($submittedTagIds[$submittedTagId]);
+//                }
+//            }
+//            foreach ($preExistingTags as $preExistingTag) {
+//                if (!$preExistingTag->getIsSystem() && !$this->removeTag($preExistingTag)) {
+//                    return false;
+//                }
+//            }
+//            foreach ($submittedTagIds as $tagIdToAdd) {
+//                $tagToAdd = TagFactory::getModelById($tagIdToAdd);
+//                if (!$this->addTag($tagToAdd)) {
+//                    return false;
+//                }
+//            }
+//            
+//       }
+//        return true;
+//    }
 
     protected function handleContactCatFormSubmission(GI_Form $form) {
         if ($form->wasSubmitted() && $form->validate()) {
@@ -811,20 +789,6 @@ abstract class AbstractContact extends GI_Model {
         return true;
         
     }
-    
-//    /**
-//     * @deprecated - //TODO - remove
-//     * @param GI_Form $form
-//     * @param type $type
-//     * @return boolean
-//     */
-//    protected function handleQnATagFormSubmission(GI_Form $form, $type = 'question') {
-//        $sampleQuestion = QuestionFactory::buildNewModel($type);
-//        if (!$sampleQuestion->handleTagInContactFormSubmission($form, $this)) {
-//            return false;
-//        }
-//        return true;
-//    }
 
     /**
      * @param GI_Form $form
@@ -1126,12 +1090,10 @@ abstract class AbstractContact extends GI_Model {
     
     /**
      * @param GI_Form $form
-     * @return TagListFormView
+     * @return AbstractTagListFormView
      */
-    public function getTagListFormView($form) {
-        $existingTags = $this->getTags();
-        $allTags = $this->getAllTags();
-        $tagListFormView = new TagListFormView($form, $allTags, $existingTags);
+    public function getTagListFormView(GI_Form $form) {
+        $tagListFormView = new TagListFormView($form, $this);
         return $tagListFormView;
     }
 
@@ -1660,16 +1622,7 @@ abstract class AbstractContact extends GI_Model {
                 ->select();
     }
     
-//    /**
-//     * @return \AbstractContactCat */
-//    public function getContactCat(){
-//        $contactCats = $this->getContactCatModels();
-//        if($contactCats){
-//            return $contactCats[0];
-//        }
-//        return NULL;
-//    }
-    
+    /** @return AbstractContactCat */
     public function getContactCat(){ 
         if (empty($this->contactCat)) {
             $array = $this->getContactCatModels();
@@ -1679,7 +1632,6 @@ abstract class AbstractContact extends GI_Model {
         }
         return $this->contactCat;
     }
-    
     
     /**
      * @return \AbstractContactCat 
@@ -1691,8 +1643,6 @@ abstract class AbstractContact extends GI_Model {
         }
         return ContactCatFactory::buildNewModel($catTypeRef);
     }
-    
-    
     
     /**
      * @param GI_Form $form
@@ -3382,6 +3332,15 @@ abstract class AbstractContact extends GI_Model {
         return GI_StringUtils::getIcon($iconClass, true, 'gray');
     }
     
+    public function getWindowIcon(){
+        $contactCat = $this->getContactCat();
+        $windowIcon = 'contacts';
+        if(!empty($contactCat)){
+            return $contactCat->getWindowIcon();
+        }
+        return $windowIcon;
+    }
+    
     /**
      * @param string $term
      * @return array
@@ -3885,8 +3844,7 @@ abstract class AbstractContact extends GI_Model {
     }
     
     /** Profile */
-    
-        public function getProfileListBarURL($otherAttributes = NULL) {
+    public function getProfileListBarURL($otherAttributes = NULL) {
         if (!$this->isIndexViewable()) {
             return NULL;
         }
@@ -3897,9 +3855,9 @@ abstract class AbstractContact extends GI_Model {
             $type = 'client';
         }
         $listURLAttributes = array(
-            'controller'=>'contactprofile',
-            'action'=>'index',
-            'type'=>$type,
+            'controller' => 'contactprofile',
+            'action' => 'index',
+            'type' => $type,
         );
         $listURLAttributes['targetId'] = 'list_bar';
         $listURLAttributes['curId'] = $this->getId();
@@ -4103,11 +4061,16 @@ abstract class AbstractContact extends GI_Model {
             static::addPhoneFilterToDataSearch($phone, $dataSearch);
         }
 
+//        $catTypeRef = $dataSearch->getSearhValue('catTypeRef');
+//        if(!empty($catTypeRef)){
+//            static::addTagFiltersToDataSearch($catTypeRef, $dataSearch);
+//        }
+        
         $tags = $dataSearch->getSearchValue('tags');
-        if (!empty($tags)) {
+        if(!empty($tags)){
             static::addTagsFilterToDataSearch($tags, $dataSearch);
         }
-
+        
         if (!is_null($form) && $form->wasSubmitted() && $form->validate()) {
             $dataSearch->clearSearchValues();
             $dataSearch->setSearchValue('search_type', 'advanced');
@@ -4124,11 +4087,55 @@ abstract class AbstractContact extends GI_Model {
             $phone = filter_input(INPUT_POST, 'search_phone');
             $dataSearch->setSearchValue('phone', $phone);
 
+//            if(!empty($catTypeRef)){
+//                $contactCat = ContactCatFactory::buildNewModel($catTypeRef);
+//                
+//                $tagContextData = $contactCat->getTagContextData();
+//                foreach($tagContextData as $contextRef => $contextData){
+//                    if(!isset($contextData['fieldName']) || empty($contextData['fieldName'])){
+//                        continue;
+//                    }
+//                    $fieldName = $contextData['fieldName'];
+//                    $searchFieldName = $fieldName . '_search';
+//                    
+//                    $tagIds = explode(',', filter_input(INPUT_POST, $searchFieldName));
+//                    $this->setQueryValue($fieldName, $tagIds);
+//                }
+//            }
+            
             $tags = filter_input(INPUT_POST, 'search_tags', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
             $dataSearch->setSearchValue('tags', $tags);
         }
 
         return true;
+    }
+    
+    public static function addTagFilterGroupToDataSearch($catTypeRef, GI_DataSearch $dataSearch, $inclChildren = true, $inclParents = true, $matchAll = false){
+        $contactCat = ContactCatFactory::buildNewModel($catTypeRef);
+        if(!$contactCat){
+            return;
+        }
+        $tagContextData = $contactCat->getTagContextData();
+        foreach($tagContextData as $contextRef => $contextData){
+            if(!isset($contextData['fieldName']) || empty($contextData['fieldName'])){
+                continue;
+            }
+            $fieldName = $contextData['fieldName'];
+            $tagIds = $this->getQueryValue($fieldName . '_tag_ids');
+            
+            if(empty($tagIds)){
+                continue;
+            }
+            if(!$matchAll){
+                $dataSearch->filterGroup()
+                        ->andIf();
+            }
+            $dataSearch->filterByTagIds($tagIds, $contextRef, 'left', $inclChildren, $inclParents, $matchAll);
+            if(!$matchAll){
+                $dataSearch->closeGroup()
+                        ->orIf();
+            }
+        }
     }
 
     public static function addNameFilterToProfileDataSearch($name, GI_DataSearch $dataSearch, $contactTableAlias = NULL){
@@ -4360,12 +4367,99 @@ abstract class AbstractContact extends GI_Model {
         return NULL;
     }
     
-    
+    /**
+     * 
+     * @return AbstractSubscription[]
+     */
     public function getSubscriptions() {
         if (is_null($this->subscriptions)) {
             $this->subscriptions = SubscriptionFactory::getModelsByContact($this);
         }
         return $this->subscriptions;
+    }
+    
+    /**
+     * 
+     * @return AbstractSubscription
+     */
+    public function getCurrentSubscription() {
+        if (empty($this->currentSubscription)) {
+            $search = SubscriptionFactory::search();
+            $tableName = $search->prefixTableName('subscription');
+            $search->join('contact_has_subscription', 'subscription_id', $tableName, 'id', 'CHS');
+            $currentDateTime = GI_Time::getDateTime();
+            $search->filter('CHS.contact_id', $this->getId())
+                    ->filterLessThan('CHS.start_date_time', $currentDateTime);
+            $search->filterGroup()
+                    ->filterGroup()
+                    ->filterNull('CHS.end_date_time')
+                    ->closeGroup()
+                    ->orIf()
+                    ->filterGroup()
+                    ->filterGreaterThan('CHS.end_date_time', $currentDateTime)
+                    ->closeGroup()
+                    ->closeGroup()
+                    ->andIf();
+            $search->groupBy('id')
+                    ->orderBy('CHS.start_date_time', 'ASC');
+            $search->setItemsPerPage(1)
+                    ->setPageNumber(1);
+            $results = $search->select();
+            if (!empty($results)) {
+                $this->currentSubscription = $results[0];
+            }
+        }
+        return $this->currentSubscription;
+    }
+    
+    /**
+     *  @return AbstractContactHasSubscription
+     */
+    public function getCurrentContactHasSubscription() {
+        if (empty($this->currentContactHasSubscription)) {
+            $models = ContactHasSubscriptionFactory::getModelsByContact($this, GI_Time::getDateTime());
+            if (!empty($models)) {
+                $this->currentContactHasSubscription = $models[0];
+            }
+        }
+        return $this->currentContactHasSubscription;
+    }
+
+    /**
+     * 
+     * @return AbstractSubscription
+     */
+    public function getUpcomingSubscription() {
+        if (empty($this->upcomingSubscription)) {
+            $currentDateTime = GI_Time::getDateTime();
+            $search = SubscriptionFactory::search();
+            $tableName = $search->prefixTableName('subscription');
+            $search->join('contact_has_subscription', 'subscription_id', $tableName, 'id', 'CHS');
+            $search->filter('CHS.contact_id', $this->getId())
+                    ->filterGreaterThan('CHS.start_date_time', $currentDateTime);
+            $search->groupBy('id')
+                    ->orderBy('CHS.start_date_time', 'ASC');
+            $search->setItemsPerPage(1)
+                    ->setPageNumber(1);
+            $results = $search->select();
+            if (!empty($results)) {
+                $this->upcomingSubscription = $results[0];
+            }
+        }
+        return $this->upcomingSubscription;
+    }
+    
+    /**
+     *  @return AbstractContactHasSubscription
+     */
+    public function getUpcomingContactHasSubscription() {
+        if (empty($this->upcomingContactHasSubscription)) {
+            $models = ContactHasSubscriptionFactory::getModelsByContactStartAfterDate($this, GI_Time::getDateTime());
+            if (!empty($models)) {
+                $this->upcomingContactHasSubscription = $models[0];
+            }
+        }
+        return $this->upcomingContactHasSubscription;
     }
 
     /**
@@ -4403,28 +4497,81 @@ abstract class AbstractContact extends GI_Model {
         return false;
     }
     
-    public function unsubscribeFromAllSubscriptions($subIdsToKeep = array()) {
-        $search = SubscriptionFactory::search();
-        $tableName = $search->prefixTableName('subscription');
-        $search->join('contact_has_subscription', 'subscription_id', $tableName, 'id', 'CHS');
-        $search->filter('CHS.contact_id', $this->getId());
-        if (!empty($subIdsToKeep)) {
-            foreach ($subIdsToKeep as $subId) {
-                $search->filterNotEqualTo('CHS.subscription_id', $subId);
+    public function getTagContextData(){
+        $tagContextData = $this->tagContextData;
+        $contactCat = $this->getContactCat();
+        if($contactCat){
+            $catTagContextData = $contactCat->getTagContextData();
+            return array_merge($tagContextData, $catTagContextData);
+        }
+        return $tagContextData;
+    }
+    
+    /**
+     * @param GI_Form $form
+     * @return AbstractTagListFormView[]
+     */
+    public function getTagListFormViews(GI_Form $form){
+        if(empty($this->tagListFormViews)){
+            $tagContextData = $this->getTagContextData();
+            foreach($tagContextData as $contextRef => $contextData){
+                $tagListFormView = TagFactory::getTagListFormView($form, $this, $contextData['typeRef']);
+                $tagListFormView->setContextRef($contextRef);
+                if(isset($contextData['plTitle'])){
+                    $tagListFormView->setListTitle($contextData['plTitle']);
+                } elseif(isset($contextData['title'])){
+                    $tagListFormView->setListTitle($contextData['title']);
+                }
+                if(isset($contextData['fieldName'])){
+                    $tagListFormView->setFieldName($contextData['fieldName']);
+                }
+                $this->tagListFormViews[] = $tagListFormView;
             }
         }
-        
-        $search->groupBy('id');
-        /* @var $results AbstractSubscription[] */
-        $results = $search->select();
-        if (!empty($results)) {
-            foreach ($results as $result) {
-                if (!$result->unsubscribeContact($this)) {
+        return $this->tagListFormViews;
+    }
+    
+    /**
+     * @param GI_Form $form
+     * @return boolean
+     */
+    public function handleTagFormSubmission(GI_Form $form) {
+        if ($form->wasSubmitted()) {
+            $tagListFormViews = $this->getTagListFormViews($form);
+            if(empty($tagListFormViews)){
+                return true;
+            }
+            foreach($tagListFormViews as $tagListFormView){
+                $submittedTagIds = $tagListFormView->getSubmittedTagIds();
+                $contextRef = $tagListFormView->getContextRef();
+                $submittedTags = array();
+                foreach($submittedTagIds as $submittedTagId){
+                    $tag = TagFactory::getModelById($submittedTagId);
+                    if($tag){
+                        $submittedTags[] = $tag;
+                    }
+                }
+                if(!TagFactory::adjustTagsOnModel($this, $submittedTags, NULL, $contextRef)){
                     return false;
                 }
             }
+            return true;
         }
         return true;
     }
-
+    
+    public function getContactCatTypeTitle(){
+        $contactCat = $this->getContactCat();
+        if($contactCat){
+            return $contactCat->getTypeTitle();
+        }
+        return NULL;
+    }
+    
+    public function getCatalogItemView(){
+        $view = new ContactCatalogView($this);
+        $view->setOnlyBodyContent(true);
+        return $view;
+    }
+    
 }

@@ -408,25 +408,8 @@ abstract class AbstractRoleController extends GI_Controller {
         $returnArray['breadcrumbs'] = $roleGroupModel->getBreadcrumbs();
         return $returnArray;
     }
-
-    public function actionSoftDeleteRoleGroup($attributes) {
-        $roleGroupId = $attributes['roleRankId'];
-        $roleArray = Role::getByProperties(array(
-                    'role_rank' => $roleGroupId
-        ));
-        if (sizeof($roleArray) > 0) {
-            //TODO: Add alert 'cannot delete role rank - currently assigned to at least 1 role'
-        } else {
-            $roleGroup = RoleGroupFactory::getModelById($roleGroupId);
-            if (empty($roleGroup)) {
-                GI_URLUtils::redirectToError(4001);
-            }
-            $roleGroup->softDelete();
-        }
-        return $this->actionIndex($attributes);
-    }
     
-        public function actionAutocompRole($attributes) {
+    public function actionAutocompRole($attributes) {
         if ((!isset($attributes['ajax']) || !$attributes['ajax'] == 1)) {
             $returnArray = GI_Controller::getReturnArray();
             return $returnArray;

@@ -12,6 +12,14 @@ abstract class AbstractSubscription extends GI_Model {
     /** @var AbstractPaymentProcessor */
     protected $paymentProcessor = NULL;
     
+    public function getTitle(){
+        return $this->getProperty('title');
+    }
+    
+    public function getDescription(){
+        return $this->getProperty('description');
+    }
+    
     public function getPrice($formatForDisplay = false, $includeCurrencyName = false) {
         $price = $this->getProperty('price');
         if ($formatForDisplay) {
@@ -81,57 +89,98 @@ abstract class AbstractSubscription extends GI_Model {
         }
         return false;
     }
-    
+
     protected function validateFormFields(GI_Form $form) {
         return true;
     }
-    
+
     public function subscribeContact(AbstractContact $contact) {
         $result = false;
-        $search = new GI_DataSearch('contact_has_subscription');
-        $search->filter('contact_id', $contact->getId())
-                ->filter('subscription_id', $this->getId());
-        $results = $search->select();
-        if (!empty($results)) {
-            $result = true;
-        }
-        if (!$result) {
-            $softDeletedSearch = new GI_DataSearch('contact_has_subscription');
-            $softDeletedSearch->filter('contact_id', $contact->getId())
-                    ->filter('subscription_id', $this->getId())
-                    ->filter('status', 0)
-                    ->setAutoStatus(false);
-            $softDeletedResults = $softDeletedSearch->select();
-            if (!empty($softDeletedResults)) {
-                $softDeletedDAO = $softDeletedResults[0];
-                $softDeletedDAO->setProperty('status', 1);
-                if ($softDeletedDAO->save()) {
+        $currentSub = $contact->getCurrentSubscription();
+        $upcomingSub = $contact->getUpcomingSubscription();
+        if (empty($currentSub)) {
+            //sub to this immediately
+            if (!empty($this->createSubscriptionLinkToContact($contact, $this->determineStartDateForContactSubscription($contact)))) {
+                $result = true;
+            }
+        } else {
+            if ($currentSub->getId() === $this->getId()) {
+                //already subbed to this, return true
+                if (!empty($upcomingSub)) {
+                    $contactHasSubArray = ContactHasSubscriptionFactory::getModelsByContact($contact);
+                    if (!empty($contactHasSubArray)) {
+                        foreach ($contactHasSubArray as $contactHasSub) {
+                            $contactHasSub->setProperty('end_date_time', NULL);
+                            $contactHasSub->save();
+                        }
+                    }
+                    $upcomingSub->unsubscribeContact($contact, '', true);
+                }
+                //return true;
+                $result = true;
+            } else {
+
+                if (!empty($upcomingSub)) {
+                    if ($upcomingSub->getId() === $this->getId()) {
+                        //already subbed to this in the future, return true
+                        return true;
+                    } else {
+                        //unsubscribe from upcoming and soft-delete connection
+                        $upcomingSub->unsubscribeContact($contact, '', true);
+                        //sub to this one (either immediately or when current (paid) one ends)
+                        $this->createSubscriptionLinkToContact($contact, $this->determineStartDateForContactSubscription($contact));
+                        $result = true;
+                    }
+                } else {
+                    //subbed to another sub
+                    //determine when to start this sub, and sub to it
+
+                    $this->createSubscriptionLinkToContact($contact, $this->determineStartDateForContactSubscription($contact));
                     $result = true;
+                    //determine end date for current sub, and unsubscribe
+                    $currentSub->unsubscribeContact($contact);
+
                 }
             }
         }
-        if (!$result) {
-            $defaultDAOClass = ApplicationConfig::getProperty('defaultDAOClass');
-            $newLink = new $defaultDAOClass('contact_has_subscription');
-            $newLink->setProperty('subscription_id', $this->getId());
-            $newLink->setProperty('contact_id', $contact->getId());
-            if (!$newLink->save()) {
-                return false;
-            }
-        }
-        if (!$this->subscribeContactToOnlineService($contact)) {
+
+        if (!$this->isFree() && $result && !$this->subscribeContactToOnlineService($contact)) {
             return false;
         }
         return true;
+    }
+    
+    protected function createSubscriptionLinkToContact(AbstractContact $contact, $startDateTime) {
+        $defaultDAOClass = ApplicationConfig::getProperty('defaultDAOClass');
+        $newLink = new $defaultDAOClass('contact_has_subscription');
+        $newLink->setProperty('subscription_id', $this->getId());
+        $newLink->setProperty('contact_id', $contact->getId());
+        $newLink->setProperty('start_date_time', $startDateTime);
+        if (!$newLink->save()) {
+            return NULL;
+        }
+        return $newLink;
+    }
+
+    protected function determineStartDateForContactSubscription(AbstractContact $contact) {
+        return GI_Time::getDateTime();
+    }
+    
+    protected function determineEndDateForContactSubscription(AbstractContact $contact) {
+        return GI_Time::getDateTime();
     }
 
     protected function subscribeContactToOnlineService(AbstractContact $contact) {
         return true;
     }
 
-    public function unsubscribeContact(AbstractContact $contact) {
+    public function unsubscribeContact(AbstractContact $contact, $endDateTime = '', $softDeleteLink = false) {
+        if (empty($endDateTime)) {
+            $endDateTime = $this->determineEndDateForContactSubscription($contact);
+        }
         $search = new GI_DataSearch('contact_has_subscription');
         $search->filter('contact_id', $contact->getId())
+                ->filterNull('end_date_time')
                 ->filter('subscription_id', $this->getId());
         $results = $search->select();
         if (empty($results)) {
@@ -140,9 +189,14 @@ abstract class AbstractSubscription extends GI_Model {
         if (!$this->unsubscribeContactFromOnlineService($contact)) {
             return false;
         }
-        foreach ($results as $linkToDelete) {
-            $linkToDelete->setProperty('status', 0);
-            if (!$linkToDelete->save()) {
+        foreach ($results as $linkToDAO) {
+            if ($softDeleteLink) {
+                $linkToDAO->setProperty('status', 0);
+            } else {
+                $linkToDAO->setProperty('end_date_time', $endDateTime);
+            }
+            
+            if (!$linkToDAO->save()) {
                 return false;
             }
         }
@@ -168,6 +222,18 @@ abstract class AbstractSubscription extends GI_Model {
             return true;
         }
         return false;
+    }
+    
+    public function getTrialPeriodDays() {
+        $trialPeriodDays = $this->getProperty('trial_period_days');
+        if (empty($trialPeriodDays)) {
+            return 0;
+        }
+        return $trialPeriodDays;
+    }
+
+    public function getExternalBillingPeriodDates(AbstractContact $contact) {
+        return array();
     }
 
 }

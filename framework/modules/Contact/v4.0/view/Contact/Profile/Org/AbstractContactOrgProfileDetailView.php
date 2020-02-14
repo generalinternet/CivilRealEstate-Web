@@ -347,6 +347,8 @@ abstract class AbstractContactOrgProfileDetailView extends AbstractContactProfil
         if (!empty($childContactInds)) {
             foreach ($childContactInds as $contactInd) {
                 $tempView = $contactInd->getProfileDetailView();
+                $tempView->setAddOuterWrap(false);
+                $tempView->setOnlyBodyContent(true);
                 $tempView->setParentContactOrg($this->contact);
                 $view->addHTML($tempView->getHTMLView());
             }

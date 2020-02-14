@@ -26,7 +26,12 @@ abstract class AbstractIconView {
     }
 
     public function getIconWrapClass() {
-        return $this->iconWrapClass;
+        $class = $this->iconWrapClass;
+        $iconColour = $this->getIconColour();
+        if($iconColour){
+            $class .= ' ' . $iconColour . '_icon';
+        }
+        return $class;
     }
 
     public function getAddIconWrap() {
@@ -69,8 +74,7 @@ abstract class AbstractIconView {
     
     protected function buildHTML(){
         $this->openWrap();
-            $this->openIcon();
-            $this->closeIcon();
+            $this->addIcon();
         $this->closeWrap();
     }
     
@@ -92,6 +96,18 @@ abstract class AbstractIconView {
     
     protected function closeIcon(){
         $this->addHTML('</span>');
+    }
+    
+    protected function addIcon(){
+//        $this->openIcon();
+//        $this->closeIcon();
+        $iconString = GI_StringUtils::getSVGIcon($this->getIcon(), '1em', '1em', $this->getIconColour() . ' ' . $this->getIconClass(), false, true);
+        if(empty($iconString)){
+            $this->openIcon();
+            $this->closeIcon();
+        } else {
+            $this->addHTML($iconString);
+        }
     }
 
     public function getHTMLView(){

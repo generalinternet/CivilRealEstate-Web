@@ -1,0 +1,240 @@
+.date_element{
+    max-width: 150px;
+}
+.label_column label.main{
+    font-size: 1em;
+    font-weight: 700;
+    color: #808080;
+    margin-bottom: 0.5em;
+    text-shadow: 0px 2px 0px #fff;
+}
+.money_element{
+    display: inline-block;
+}
+.money_element + .right_currency_name{
+    display: inline-block;
+    margin-left: 0.5em;
+}
+.single_column .form_element{
+    margin-bottom: 0 !important;
+}
+#refund_body{
+    border: 3px solid #808080;
+    padding: 2em;
+    margin-bottom: 2em;
+}
+#refund_body .pay_to_field{
+    border-bottom: 1px solid;
+    line-height: 40px;
+}
+
+.report_options{
+    margin-bottom:2em;
+}
+
+.reports_bar_wrap{
+    position: relative;
+    z-index: 99;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.reports_bar{
+    background: #7A7373;
+    position: relative;
+    min-height: 2.14em;
+    padding-left: 90px;
+    cursor: default;
+}
+
+.reports_bar:after{
+    content: '';
+    display: block;
+    clear: both;
+}
+
+.reports_bar .h_content_wrap{
+    padding: 0.5em;
+}
+.reports_bar h3{
+    width: 25%;
+    display: inline-block;
+    vertical-align: baseline;
+    margin-bottom: 0;
+   /** font-weight: 600; */
+    font-size: 14px;
+    text-transform: lowercase;
+  /**  line-height: 1.5; */
+    color: #000;
+    text-shadow: 0px 0px 0px !important;
+    text-align: right;
+}
+.reports_bar .longer_title h3 {
+    width: 50%;
+}
+.reports_bar p.content_block{
+    width: 75%;
+    display: inline-block;
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.5;
+    background: #7A7373;
+    color: #fff;
+}
+.reports_bar .longer_title p.content_block{
+    width: 50%;
+}
+.reports_bar .custom_btn .btn_text{
+    color: #fff;
+}
+.acc_report_table{
+    border: 0!important;
+}
+.acc_report_row
+, .flex_table .flex_row.acc_report_row{
+    border-top:1px solid #7a7373;
+    background-color: #dcdbdb;
+}
+.acc_report_row.qb_table_row:last-child
+,.acc_report_row.total_row{
+    border-top: 2px solid #7a7373;
+    border-bottom: 2px solid #7a7373;
+}
+.ui_table.acc_report_table .acc_report_row:last-child{
+    border-bottom:1px solid #7a7373;
+}
+.acc_report_row:nth-child(even)
+,.flex_table .flex_row.acc_report_row:nth-child(even){
+    background-color: #e8e8e8;
+}
+.acc_report_row.sub_row {
+    padding-left:3%;
+}
+.acc_report_row > .sub_row:nth-child(even){
+    background-color: #e8e8e8;
+}
+.acc_report_row:nth-child(even) > .sub_row:nth-child(even){
+    background-color: #dcdbdb;
+}
+.acc_report_row .flex_row.data_header_row{
+    border-top: 1px solid #7a7373;
+}
+.acc_report_row .flex_row.data_header_row i{
+    font-weight: 700;
+}
+.acc_report_row .flex_col.right_column {
+    text-align: right;
+}
+
+.acc_report_row .flex_col.total_column {
+    font-weight: bold;
+}
+.acc_report_row:last-child .flex_col.total_column{
+    font-size:1.2em;
+}
+.qb_table_row.acc_report_row.table_header_row
+,.flex_table .flex_row.acc_report_row.table_header_row{
+    border: 0;
+    background-color: transparent!important;
+}
+.acc_report_row.table_header_row .flex_col{
+    color: #7a7373;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.acc_report_row .flex_row.summary_row{
+    border-top:1px solid #7a7373;
+    background-color: #d0cece;
+}
+.acc_report_row .flex_row.summary_row:first-child{
+    border-top:0;
+}
+
+.report_options .flex_col .form_element
+,.report_options .flex_col .form_element .field_content
+,.report_options .flex_col .form_element .field_content .options_wrap{
+    height: 100%;
+}
+.report_options .options_wrap label{
+    height: 100%;
+    margin-bottom: 0;
+}
+.report_options .options_wrap label .radio_label{
+    height: 100%;
+    padding: 0.8em;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin-left: -0.8em;
+    border-radius: 10px;
+}
+.report_options .options_wrap label:not(.disabled) .radio_label:hover,
+.report_options .options_wrap label input[type="radio"]:checked + .radio_box + .radio_label
+,.report_options .options_wrap label input[type="checkbox"]:checked + .radio_box + .radio_label{
+    background-color: #6ca7da;
+}
+.report_options .options_wrap label .radio_box{
+    display: none;
+}
+.report_summary_wrap{
+    background-color: #fff;
+    -webkit-box-shadow: 0px 0px 6px 0px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow:    0px 0px 6px 0px rgba(50, 50, 50, 0.75);
+    box-shadow:         0px 0px 6px 0px rgba(50, 50, 50, 0.75);
+    border-radius: 8px;
+    height: 100%;
+}
+.report_summary_wrap .avatar_wrap{
+    color:#000;
+    font-size: 1.2em;
+    line-height: 34px;
+    text-align: center;
+    text-shadow: none;
+}
+.report_summary_wrap .avatar_wrap.use_light_font{
+    color:#fff;
+}
+.report_summary_wrap .title{
+    font-size: 1.1em;
+    font-weight: 700;
+    color:#7a7373;
+    word-break: break-word;
+}
+.report_summary_wrap .report_summary_row .flex_col{
+    padding:0.8em 0.4em 0.4em 0.4em;
+}
+.report_summary_wrap .report_summary_row .flex_col:first-child{
+    padding-left: 0.8em;
+}
+.report_summary_wrap .report_summary_row .flex_col:last-child{
+    padding-right: 0.8em;
+}
+.reports_bar .form_element .selectric{
+    background: rgba(35,31,32, 0.25);
+    border: 0;
+    color: #fff;
+    padding: 0.4em 2em 0.4em 1em;
+    border-radius: 8px;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+    width: 300px;
+}
+.form_element .selectric .button{
+    border: 0;
+    
+}
+.form_element .selectric .button:after{
+    border-top-color: #fff;
+}
+.form_element .selectric-open .selectric .button:after{
+    border-bottom-color: #fff;
+}
+.acc_report_section {
+    margin-bottom: 3em;
+}

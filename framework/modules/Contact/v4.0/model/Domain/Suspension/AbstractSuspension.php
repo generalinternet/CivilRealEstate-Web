@@ -10,6 +10,7 @@ abstract class AbstractSuspension extends GI_Model {
 
     protected $contact;
     protected $users;
+    protected $overrideDeletePermission = false;
 
     public function setContact(AbstractContact $contact) {
         $this->contact = $contact;
@@ -38,10 +39,14 @@ abstract class AbstractSuspension extends GI_Model {
     }
 
     public function getIsDeleteable() {
-        if (Permission::verifyByRef('delete_suspensions')) {
+        if ($this->overrideDeletePermission || Permission::verifyByRef('delete_suspensions')) {
             return true;
         }
         return false;
+    }
+    
+    public function setOverrideDeletePermission($override = true) {
+        $this->overrideDeletePermission = $override;
     }
 
     public function getIsViewable() {

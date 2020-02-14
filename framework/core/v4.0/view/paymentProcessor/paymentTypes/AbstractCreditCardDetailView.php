@@ -10,24 +10,47 @@
 abstract class AbstractCreditCardDetailView extends MainWindowView {
     
     protected $creditCardDataArray = array();
+    protected $isDefault = false;
     
     public function __construct($creditCardDataArray) {
         parent::__construct();
         $this->creditCardDataArray = $creditCardDataArray;
     }
     
+    public function setIsDefault($isDefault){
+        $this->isDefault = $isDefault;
+        return $this;
+    }
+    
     protected function addViewBodyContent() {
-        $this->addHTML('<div class="flex_row">')
-                ->addHTML('<div class="flex_col">');
-        $this->addBrand();
-        $this->addHTML('</div>')
-                ->addHTML('<div class="flex_col">');
-        $this->addLastFour();
-        $this->addHTML('</div>')
-                ->addHTML('<div class="flex_col">');
-        $this->addExpiry();
-        $this->addHTML('</div>')
-                ->addHTML('</div>');
+        $this->openCreditCardWrap();
+            $this->openCreditCard();
+                $this->addBrand();
+                $this->addLastFour();
+                $this->addExpiry();
+            $this->closeCreditCard();
+        $this->closeCreditCardWrap();
+    }
+    
+    protected function openCreditCardWrap(){
+        $class = '';
+        if($this->isDefault){
+            $class = 'default';
+        }
+        $this->addHTML('<div class="credit_card_wrap ' . $class . '">');
+        return $this;
+    }
+    protected function openCreditCard(){
+        $this->addHTML('<div class="credit_card">');
+        return $this;
+    }
+    protected function closeCreditCardWrap(){
+        $this->addHTML('</div>');
+        return $this;
+    }
+    protected function closeCreditCard(){
+        $this->addHTML('</div>');
+        return $this;
     }
 
     protected function addBrand() {
@@ -36,7 +59,38 @@ abstract class AbstractCreditCardDetailView extends MainWindowView {
         } else {
             $brand = '';
         }
-        $this->addHTML($brand);
+        $this->addHTML('<span class="cc_brand">');
+        $this->addBrandLogo($brand);
+//        $this->addHTML('<span class="cc_brand_name">' . $brand . '</span>');
+        $this->addHTML('</span>');
+    }
+    protected function addBrandLogo($brand){
+        switch(strtolower($brand)){
+            case 'visa':
+                $logoRef = 'pf-visa';
+                break;
+            case 'mastercard':
+                $logoRef = 'pf-mastercard';
+                break;
+            case 'amex':
+                $logoRef = 'pf-american-express';
+                break;
+            case 'discover':
+                $logoRef = 'pf-discover';
+                break;
+            case 'diners':
+                $logoRef = 'pf-diners';
+                break;
+            case 'jcb':
+                $logoRef = 'pf-jcb';
+                break;
+            default:
+                $logoRef = 'pf-credit-card';
+                break;
+        }
+        $this->addHTML('<span class="cc_brand_logo" title="' . $brand . '">');
+        $this->addHTML('<i class="pf ' . $logoRef . '"></i>');
+        $this->addHTML('</span>');
     }
 
     protected function addLastFour() {
@@ -45,7 +99,9 @@ abstract class AbstractCreditCardDetailView extends MainWindowView {
         } else {
             $lastFour = '';
         }
-        $this->addHTML('Ending in ' . $lastFour);
+        $this->addHTML('<span class="cc_last_four">');
+        $this->addHTML('Ending in <b>' . $lastFour . '</b>');
+        $this->addHTML('</span>');
     }
 
     protected function addExpiry() {
@@ -60,7 +116,9 @@ abstract class AbstractCreditCardDetailView extends MainWindowView {
             $expYear = '';
         }
         $expiry = $expMonth . '/' . $expYear;
-        $this->addHTML('Expiring in ' .$expiry);
+        $this->addHTML('<span class="cc_exp">');
+        $this->addHTML('Expiring in <b>' .$expiry . '</b>');
+        $this->addHTML('</span>');
     }
 
 }

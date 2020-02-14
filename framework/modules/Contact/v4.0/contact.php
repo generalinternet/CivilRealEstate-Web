@@ -36,6 +36,7 @@ require_once 'model/Domain/Application/AbstractContactApplication.php';
 require_once 'model/Domain/Application/AbstractContactApplicationClient.php';
 require_once 'model/Domain/ApplicationStatus/AbstractContactApplicationStatus.php';
 require_once 'model/Domain/Suspension/AbstractSuspension.php';
+require_once 'model/Domain/ContactHasSubscription/AbstractContactHasSubscription.php';
 
 // Abstract Factory
 require_once 'model/Factory/AbstractContactFactory.php';
@@ -50,12 +51,14 @@ require_once 'model/Factory/AbstractContactScheduledFactory.php';
 require_once 'model/Factory/AbstractContactApplicationStatusFactory.php';
 require_once 'model/Factory/AbstractContactApplicationFactory.php';
 require_once 'model/Factory/AbstractSuspensionFactory.php';
+require_once 'model/Factory/AbstractContactHasSubscriptionFactory.php';
 
 //Abstract Utility
 require_once 'model/Utility/AbstractQBContactImporter.php';
 
 // Abstract View
 require_once 'view/Contact/AbstractContactDetailView.php';
+require_once 'view/Contact/AbstractContactCatalogView.php';
 require_once 'view/Contact/AbstractContactFormView.php';
 require_once 'view/Contact/AbstractContactSummaryView.php';
 require_once 'view/Contact/AbstractContactManageRelationshipFormView.php';
@@ -118,6 +121,7 @@ require_once 'view/Suspension/AbstractSuspensionFormView.php';
 require_once 'view/Suspension/AbstractSuspensionDetailView.php';
 require_once 'view/Suspension/AbstractSuspensionTableView.php';
 require_once 'view/Suspension/AbstractSuspensionSummaryView.php';
+require_once 'view/ContactHasSubscription/AbstractContactHasSubscriptionDetailView.php';
 
 //Profile
 require_once 'view/Contact/Profile/AbstractContactProfileIndexView.php';
@@ -177,6 +181,7 @@ require_once 'model/Domain/Application/ContactApplication.php';
 require_once 'model/Domain/Application/ContactApplicationClient.php';
 require_once 'model/Domain/ApplicationStatus/ContactApplicationStatus.php';
 require_once 'model/Domain/Suspension/Suspension.php';
+require_once 'model/Domain/ContactHasSubscription/ContactHasSubscription.php';
 
 //Concrete Factory
 require_once 'model/Factory/ContactFactory.php';
@@ -191,6 +196,7 @@ require_once 'model/Factory/ContactScheduledFactory.php';
 require_once 'model/Factory/ContactApplicationStatusFactory.php';
 require_once 'model/Factory/ContactApplicationFactory.php';
 require_once 'model/Factory/SuspensionFactory.php';
+require_once 'model/Factory/ContactHasSubscriptionFactory.php';
 
 //Concrete Utility
 require_once 'model/Utility/QBContactImporter.php';
@@ -199,6 +205,7 @@ require_once 'model/Utility/QBContactImporter.php';
 require_once 'view/contact_indexView.php';
 require_once 'view/contact_catIndexView.php';
 require_once 'view/contact/contact_detailView.php';
+require_once 'view/contact/contact_catalogView.php';
 require_once 'view/contact/contact_formView.php';
 require_once 'view/contact/contact_summaryView.php';
 require_once 'view/contact/contact_manageRelationshipFormView.php';
@@ -291,6 +298,8 @@ require_once 'view/suspension/suspension_formView.php';
 require_once 'view/suspension/suspension_detailView.php';
 require_once 'view/suspension/suspension_tableView.php';
 require_once 'view/suspension/suspension_summaryView.php';
+
+require_once 'view/contactHasSubscription/contactHasSubscription_detailView.php';
 
 set_include_path($curIncludePath);
 //### End Con

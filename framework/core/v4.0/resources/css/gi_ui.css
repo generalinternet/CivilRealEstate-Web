@@ -8,6 +8,12 @@
     min-width: 100%;
 }
 /***autocompletes/dropdowns/selects***/
+body > .ac_results{
+    z-index: 9999;
+}
+body > .ac_results ul{
+    z-index: 9999;
+}
 .ac_results ul.ui-menu li.ui-menu-item,
 .ac_list li,
 .selectric-items li{
@@ -181,6 +187,9 @@ li.ui-menu-item a{
     right: 0.3em;
     top: 0.3em;
     z-index: 10;
+}
+.ac_remove:hover{
+    mix-blend-mode: multiply;
 }
 
 .ac_list li .result_text{
@@ -373,7 +382,7 @@ li.ui-menu-item a{
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    border: 1px solid #808080;
+    border: 1px solid rgba(0,0,0,0.4);
     margin-right: 0.5em;
 }
 

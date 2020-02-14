@@ -444,7 +444,7 @@ abstract class GI_FormStepView extends GI_View {
         } else {
             $curStepTitle = $this->curStep;
         }
-        $this->form->addHTML('<h1 class="step_title '.$classNames.'">'.(($withStep)? ('Step '.$this->curStep).' : ':'').$curStepTitle.'</h1>');
+        $this->form->addHTML('<h2 class="step_title '.$classNames.'">'.(($withStep)? ('Step '.$this->curStep).' : ':'').$curStepTitle.'</h2>');
     }
     
     protected function buildStepNav($withStep = true, $classNames = NULL) {

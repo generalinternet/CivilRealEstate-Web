@@ -7,7 +7,7 @@
  * @version    4.0.0
  */
 abstract class AbstractEventInstaller {
-
+    
     protected static $projectEvents = array(
         array(
             'title' => 'Created',
@@ -62,6 +62,32 @@ abstract class AbstractEventInstaller {
             'ref' => 'answer_replied_to',
             'hidden_from_users' => 0,
             'pos' => 30,
+        ),
+        array(
+            'title' => 'Question is Spam',
+            'ref' => 'question_is_spam',
+            'hidden_from_users' => 0,
+            'pos' => 40,
+        ),
+        array(
+            'title' => 'Answer is Spam',
+            'ref' => 'answer_is_spam',
+            'hidden_from_users' => 0,
+            'pos' => 50,
+        ),
+    );
+    protected static $paymentEvents = array(
+        array(
+            'title' => 'Payment Failed',
+            'ref' => 'payment_failed',
+            'hidden_from_users' => 0,
+            'pos' => 10,
+        ),
+        array(
+            'title' => 'Payment Processor Error',
+            'ref' => 'processor_error',
+            'hidden_from_users' => 0,
+            'pos' => 20,
         ),
     );
 
@@ -137,6 +163,18 @@ abstract class AbstractEventInstaller {
         if (!empty($events)) {
             foreach ($events as $data) {
                 if (!$this->installEvent($data, 'qna')) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public function installPaymentEvents() {
+        $events = static::$paymentEvents;
+        if (!empty($events)) {
+            foreach ($events as $data) {
+                if (!$this->installEvent($data, 'payment')) {
                     return false;
                 }
             }

@@ -135,6 +135,18 @@ abstract class AbstractPublicLayoutView extends AbstractLayoutView {
             $this->addJS('resources/js/custom_google_map.js');
             $this->addJS('https://maps.googleapis.com/maps/api/js?key=' . $googleApiKey.'&callback=googleMapInit', false);
         }
+        
+        //Module Specific Javascript
+        if (dbConnection::isModuleInstalled('inventory')) {
+            $this->addJS('framework/modules/Inventory/' . MODULE_INVENTORY_VER . '/resources/inventory.js');
+        }
+        if (dbConnection::isModuleInstalled('contact')) {
+            $this->addJS('framework/modules/Contact/' . MODULE_CONTACT_VER . '/resources/contacts.js');
+        }
+        if (dbConnection::isModuleInstalled('accounting')) {
+            $this->addJS('framework/modules/Accounting/' . MODULE_ACCOUNTING_VER . '/resources/accounting.js');
+            $this->addJS('framework/core/' . FRMWK_CORE_VER. '/resources/js/global_accounting.js');
+        }
     }
     
     protected function buildMainNav(){

@@ -78,7 +78,7 @@ abstract class AbstractContactIndConfirmEmailFormView extends MainWindowView {
     }
 
     public function addCancelBtn() {
-        $this->form->addHTML('<span class="other_btn gray">Cancel</span>');
+        $this->form->addHTML('<span class="other_btn gray close_gi_modal">Cancel</span>');
     }
     
     protected function addMessage() {

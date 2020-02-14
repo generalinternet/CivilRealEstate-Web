@@ -943,8 +943,8 @@ abstract class AbstractUser extends GI_Model {
             $roleId = (int) filter_input(INPUT_POST, 'role_id');
             $email = trim(filter_input(INPUT_POST, 'r_email'));
 
-            $firstName = filter_input(INPUT_POST, 'first_name');
-            $lastName = filter_input(INPUT_POST, 'last_name');
+            $firstName = trim(filter_input(INPUT_POST, 'first_name'));
+            $lastName = trim(filter_input(INPUT_POST, 'last_name'));
 
             $mobile = filter_input(INPUT_POST, 'mobile');
 

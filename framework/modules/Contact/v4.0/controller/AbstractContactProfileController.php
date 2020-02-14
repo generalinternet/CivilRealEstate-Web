@@ -4,8 +4,8 @@
  * Description of AbstractContactProfileController
  *
  * @author General Internet
- * @copyright  2019 General Internet
- * @version    4.0.0
+ * @copyright  2020 General Internet
+ * @version    4.0.1
  */
 abstract class AbstractContactProfileController extends GI_Controller {
 
@@ -84,6 +84,8 @@ abstract class AbstractContactProfileController extends GI_Controller {
         $sampleContact->setDefaultContactCatTypeRef($type);
         $sampleContact->addCustomFiltersToProfileDataSearch($contactSearch);
         $sampleContact->addSortingToProfileDataSearch($contactSearch);
+        
+        $sampleContactCat->addCustomFiltersToProfileDataSearch($contactSearch);
         
 
         $actionResult = ActionResultFactory::buildActionResult();
@@ -951,7 +953,28 @@ abstract class AbstractContactProfileController extends GI_Controller {
         }
         return $returnArray;
     }
-    
 
+    public function actionIncomingStripeWebhookData($attributes) {
+        ob_start();
+        echo 'OK';
+        $size = ob_get_length();
+        header("Content-Encoding: none");
+        header("Content-Length: {$size}");
+        header("Connection: close");
+        ob_end_flush();
+        ob_flush();
+        flush();
+
+        $body = @file_get_contents('php://input');
+        $eventJSON = json_decode($body);
+        $eventId = $eventJSON->id;
+        $paymentProcessor = new StripePaymentProcessor();
+        $stripeEvent = $paymentProcessor->getStripeEventObject($eventId);
+        if (empty($stripeEvent)) {
+            die();
+        }
+        $paymentProcessor->processEventData($stripeEvent);
+        die();
+    }
 
 }

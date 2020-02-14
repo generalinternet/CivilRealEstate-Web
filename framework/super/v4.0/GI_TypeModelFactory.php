@@ -38,8 +38,9 @@ abstract class GI_TypeModelFactory extends GI_Object {
         return new $defaultTypeModelClass($typeDAO);
     }
     
-    public static function getBaseTypeModel($typeTableName) {
+    public static function getBaseTypeModel($typeTableName, $dbType = 'client') {
         $dataSearch = new GI_DataSearch($typeTableName);
+        $dataSearch->setDBType($dbType);
         $dataSearch->orderBy('id', 'ASC');
         $typeDAOArray = $dataSearch->select();
         if (!empty($typeDAOArray)) {

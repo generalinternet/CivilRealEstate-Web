@@ -96,7 +96,7 @@ abstract class GI_DataMap extends GI_Object {
                     $this->typeTitle = $typeTitle;
                 }
                 $typeTableName = $typeDAO->getTableName();
-                $baseTypeModel = TypeModelFactory::getBaseTypeModel($typeTableName);
+                $baseTypeModel = TypeModelFactory::getBaseTypeModel($typeTableName, $typeDAO->getDBType());
                 if (!empty($baseTypeModel)) {
                     $baseTypeRef = $baseTypeModel->getProperty('ref');
                     if (!isset($this->baseTypeModelArray[$baseTypeRef])) {

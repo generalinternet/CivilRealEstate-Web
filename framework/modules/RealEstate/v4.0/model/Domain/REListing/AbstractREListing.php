@@ -586,14 +586,14 @@ abstract class AbstractREListing extends GI_Model {
                 ->filterIn('TL.tag_id', $tagIds);
     }
     
-   public function getTagTypeTitle(){
-       $tags = $this->getTags();
-       if(empty($tags)){
-           return false;
-       }
-       
-       return $tags[0]->getProperty('title');
-   }
+//    public function getTagTypeTitle(){
+//        $tags = $this->getTags();
+//        if(empty($tags)){
+//            return false;
+//        }
+//        
+//        return $tags[0]->getProperty('title');
+//    }
     
     public function getMLSListingAddress(){
         $mlsListing = $this->getMLSListing();
@@ -668,7 +668,7 @@ abstract class AbstractREListing extends GI_Model {
         $breadcrumbs = array();
         if($this->isIndexViewable()) {
             $indexUrl = GI_URLUtils::buildURL(array(
-                'controller' => 're',
+                'controller' => 'relisting',
                 'action' => 'index',
             ));
             $breadcrumbs[] = array(
@@ -701,7 +701,7 @@ abstract class AbstractREListing extends GI_Model {
     
     public function getAddURLAttributes(){
         $urlAttributes = array(
-            'controller' => 're',
+            'controller' => 'relisting',
             'action' => 'add',
             'type' => $this->getTypeRef(),
         );
@@ -715,7 +715,7 @@ abstract class AbstractREListing extends GI_Model {
     
     public function getEditURLAttributes(){
         $urlAttributes = array(
-            'controller' => 're',
+            'controller' => 'relisting',
             'action' => 'edit',
             'id' => $this->getId(),
         );
@@ -729,7 +729,7 @@ abstract class AbstractREListing extends GI_Model {
     
     public function getDeleteURLAttributes(){
         $urlAttributes = array(
-            'controller' => 're',
+            'controller' => 'relisting',
             'action' => 'delete',
             'id' => $this->getId(),
         );
@@ -743,7 +743,7 @@ abstract class AbstractREListing extends GI_Model {
     
     public function getIndexURLAttrs($withPageNumber = false){
         $indexURLAttributes = array(
-            'controller' => 're',
+            'controller' => 'relisting',
             'action' => 'index',
         );
         $attributes = GI_URLUtils::getAttributes();
@@ -861,7 +861,7 @@ abstract class AbstractREListing extends GI_Model {
             
             if(empty($redirectArray)){
                 $redirectArray = array(
-                    'controller' => 're',
+                    'controller' => 'relisting',
                     'action' => 'index'
                 );
                 

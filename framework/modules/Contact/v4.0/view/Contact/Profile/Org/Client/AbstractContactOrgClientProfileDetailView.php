@@ -66,7 +66,6 @@ abstract class AbstractContactOrgClientProfileDetailView extends AbstractContact
                 'icon' => $linkIcon,
                 'link' => $linkURL,
                 // 'class_names' => 'open_modal_form',
-                'class_names' => 'ajax_link',
             );
         }
         $advClassNames = $classNames . ' contact_detail_advanced ' . $this->targetRefPrefix . $targetRef;
@@ -180,6 +179,46 @@ abstract class AbstractContactOrgClientProfileDetailView extends AbstractContact
         $view = new GenericMainWindowView();
         $this->addOrdersSection('sales', $view);
         $this->addAdvancedBlock($headerTitle, $view->getHTMLView(), $btnOptionsArray, NULL, $isOpenOnLoad, '--', NULL, $targetRef, $classNames, $headerIcon, false);
+    }
+    
+    protected function addTagSectionAdvancedBlock(){
+        $targetRef = 'tags';
+        $isOpenOnLoad = false;
+        if (!$this->hasOverlay || $this->curTab === $targetRef) {
+            $isOpenOnLoad = true;
+        }
+
+        $btnOptionsArray = array(
+            'type' => 'basic',
+        );
+        if ($this->contact->isEditable()) {
+            $editAttrs = $this->contact->getEditProfileURLAttrs();
+            $editAttrs['step'] = 20;
+            $linkURL = GI_URLUtils::buildURL($editAttrs);
+            $linkType = 'edit';
+            $linkTitle = '';
+            $linkIcon = 'pencil';
+            $btnOptionInfo = array(
+                'type' => $linkType,
+                'title' => $linkTitle,
+                'icon' => $linkIcon,
+                'link' => $linkURL
+            );
+            if (Login::interfacePerspectiveRefEquals('admin')) {
+                $btnOptionInfo['class_names'] = 'ajax_link';
+            }
+            $btnOptionsArray[] = $btnOptionInfo;
+        }
+
+        $classNames = $this->targetRefPrefix . $targetRef;
+        $advClassNames = $classNames . ' contact_detail_advanced ' . $this->targetRefPrefix . $targetRef;
+        $headerIcon = 'check';
+        $headerTitle = 'Categories';
+        $isAddToSidebar = false;
+        $view = new GenericMainWindowView();
+        $view->setOnlyBodyContent(true);
+        $this->addTagSectionContent($view);
+        $this->addAdvancedBlock($headerTitle, $view->getHTMLView(), $btnOptionsArray, NULL, $isOpenOnLoad, '--', NULL, $targetRef, $advClassNames, $headerIcon, $isAddToSidebar, NULL, NULL);
     }
 
 }
