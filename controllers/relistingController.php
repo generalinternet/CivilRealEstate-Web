@@ -87,15 +87,17 @@ class REListingController extends AbstractREListingController {
         $pageBarLinkProps = $attributes;
 
         $redirectArray = array();
-        $searchView = $sampleListing->getSearchForm($search, $type, $redirectArray);
+
+        $filterForm = new GI_Form('real_estate_search');
+        $searchView = $sampleListing->getSearchForm($search, $type, $redirectArray, $filterForm);
         $sampleListing->addSortingToDataSearch($search);
 
         $actionResult = ActionResultFactory::buildActionResult();
-        $actionResult->setSearchView($searchView)
+        $actionResult
                 ->setSampleModel($sampleListing)
                 ->setUseAjax(true)
                 ->setRedirectArray($redirectArray);
-        
+
         if(!GI_URLUtils::getAttribute('search')){
             $mlsListings = $mlsSearch->select();
             $reListings = $search->select();

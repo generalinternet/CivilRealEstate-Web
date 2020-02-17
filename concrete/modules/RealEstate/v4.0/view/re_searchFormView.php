@@ -1,22 +1,19 @@
 <?php
 
-class RESearchFormView extends AbstractRESearchFormView{
+class RESearchFormView extends GI_View{
     protected $useShadowBox = false;
     protected $useBasicSearch = false;
     protected $hideAdvancedSearch = false;
     protected $useAjax = false;
+    protected $form = null;
 
-    public function getShadowBoxURL(){
-        if(is_null($this->searchAttributes)){
-            $curAttributes = GI_URLUtils::getAttributes();
-        } else {
-            $curAttributes = $this->searchAttributes;
+    public function __construct(GI_Form $form = NULL)
+    {
+        if(empty($form)){
+            $form = new GI_Form('real_estate_search');
         }
-        $curAttributes['search'] = 1;
-        if(isset($this->queryValues['queryId'])){
-            $curAttributes['queryId'] = $this->queryValues['queryId'];
-        }
-        return GI_URLUtils::buildURL($curAttributes, false, true);
+        $this->form = $form;
+        $this->buildForm();
     }
 
     protected function buildForm(){
@@ -43,27 +40,20 @@ class RESearchFormView extends AbstractRESearchFormView{
     }
     
     protected function addPriceField(){
-        $this->addRangeField('Price (in CAD)', 'search_price');
+        $this->addRangeField('Price (in CAD)', 'price');
     }
 
     protected function addPropertyTypeField(){
-        $options = array(
-            'detached_home' => 'Detached Home',
-            'apartment_condo' => 'Apartment / Condo',
-            'estate_farm' => 'Estate / Farm',
-            'commercial' => 'Commercial',
-            'land' => 'Land'
-        );
-        $this->form->addField('search_property_type', 'checkbox', array(
+        $typeArr = MLSListingFactory::getTypesArray();
+        $this->form->addField('property_type', 'checkbox', array(
             'class' => 'form__input form__input_type_checkbox',
             'displayName' => "Property Type",
-            'options'=> $options,
-            'value' => $this->getQueryValue('property_type')
+            'options'=> $typeArr,
         ));
     }
 
     protected function addAreaField(){
-        $this->addRangeField('Area (in sqft)', 'search_area');
+        $this->addRangeField('Area (in sqft)', 'area');
     }
 
     protected function addPropertyStatusField(){
@@ -94,24 +84,24 @@ class RESearchFormView extends AbstractRESearchFormView{
 
     protected function addFeaturesField(){
         $options = array(
-            'covered_parking' => 'Covered Parking',
-            'private_outdoor_area' => 'Private Outdoor Area',
+            'Covered Parking' => 'Covered Parking',
+            'Private Outdoor Area' => 'Private Outdoor Area',
             'Air Conditioning' => 'Air Conditioning',
-            'balcony' => 'Balcony',
-            'enclosed_yard' => 'Enclosed Yard',
-            'attached_garage' => 'Attached Garage',
-            'sauna' => 'Sauna',
-            'steam_room' => 'Steam Room',
-            'view' => 'View',
-            'storage' => 'Storage',
-            'fireplace' => 'Fireplace',
-            'en_suite_laundry' => 'En Suite Laundry',
-            'jacuzzi' => 'Jacuzzi',
-            'common_room' => 'Common Room',
-            'finished_basement' => 'Finished Basement',
-            'high_end_appliances' => 'High End Appliances',
-            'guest_suite' => 'Guest Suite',
-            'penthouse' => 'Penthouse',
+            'Balcony' => 'Balcony',
+            'Enclosed Yard' => 'Enclosed Yard',
+            'Attached Garage' => 'Attached Garage',
+            'Sauna' => 'Sauna',
+            'Steam Room' => 'Steam Room',
+            'View' => 'View',
+            'Storage' => 'Storage',
+            'Fireplace' => 'Fireplace',
+            'En Suite Laundry' => 'En Suite Laundry',
+            'Jacuzzi' => 'Jacuzzi',
+            'Common Room' => 'Common Room',
+            'Finished Basement' => 'Finished Basement',
+            'High End Appliances' => 'High End Appliances',
+            'Guest Suite' => 'Guest Suite',
+            'Penthouse' => 'Penthouse',
         );
         $this->form->addField('features', 'checkbox', array(
             'class' => 'form__input form__input_type_checkbox',
@@ -143,6 +133,7 @@ class RESearchFormView extends AbstractRESearchFormView{
                             '200' => 200,
                             '300' => 300,
                             '400' => 400,
+                            '100000' => '100,000',
                         )
                     ));
                 $this->form->addHTML('</div>');
@@ -154,4 +145,9 @@ class RESearchFormView extends AbstractRESearchFormView{
     {
         $this->addHTML($this->form->getForm('Search'));
     }
+
+    public function beforeReturningView(){
+        $this->addHTML($this->form->getForm('Search'));
+    }
+
 }
