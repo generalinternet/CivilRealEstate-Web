@@ -60,11 +60,14 @@ RewriteRule ^login/$ index.php?controller=login&action=index [NC,L]
 RewriteRule ^logout$ index.php?controller=login&action=logout [NC,L]
 RewriteRule ^logout/$ index.php?controller=login&action=logout [NC,L]
 
-RewriteRule ^register index.php?controller=login&action=register [NC,L]
+RewriteRule ^register$ index.php?controller=login&action=register [NC,L]
 RewriteRule ^register/$ index.php?controller=login&action=register [NC,L]
 
-RewriteRule ^signup index.php?controller=login&action=register [NC,L]
+RewriteRule ^signup$ index.php?controller=login&action=register [NC,L]
 RewriteRule ^signup/$ index.php?controller=login&action=register [NC,L]
+
+RewriteRule ^referrals/qr$ index.php?controller=static&action=referrals&qr=1 [NC,L]
+RewriteRule ^referrals/qr/$ index.php?controller=static&action=referrals&qr=1 [NC,L]
 
 #Remove forward slash
 RewriteRule ^(.*)/$ /$1 [L,R=301]
