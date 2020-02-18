@@ -41,6 +41,7 @@ abstract class AbstractContactIndProfileFormView extends MainWindowView {
         }
         $title .= 'Person';
         $this->setWindowTitle($title);
+        $this->setWindowIcon('contact');
     }
 
     public function setAjax($ajax) {

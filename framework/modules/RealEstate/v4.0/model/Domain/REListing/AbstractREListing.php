@@ -821,6 +821,10 @@ abstract class AbstractREListing extends GI_Model {
      * @return \GI_DataSearch
      */
     public function addCustomFiltersToDataSearch(GI_DataSearch $dataSearch) {
+        $openHouse = $dataSearch->getSearchValue('openHouse');
+        if($openHouse){
+            static::addOpenHouseFilterToDataSearch($dataSearch);
+        }
         return $dataSearch;
     }
     
@@ -990,6 +994,23 @@ abstract class AbstractREListing extends GI_Model {
         }
         
         return true;
+    }
+    
+    public static function addOpenHouseFilterToDataSearch(GI_DataSearch $dataSearch){
+        $dbType = $dataSearch->getDBType();
+        if(dbConnection::verifyTableExists('mls_open_house', $dbType)){
+            $mlsListingTable = $dataSearch->prefixTableName('mls_listing');
+            if(DEV_MODE){
+                $date = new DateTime('2014-01-01');
+            } else {
+                $date = new DateTime();
+            }
+            $ohExpiryDate = GI_Time::formatDateTime($date, 'datetime');
+            
+            $dataSearch->innerJoin('mls_open_house', 'mls_listing_id', $mlsListingTable, 'id', 'moh')
+                ->filterGreaterOrEqualTo('moh.oh_end_date_time', $ohExpiryDate)
+                ->groupBy('moh.mls_listing_id');
+        }
     }
     
     /**

@@ -65,10 +65,13 @@ abstract class GI_AuditModel {
         if ($status !== '0') {
             $status = '1';
         }
-        $dbConnect = dbConnection::getInstance($dbType);
+        $dbConnection = dbConnection::getInstance($dbType);
+        if(empty($dbConnection)){
+            return false;
+        }
         $sql = 'SELECT * FROM ' . dbConfig::getDbPrefix($dbType) . static::$targetTableName . static::$auditPostfix . ' WHERE id=' . $id . ' AND status = ' . $status;
         try {
-            $req = $dbConnect->query($sql);
+            $req = $dbConnection->query($sql);
             $modelName = static::$targetTableName . static::$auditPostfix;
             $tempModel = new $modelName();
             $cols = $tempModel->getCols();
@@ -113,6 +116,9 @@ abstract class GI_AuditModel {
             $status = '1';
         }
         $dbConnection = dbConnection::getInstance($dbType);
+        if(empty($dbConnection)){
+            return false;
+        }
         $sql = 'SELECT * FROM ' . dbConfig::getDbPrefix($dbType) . static::$targetTableName . static::$auditPostfix . ' WHERE target_id=' . $targetId . ' AND status = ' . $status;
         try {
             $req = $dbConnection->query($sql);
@@ -180,6 +186,9 @@ abstract class GI_AuditModel {
         }
 
         $dbConnection = dbConnection::getInstance($dbType);
+        if(empty($dbConnection)){
+            return false;
+        }
         $cols = '';
         $colsAndValues = '';
         foreach ($properties as $column => $value) {
@@ -239,6 +248,9 @@ abstract class GI_AuditModel {
             $status = '1';
         }
         $dbConnection = dbConnection::getInstance($dbType);
+        if(empty($dbConnection)){
+            return false;
+        }
         $queryString = 'SELECT * FROM ' . dbConfig::getDbPrefix($dbType) . static::$targetTableName . static::$auditPostfix . ' WHERE status = ' . $status;
         try {
             $req = $dbConnection->query($queryString);
@@ -299,6 +311,9 @@ abstract class GI_AuditModel {
      */
     public static function getModelsBySearchParams($searchParams, $orderByString = NULL, $dbType = 'client') {
         $dbConnection = dbConnection::getInstance($dbType);
+        if(empty($dbConnection)){
+            return false;
+        }
         $queryString = 'SELECT * FROM ' . dbConfig::getDbPrefix($dbType) . static::$targetTableName . static::$auditPostfix;
 
         if (sizeof($searchParams) == 1) {

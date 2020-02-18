@@ -217,7 +217,10 @@ abstract class GI_DAO extends GI_Object {
      * Sets the columns corresponding to the db table
      */
     protected function setCols() {
-        $dbConnect = dbConnection::getInstance($this->getDBType());
+        $dbConnection = dbConnection::getInstance($this->getDBType());
+        if(empty($dbConnection)){
+            return false;
+        }
         try {
             $this->commonColsType = 'full';
             if (!$this->tableHasBaseColumns()) {
@@ -240,7 +243,7 @@ abstract class GI_DAO extends GI_Object {
                 $result = static::$colsResults[$this->tableName];
             } else {
                 $sql = 'SELECT column_name, type, not_null, indexed FROM ' . dbConfig::getDbPrefix($this->getDBType()) . 'table_column WHERE table_id="' . $this->tableId . '"';
-                $req = $dbConnect->query($sql);
+                $req = $dbConnection->query($sql);
                 $result = $req->fetch_all(MYSQLI_ASSOC);
                 static::$colsResults[$this->tableName] = $result;
             }
@@ -260,10 +263,13 @@ abstract class GI_DAO extends GI_Object {
     }
 
 //    protected function setTableId() {
-//        $dbConnect = dbConnection::getInstance($this->getDBType());
+//        $dbConnection = dbConnection::getInstance($this->getDBType());
+//        if(empty($dbConnection)){
+//            return false;
+//        }
 //        $sql = 'SELECT * FROM ' . dbConfig::getDbPrefix($this->getDBType()) . 'table WHERE system_title="' . strtolower($this->tableName) . '"';
 //        try{
-//            $req = $dbConnect->query($sql);
+//            $req = $dbConnection->query($sql);
 //            $result = $req->fetch_array(MYSQLI_ASSOC);
 //            $this->tableId = $result['id'];
 //            return true;
@@ -274,10 +280,13 @@ abstract class GI_DAO extends GI_Object {
 //    }
 
     protected function setTableId() {
-        $dbConnect = dbConnection::getInstance($this->getDBType());
+        $dbConnection = dbConnection::getInstance($this->getDBType());
+        if(empty($dbConnection)){
+            return false;
+        }
         $sql = 'SELECT * FROM `' . dbConfig::getDbPrefix($this->getDBType()) . 'table` WHERE `system_title`="' . strtolower($this->tableName) . '"';
         try {
-            $req = $dbConnect->query($sql);
+            $req = $dbConnection->query($sql);
             $result = $req->fetch_array(MYSQLI_ASSOC);
             if(empty($result)){
                 echo '<pre>';
@@ -296,10 +305,13 @@ abstract class GI_DAO extends GI_Object {
     protected function tableHasBaseColumns(){
         if(is_null($this->tableHasBaseColumns)){
             $this->tableHasBaseColumns = true;
-            $dbConnect = dbConnection::getInstance($this->getDBType());
+            $dbConnection = dbConnection::getInstance($this->getDBType());
+            if(empty($dbConnection)){
+                return false;
+            }
             if ($this->getDBType() !== 'master') {
                 $tableQuery = 'SELECT * FROM `' . dbConfig::getDbPrefix($this->getDBType()) . 'table` WHERE `id`="' . $this->tableId . '"';
-                $tableReq = $dbConnect->query($tableQuery);
+                $tableReq = $dbConnection->query($tableQuery);
                 $tableResult = $tableReq->fetch_all(MYSQLI_ASSOC);
                 if ($tableResult) {
                     $tableInfo = $tableResult[0];
@@ -447,10 +459,13 @@ abstract class GI_DAO extends GI_Object {
         if ($status !== '0') {
             $status = '1';
         }
-        $dbConnect = dbConnection::getInstance($dbType);
+        $dbConnection = dbConnection::getInstance($dbType);
+        if(empty($dbConnection)){
+            return false;
+        }
         $sql = 'SELECT * FROM `' . dbConfig::getDbPrefix($dbType) . $tableName . '` WHERE `id`=' . $id . ' AND `status` = ' . $status;
         try {
-            $req = $dbConnect->query($sql);
+            $req = $dbConnection->query($sql);
             $daoClass = get_called_class();
             $tempModel = new $daoClass($tableName, array(
                 'dbType' => $dbType
@@ -521,6 +536,9 @@ abstract class GI_DAO extends GI_Object {
         }
 
         $dbConnection = dbConnection::getInstance($dbType);
+        if(empty($dbConnection)){
+            return false;
+        }
         //check if the table exists before continuing
         if (!dbConnection::verifyTableExists($tableName, $dbType)) {
             return NULL;
@@ -596,6 +614,9 @@ abstract class GI_DAO extends GI_Object {
             $sqlLimit = ' LIMIT ' . static::buildSQLLimit($pageNumber, $itemsPerPage);
         }
         $dbConnection = dbConnection::getInstance($dbType);
+        if(empty($dbConnection)){
+            return false;
+        }
         $queryString = 'SELECT * FROM `' . dbConfig::getDbPrefix($dbType) . $tableName . '` WHERE `status` = ' . $status . $sqlLimit;
         try {
             $req = $dbConnection->query($queryString);
@@ -617,6 +638,9 @@ abstract class GI_DAO extends GI_Object {
         $tableName = $dataSearch->getTableName();
         $dbType = $dataSearch->getDBType();
         $dbConnection = dbConnection::getInstance($dbType);
+        if(empty($dbConnection)){
+            return false;
+        }
         $queryString = $dataSearch->getSearchString();
         try {
             $req = $dbConnection->query($queryString);
@@ -637,6 +661,9 @@ abstract class GI_DAO extends GI_Object {
     public static function getCountByDataSearch(GI_DataSearch $dataSearch){
         $dbType = $dataSearch->getDBType();
         $dbConnection = dbConnection::getInstance($dbType);
+        if(empty($dbConnection)){
+            return false;
+        }
         $queryString = $dataSearch->getCountString();
         try {
             $req = $dbConnection->query($queryString);
@@ -650,6 +677,9 @@ abstract class GI_DAO extends GI_Object {
     public static function getSumByDataSearch(GI_DataSearch $dataSearch){
         $dbType = $dataSearch->getDBType();
         $dbConnection = dbConnection::getInstance($dbType);
+        if(empty($dbConnection)){
+            return false;
+        }
         $queryString = $dataSearch->getSumString();
         try {
             $req = $dbConnection->query($queryString);
@@ -662,7 +692,10 @@ abstract class GI_DAO extends GI_Object {
 
     public function delete() {
         $id = $this->properties['id'];
-        $dbConnect = dbConnection::getInstance($this->getDBType());
+        $dbConnection = dbConnection::getInstance($this->getDBType());
+        if(empty($dbConnection)){
+            return false;
+        }
         if ($this->tableName != 'login') {
             $auditSql = 'DELETE FROM `' . dbConfig::getDbPrefix($this->getDBType()) . static::getTableName() . '_audit` WHERE `target_id`=' . $id;
         } else {
@@ -671,9 +704,9 @@ abstract class GI_DAO extends GI_Object {
         $sql = 'DELETE FROM `' . dbConfig::getDbPrefix($this->getDBType()) . static::getTableName() . '` WHERE id=' . $id;
         try {
             if ($auditSql) {
-                $dbConnect->query($auditSql);
+                $dbConnection->query($auditSql);
             }
-            $dbConnect->query($sql);
+            $dbConnection->query($sql);
             $this->clearProperties();
             return true;
         } catch (Exception $ex) {
@@ -688,7 +721,10 @@ abstract class GI_DAO extends GI_Object {
         return $this->save();
          */
         $id = $this->getProperty('id');
-        $dbConnect = dbConnection::getInstance($this->getDBType());
+        $dbConnection = dbConnection::getInstance($this->getDBType());
+        if(empty($dbConnection)){
+            return false;
+        }
         $uid = Login::getUserId(true);
         $tempInception = GI_Time::getDateTime();
         $lastModTime = GI_Time::formatToGMT($tempInception);
@@ -700,7 +736,7 @@ abstract class GI_DAO extends GI_Object {
         }
         $sql .= 'WHERE `id`=' . $id;
         try {
-            $dbConnect->query($sql);
+            $dbConnection->query($sql);
             $this->setProperty('status', 0);
             return true;
         } catch (Exception $ex) {
@@ -744,6 +780,9 @@ abstract class GI_DAO extends GI_Object {
 
     public function prepareValue($value, $column, $ignoreBaseDateTimes = false){
         $dbConnection = dbConnection::getInstance($this->getDBType());
+        if(empty($dbConnection)){
+            return false;
+        }
         $columnType = 'text';
         $columnNotNull = false;
         if(isset($this->cols[$column])){
@@ -785,6 +824,9 @@ abstract class GI_DAO extends GI_Object {
 
     protected function insert() {
         $dbConnection = dbConnection::getInstance($this->getDBType());
+        if(empty($dbConnection)){
+            return false;
+        }
         $columns = '';
         $values = '';
         $tempInception = NULL;
@@ -895,6 +937,9 @@ abstract class GI_DAO extends GI_Object {
 
     protected function update() {
         $dbConnection = dbConnection::getInstance($this->getDBType());
+        if(empty($dbConnection)){
+            return false;
+        }
         UserFactory::setDBType($this->getDBType());
         $uid = Login::getUserId(true);
         UserFactory::resetDBType();

@@ -3,8 +3,8 @@
  * Description of config.project
  *
  * @author General Internet
- * @copyright  2016 General Internet
- * @version    2.0.10
+ * @copyright  2019 General Internet
+ * @version    4.0.0
  */
 //Local
 $localHost = array(
@@ -46,6 +46,9 @@ define('SITE_TITLE', 'Civil Real Estate Solutions');
 
 /** @const email address of root user account */
 define('ROOT_USER_EMAIL', 'admin@generalinternet.ca');
+
+/** @const email address for customer support */
+define('SUPPORT_EMAIL', 'support@generalinternet.ca');
 
 /** @const boolean whether or not this application is deployed to a worker environment or not */
 define ('IS_WORKER_SERVER', false);
@@ -104,6 +107,9 @@ if (defined('HTML_PROTOCOL') && HTML_PROTOCOL === 'https') {
 }
 
 define('ENABLE_BROWSER_NOTIFICATIONS', true);
+
+//define('CHAT_ENABLED', true);
+define('CHAT_ENABLED', false); //TEMP
 /* * ******* */
 
 /** @const boolean, whether the site allows file uploading */
@@ -151,6 +157,9 @@ define('REGISTER_REQUIRES_CONFIRMATION', false);
 /** @const does registering require a confirmation code (this is for quick email/phone verification within a registration form) */
 define('REGISTER_REQUIRES_CODE_CONFIRMATION', true);
 
+/** @const does the site allow users to register themselves */
+define('REGISTRATION_ENABLED', false);
+
 /*****Mandrill Constants*****/
     define('MANDRILL_ENABLED', true);
     
@@ -160,7 +169,7 @@ define('REGISTER_REQUIRES_CODE_CONFIRMATION', true);
 
     define('MANDRILL_SMTP_USERNAME', 'General Internet Inc.');
     
-    define('MANDRILL_SUBACCOUNT', ''); //this subaccount has an hourly quota of 5
+    define('MANDRILL_SUBACCOUNT', 'civil-real-estate');
     
     define('MANDRILL_DEFAULT_TAG', SESSION_NAME);
 /**********/
@@ -283,7 +292,7 @@ if (DEV_MODE) {
     define('QB_CLIENT_SECRET', 'zvgIWHBAQtCATrrnfXlvPukCqYwzuQORcBB5zMMp');
     define('QB_LOG_PATH', '/Users/GI_DT_7/Desktop/newFolderForLog');
     define('QB_WEBHOOKS_TOKEN', '');
-    define('QB_REDIRECT_URL', 'http://localhost/GI_Framework/index.php?controller=accounting&action=handleQBOAuth2');
+    define('QB_REDIRECT_URL', 'http://localhost/GI-Framework-V4/index.php?controller=accounting&action=handleQBOAuth2');
     define('QB_PRODUCTION_MODE', false); //Always false for DEV MODE
 } else {
     define('QB_CLIENT_ID', 'Q0G0GcNIiAs266OQdcZzD4c8j9I58pYL4PnYhqqlk5Ua6e9bTI'); //GI DEV
@@ -296,7 +305,7 @@ if (DEV_MODE) {
 
 define('APCU_TTL', 2419200); //28 Days
 
-
+define('USE_ADVANCED_SESSION_FUNCTIONS', true);
 
 /* * ****** */
 
@@ -324,6 +333,14 @@ define('APCU_TTL', 2419200); //28 Days
     define('PASS_MIN_LENGTH', 8);
     /* * ****** */
 
+if (DEV_MODE || STAGING_MODE) {
+    define('BYPASS_LIVE_OTP', true);
+} else {
+    define('BYPASS_LIVE_OTP', false);
+}
+
 /* * **** Contact Options * */
 
-define('CONTACT_USE_FULLY_QUALIFIED_NAME', true);
+define('CONTACT_USE_FULLY_QUALIFIED_NAME', false);
+
+

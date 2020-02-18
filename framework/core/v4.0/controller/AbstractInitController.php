@@ -38,8 +38,7 @@ abstract class AbstractInitController extends GI_Controller {
         $eventInstaller->installQnAEvents();
         $eventInstaller->installPaymentEvents();
         //TODO - alert w/ success/fail messages
-        print_r('Done Events');
-        die();
+        exit('Done Events');
     }
 
     public function actionContextRoles($attributes) {
@@ -47,14 +46,13 @@ abstract class AbstractInitController extends GI_Controller {
         $installer->installProjectContextRoles();
 
         //TODO - alert w/ success/fail messages
-        print_r('Done Context Roles');
-        die();
+        exit('Done Context Roles');
     }
     
     public function actionLocationTags($attributes) {
         $installer = new LocationTagInstaller();
         if (empty($installer)) {
-            die('error - installer not found');
+            exit('error - installer not found');
         }
         $installer->installTags();
         
@@ -65,19 +63,18 @@ abstract class AbstractInitController extends GI_Controller {
         //Removed Tags
         //Failures
         
-        die('Done Location Tags');
+        
+        exit('Done Location Tags');
     }
     
     public function actionBOSContact($attributes) {
         $superAdminRole = RoleFactory::getRoleBySystemTitle('super_admin');
         if (empty($superAdminRole)) {
-            print_r('ERROR - Super Admin Role Not Found.');
-            die();
+            exit('ERROR - Super Admin Role Not Found.');
         }
         $users = UserFactory::getUsersByRole($superAdminRole);
         if (empty($users)) {
-            print_r('ERROR - User with Super Admin Role Not Found.');
-            die();
+            exit('ERROR - User with Super Admin Role Not Found.');
         }
         $user = $users[0];
         
@@ -95,8 +92,7 @@ abstract class AbstractInitController extends GI_Controller {
             $ind->setProperty('contact_ind.first_name', 'Super');
             $ind->setProperty('contact_ind.last_name', 'Admin');
             if (!$ind->save()) {
-                print_r('ERROR - Could Not Save Super Admin Contact Ind');
-                die();
+                exit('ERROR - Could Not Save Super Admin Contact Ind');
             }
         }
         $orgSearch = ContactFactory::search();
@@ -115,13 +111,11 @@ abstract class AbstractInitController extends GI_Controller {
         if (empty($org->getId()) || empty($org->getProperty('contact_org.primary_individual_id'))) {
             $org->setProperty('contact_org.primary_individual_id', $ind->getId());
             if (!$org->save()) {
-                print_r('ERROR - Could Not Save BOS Admin Contact Org');
-                die();
+                exit('ERROR - Could Not Save BOS Admin Contact Org');
             }
         }
         if (!ContactRelationshipFactory::establishRelationship($org, $ind)) {
-            print_r('ERROR - Could Not Save Relationship between Super Admin Contact Ind and BOS Admin Contact Org');
-            die();
+            exit('ERROR - Could Not Save Relationship between Super Admin Contact Ind and BOS Admin Contact Org');
         }
         
         //contact cat (internal)
@@ -135,12 +129,11 @@ abstract class AbstractInitController extends GI_Controller {
             $cat = ContactCatFactory::buildNewModel('internal');
             $cat->setProperty('contact_id', $org->getId());
             if (!$cat->save()) {
-                print_r('ERROR - Could Not Save Contact Cat');
-                die();
+                exit('ERROR - Could Not Save Contact Cat');
             }
         }
         
-        print_r('Done Admin Contacts<br>');
+        exit('Done Admin Contacts');
     }
     
     public function actionRun($attributes){

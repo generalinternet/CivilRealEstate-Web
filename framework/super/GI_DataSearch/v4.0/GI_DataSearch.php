@@ -869,6 +869,9 @@ class GI_DataSearch extends GI_DataSearchFilterable{
         $cleanString = $string;
         if($this->escapeStrings){
             $dbConnect = dbConnection::getInstance($this->getDBType());
+            if(empty($dbConnect)){
+                return false;
+            }
             $cleanString = $dbConnect->real_escape_string($string);
         }
         return $cleanString;
@@ -983,6 +986,9 @@ class GI_DataSearch extends GI_DataSearchFilterable{
         
         if($this->returnRaw){
             $dbConnect = dbConnection::getInstance($this->getDBType());
+            if(empty($dbConnect)){
+                return false;
+            }
             $req = $dbConnect->query($selectString);
             return $req->fetch_all(MYSQLI_ASSOC);
         } elseif($this->factoryCreated()){
@@ -1387,6 +1393,9 @@ class GI_DataSearch extends GI_DataSearchFilterable{
         $rowTerm = 'rows';
         if($runQuery){
             $dbConnection = dbConnection::getInstance($dbType);
+            if(empty($dbConnection)){
+                return false;
+            }
             try {
                 $result = $dbConnection->query($finalQuery);
                 $affectedCount = $dbConnection->affected_rows;

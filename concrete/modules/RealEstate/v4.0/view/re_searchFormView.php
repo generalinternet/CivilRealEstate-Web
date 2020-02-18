@@ -1,6 +1,6 @@
 <?php
 
-class RESearchFormView extends GI_View{
+class RESearchFormView extends AbstractRESearchFormView{
     protected $useShadowBox = false;
     protected $useBasicSearch = false;
     protected $hideAdvancedSearch = false;

@@ -35,6 +35,11 @@ class REListingController extends AbstractREListingController {
                 ->setItemsPerPage($itemPerPage)
                 ->setQueryId($queryId);
         
+        if(isset($attributes['openHouse']) && $attributes['openHouse'] == 1){
+            $search->setSearchValue('openHouse', true, true);
+            $mlsSearch->setSearchValue('openHouse', true, true);
+        }
+        
         $search->filterNull('mls_listing_id');
         $reListingTable = REListingFactory::getDbPrefix() . 're_listing';
         $search->innerJoin('re_listing_status', 'id', $reListingTable, 're_listing_status_id', 'rls')
@@ -77,10 +82,10 @@ class REListingController extends AbstractREListingController {
         }
 
         $sampleListing  = REListingFactory::buildNewModel($type);
-
+        
         $sampleListing->addCustomFiltersToDataSearch($mlsSearch);
         $sampleListing->addUIFiltersToDataSearch($mlsSearch, $mlsListingTable);
-
+        
         $sampleListing->addCustomFiltersToDataSearch($search);
         $sampleListing->addUIFiltersToDataSearch($search, $reListingTable);
 
@@ -122,6 +127,8 @@ class REListingController extends AbstractREListingController {
     }
 
     public function actionOpenHouse($attributes){
+        $attributes['openHouse'] = 1;
+        return $this->actionIndex($attributes);
         $queryId = 'gi_1';
 
         /*items displayed per page*/
@@ -182,7 +189,7 @@ class REListingController extends AbstractREListingController {
             'action' => 'openHouse',
             'type' => $type
         );
-
+                
         $pageBar = $listingSearch->getPageBar($pageBarLinkArray);
         $sampleListing = MLSListingFactory::buildNewModel($type);
         $view = new MLSOpenHouseView($listings, $pageBar, $sampleListing);

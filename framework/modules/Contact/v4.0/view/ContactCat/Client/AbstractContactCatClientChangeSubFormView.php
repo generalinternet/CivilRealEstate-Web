@@ -8,11 +8,13 @@
  */
 abstract class AbstractContactCatClientChangeSubFormView extends AbstractContactCatChangeSubFormView {
     
+    /** @var AbstractContactApplicationFormView  */
     protected $applicationFormView;
 
     public function __construct(\GI_Form $form, \AbstractContactCat $contactCat) {
         parent::__construct($form, $contactCat);
         $this->showStepNav = false;
+        $this->addJS('framework/modules/Contact/' . MODULE_CONTACT_VER . '/resources/application/contact_application.js');
     }
 
     protected function buildSteps() {
@@ -71,6 +73,7 @@ abstract class AbstractContactCatClientChangeSubFormView extends AbstractContact
         $this->form->addHTML('congrats, you are done'); //TODO - temp
     }
 
+    /** @var AbstractContactApplicationFormView */
     protected function getApplicationFormView() {
         if (empty($this->applicationFormView)) {
             $application = ContactApplicationFactory::buildNewModel($this->model->getApplicationTypeRef());
@@ -88,7 +91,7 @@ abstract class AbstractContactCatClientChangeSubFormView extends AbstractContact
     }
 
     protected function buildFormFooter() {
-        $this->form->addHTML('<div class="step_form_footer">');
+        $this->form->addHTML('<div class="step_form_footer"><div class="wrap_btns">');
         $this->addCurStepField();
         $step = $this->curStep;
         switch ($step) {
@@ -111,7 +114,7 @@ abstract class AbstractContactCatClientChangeSubFormView extends AbstractContact
                 break;
         }
 
-        $this->form->addHTML('</div>');
+        $this->form->addHTML('</div></div>');
     }
     
     protected function addCancelBtn($buttonText = 'Cancel') {
@@ -122,7 +125,18 @@ abstract class AbstractContactCatClientChangeSubFormView extends AbstractContact
         $attrs = $contact->getViewProfileURLAttrs();
         $attrs['tab'] = 'payments';
         $url = GI_URLUtils::buildURL($attrs);
-        $this->form->addHTML('<a href="'.$url.'"><span class="btn other_btn"><span class="btn_text">'.$buttonText.'</span></span></a>');
+        $this->form->addHTML('<a href="'.$url.'" class="btn other_btn"><span class="btn_text">'.$buttonText.'</span></a>');
+    }
+    
+    protected function buildFormHeader($withStep = true, $classNames = NULL) {
+        if ($this->showStepTitle) {
+            if (!empty($this->stepArray) && isset($this->stepArray[$this->curStep][$this->stepTitleKey])) {
+                $curStepTitle = $this->stepArray[$this->curStep][$this->stepTitleKey];
+            } else {
+                $curStepTitle = $this->curStep;
+            }
+            $this->form->addHTML('<h2 class="step_title '.$classNames.'">'.$curStepTitle.'</h2>');
+        }
     }
 
 }

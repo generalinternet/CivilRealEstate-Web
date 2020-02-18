@@ -18,6 +18,11 @@ abstract class GI_DBConnection {
     );
     
     protected static $verifiedModules = array();
+    protected static $pingErrors = array(
+        'client' => false,
+        'rets' => false,
+        'master' => false,
+    );
 
     protected function __construct() {
         
@@ -28,20 +33,25 @@ abstract class GI_DBConnection {
     }
 
     public static function getInstance($type = 'client') {
+        if(isset(static::$pingErrors[$type]) && static::$pingErrors[$type]){
+            return NULL;
+        }
         if(!isset(static::$instances[$type]) || is_null(static::$instances[$type])){
             static::$instances[$type] = new mysqli(dbConfig::getDbHostURI($type), dbConfig::getDbUsername($type), dbConfig::getDbPassword($type), dbConfig::getDbName($type));
+            if(dbConfig::getDbName($type) && !static::$instances[$type]->ping()){
+                static::$pingErrors[$type] = true;
+                trigger_error('Could not connect to database.');
+                return NULL;
+            }
             static::$instances[$type]->set_charset('utf8');
             mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-        }
-        if(dbConfig::getDbName($type) && !static::$instances[$type]->ping()){
-            trigger_error('Could not connect to database.');
         }
         return static::$instances[$type];
     }
 
     public static function verifyTableExists($tableName, $dbType = 'client') {
         $dbConnection = static::getInstance($dbType);
-        if(!$dbConnection){
+        if(empty($dbConnection)){
             return false;
         }
         $verifyTableSQL = 'SHOW TABLES LIKE "' . dbConfig::getDbPrefix() . $tableName . '"';

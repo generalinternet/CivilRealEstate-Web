@@ -184,13 +184,16 @@ abstract class AbstractNotificationService extends GI_Service {
     }
 
     public static function notifyBySocketUserId($socketUserId) {
+        if (empty($socketUserId)) {
+            return false;
+        }
         $data = array(
             'socketUserId' => $socketUserId
         );
         return static::socketEmit('notify', $data);
     }
-    
-    public static function sendChatMsg(AbstractUser $user, $msg, $otherMsgData = array(), $socketUserId = NULL){
+
+    public static function sendChatMsg(AbstractUser $user, $msg, $otherMsgData = array(), $socketUserId = NULL) {
         $toSocketUserId = Login::getSocketUserId($user->getId());
         static::sendChatMsgToSocketUser($toSocketUserId, $msg, $otherMsgData, $socketUserId);
     }
@@ -246,7 +249,7 @@ abstract class AbstractNotificationService extends GI_Service {
             $client->emit($emit, $data);
             return true;
         } catch (Exception $ex) {
-            die(var_dump($ex->getMessage()));
+           // die(var_dump($ex->getMessage()));
             return false;
         }
     }

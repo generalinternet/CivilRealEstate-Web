@@ -28,6 +28,7 @@ abstract class AbstractTagInstaller extends GI_Object {
                     $tag = $tagsToRemove[$ref];
                     unset($tagsToRemove[$ref]);
                     if (!$this->updateTagPropertiesFromDefinition($tag, $definition)) {
+                        echo 'Error - updating tag props<br/>';
                         //TODO - add failure
                         continue;
                     }
@@ -35,6 +36,7 @@ abstract class AbstractTagInstaller extends GI_Object {
                     $tag = $this->installTag($definition);
                 }
                 if (empty($tag)) {
+                    echo 'Error - empty tag<br/>';
                     //TODO - add failure string
                     continue;
                 }
@@ -47,6 +49,7 @@ abstract class AbstractTagInstaller extends GI_Object {
                 $installDefinition = $tag->getInstallDefinition();
                 if (!empty($installDefinition) && isset($installDefinition['parent_tag_refs'])) {
                     if (!$this->updateTagParentConnections($tag, $installDefinition['parent_tag_refs'])) {
+                        echo 'Error - updating parent tag connections<br/>';
                         continue;
                     }
                 }
@@ -55,6 +58,7 @@ abstract class AbstractTagInstaller extends GI_Object {
         if (!empty($tagsToRemove)) {
             foreach ($tagsToRemove as $tagToRemove) {
                 if (!$tagToRemove->softDelete()) {
+                    echo 'Error - could not soft delete<br/>';
                     //TODO - failure message
                 }
                 //TODO - old tags remove report - add string

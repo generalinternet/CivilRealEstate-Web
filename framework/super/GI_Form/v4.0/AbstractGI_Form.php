@@ -1955,7 +1955,7 @@ abstract class AbstractGI_Form {
             $this->openHideDuringOTP($fieldName);
             $otpMsgTypeName = $fieldName . '_msg_type';
             $msgTypeFieldSettings = array(
-                'displayName' => 'How would you like to receive your ' . $otpTerm,
+                'displayName' => 'How would you like us to send you a temporary ' . $otpTerm . '?',
                 'options' => array(
                     'email' => 'Email',
                     'phone' => 'Text Message'
@@ -1971,25 +1971,27 @@ abstract class AbstractGI_Form {
             $this->closeHideDuringOTP($fieldName);
         }
         
+        $togglerFieldName = $fieldName . '_toggler';
+        
         $this->openShowDuringOTP($fieldName);
-            $this->addHTML('If you’d like to change how you receive your ' . $otpTerm .', <a href="" class="toggle_otp">click here</a>.');
+            $this->addHTML('<p>If you’d like to change how you receive your ' . $otpTerm .', <a href="" class="toggle_otp">click here</a>.</p>');
         $this->closeShowDuringOTP($fieldName);
         $togglerValue = 0;
-        if($this->wasSubmitted() && $this->validate() && $readyToSend){
+        if($this->wasSubmitted()){
             if(isset($otpMsgTypeName)){
                 $otpMsgType = filter_input(INPUT_POST, $otpMsgTypeName);
             }
             if(!$useUserInfo){
                 $emailValue = filter_input(INPUT_POST, $otpEmailField);
                 if($otpMsgType == 'email' && empty($emailValue)){
-                    $this->addFieldError($otpEmailField, 'required', 'Required.');
+                    $this->addFieldError($otpEmailField, 'required', 'Required field.');
                 }
                 $phoneValue = filter_input(INPUT_POST, $otpPhoneField);
                 if($otpMsgType == 'phone' && empty($phoneValue)){
-                    $this->addFieldError($otpPhoneField, 'required', 'Required.');
+                    $this->addFieldError($otpPhoneField, 'required', 'Required field.');
                 }
             }
-            if(!$this->fieldErrorCount()){
+            if($readyToSend && !$this->fieldErrorCount()){
                 $togglerValue = 1;
                
                 $sendOTP = false;
@@ -2074,8 +2076,9 @@ abstract class AbstractGI_Form {
                 $otpCheckName = $fieldName . '_check';
                 
                 $otpCheckVal = filter_input(INPUT_POST, $otpCheckName);
+                $otpTogglerVal = filter_input(INPUT_POST, $togglerFieldName);
                 $required = false;
-                if(!is_null($otpCheckVal)){
+                if($otpTogglerVal && !is_null($otpCheckVal)){
                     $required = true;
                 } else {
                     $this->addFieldError($fieldName . '_prevent', 'invalid', 'Error added to force OTP validation');
@@ -2100,7 +2103,7 @@ abstract class AbstractGI_Form {
             }
         }
         
-        $this->addField($fieldName . '_toggler', 'onoff', array(
+        $this->addField($togglerFieldName, 'onoff', array(
             'formElementClass' => 'hide_on_load otp_toggler',
             'fieldClass' => 'checkbox_toggler',
             'value' => $togglerValue,

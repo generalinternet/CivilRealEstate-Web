@@ -735,7 +735,35 @@ class GI_StringUtils{
             'hidden' => 'invisible',
             'close_sml' => 'remove_sml',
             'minimize' => 'contract',
-            'maximize' => 'expand'
+            'maximize' => 'expand',
+            'contract sml' => 'contract',
+            'expand sml' => 'expand',
+            'clipboard work_order' => 'clipboard_work_order',
+            'clipboard text' => 'clipboard_text',
+            'clipboard money' => 'clipboard_money',
+            'arrow_up full' => 'arrow_up_full',
+            'arrow_down full' => 'arrow_down_full',
+            'arrow_left full' => 'arrow_left_full',
+            'arrow_right full' => 'arrow_right_full',
+            
+            'inventory' => 'barcode',
+            'item' => 'barcode',
+            'workorder' => 'clipboard_text',
+            'order' => 'clipboard_text',
+            'purchase_order' => 'clipboard_text',
+            'purchase_orders' => 'clipboard_text',
+            'sales_order' => 'clipboard_money',
+            'sales_orders' => 'clipboard_money',
+            'work_order' => 'clipboard_work_order',
+            'head_office' => 'office',
+            'admin' => 'gear',
+            'notification' => 'bell',
+            'client' => 'contacts',
+            'contact_warehouse' => 'warehouse',
+            'category' => 'contacts',
+            'internal' => 'contacts',
+            'shipper' => 'shipping',
+            'users' => 'person',
         );
         if(isset($nameMatches[$fileName])){
             return $nameMatches[$fileName];
@@ -754,12 +782,15 @@ class GI_StringUtils{
      * @return type
      */
     public static function getSVGIcon($fileName, $width = '1em', $height = '1em', $classNames = '', $customPath = false, $returnNullIfMissing = false){
+        if(substr($fileName, strlen($fileName) - strlen('_sml') ) === '_sml' || substr($fileName, strlen($fileName) - strlen(' sml') ) === ' sml'){
+            $classNames .= ' sml';
+        }
         //Find SVG file
         if($customPath){
             $svgFilePath = $fileName;
         } else {
             $svgDirPath = 'framework/core/' . FRMWK_CORE_VER. '/resources/media/svgs/';
-            $iconName = static::getSVGIconName($fileName);
+            $iconName = $fileName;
             $svgFilePath = $svgDirPath.'icon_svg_'.$iconName.'.svg';
         }
         if(!file_exists($svgFilePath)){
@@ -772,9 +803,6 @@ class GI_StringUtils{
             }
             //Default
             $svgFilePath = $svgDirPath.'icon_svg_info.svg';
-        }
-        if(substr($fileName, strlen($fileName) - strlen('_sml') ) === '_sml'){
-            $classNames .= ' sml';
         }
         return '<span class="svg_icon '.$classNames.'" style="width:'.$width.';height:'.$height.';">'.file_get_contents($svgFilePath).'</span>';
     }
@@ -882,34 +910,6 @@ class GI_StringUtils{
             return false;
         }
         return true;
-    }
-    
-    public static function getSVGIconName($icon) {
-        $iconMap = array(
-            'inventory' => 'barcode',
-            'item' => 'barcode',
-            'workorder' => 'clipboard_text',
-            'order' => 'clipboard_text',
-            'purchase_order' => 'clipboard_text',
-            'purchase_orders' => 'clipboard_text',
-            'sales_order' => 'clipboard_money',
-            'sales_orders' => 'clipboard_money',
-            'work_order' => 'clipboard_work_order',
-            'head_office' => 'office',
-            'admin' => 'gear',
-            'notification' => 'bell',
-            'client' => 'contacts',
-        //    'vendor' => 'contacts',
-            'contact_warehouse' => 'warehouse',
-            'category' => 'contacts',
-            'internal' => 'contacts',
-            'shipper' => 'shipping',
-            'users' => 'person',
-        );
-        if (isset($iconMap[$icon])) {
-            return $iconMap[$icon];
-        }
-        return $icon;
     }
     
     public static function getLabelWithValue($label, $value = NULL, $forceShow = false, $emptyValue = '--'){

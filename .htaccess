@@ -51,6 +51,9 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^contact/1 index.php?controller=static&action=contact&sent=1 [NC,L]
 RewriteRule ^referrals/1 index.php?controller=static&action=referrals&sent=1 [NC,L]
 
+RewriteRule ^admin$ index.php?controller=admin&action=index [NC,L]
+RewriteRule ^admin/$ index.php?controller=admin&action=index [NC,L]
+
 RewriteRule ^login$ index.php?controller=login&action=index [NC,L]
 RewriteRule ^login/$ index.php?controller=login&action=index [NC,L]
 

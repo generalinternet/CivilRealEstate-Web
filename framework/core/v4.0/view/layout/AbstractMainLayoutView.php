@@ -1642,7 +1642,7 @@ abstract class AbstractMainLayoutView extends AbstractLayoutView {
     protected function addRealEstateMenu() {
         if (dbConnection::isModuleInstalled('realEstate')) {
             if(Permission::verifyByRef('view_re_listing_index') || Permission::verifyByRef('view_modified_mls_listing_index')){
-                $this->menuView->addSubMenu('main', 'realEstate', $this->getMenuTextWithSVGIcon('real_estate', 'Real Estate'));
+                $this->menuView->addSubMenu('main', 'realEstate', $this->getMenuTextWithSVGIcon('re_listings', 'Real Estate'));
                 
                 if(Permission::verifyByRef('view_re_listing_index')) {
                     $reIndexURL = GI_URLUtils::buildURL(array(

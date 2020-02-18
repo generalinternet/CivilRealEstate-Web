@@ -495,7 +495,7 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
         $finalQuery = 'WITH RECURSIVE TAG_LINK_CTE (c_tag_id, p_tag_id) AS (';
 	$finalQuery .= 'SELECT c_tag_id, p_tag_id ';
 	$finalQuery .= 'FROM ' . $dbPrefix . 'tag_link_to_tag ';
-	$finalQuery .= 'WHERE p_tag_id = 229 ';
+	$finalQuery .= 'WHERE p_tag_id = ' . $tagId . ' ';
 	$finalQuery .= 'UNION ALL ';
 	$finalQuery .= 'SELECT TAG_LINK.c_tag_id, TAG_LINK.p_tag_id ';
 	$finalQuery .= 'FROM ' . $dbPrefix . 'tag_link_to_tag TAG_LINK ';
@@ -545,7 +545,7 @@ abstract class AbstractTagFactory extends GI_ModelFactory {
         $finalQuery = 'WITH RECURSIVE TAG_LINK_CTE (c_tag_id, p_tag_id) AS (';
 	$finalQuery .= 'SELECT c_tag_id, p_tag_id ';
 	$finalQuery .= 'FROM ' . $dbPrefix . 'tag_link_to_tag ';
-	$finalQuery .= 'WHERE p_tag_id = 229 ';
+	$finalQuery .= 'WHERE p_tag_id = ' . $tagId . ' ';
 	$finalQuery .= 'UNION ALL ';
 	$finalQuery .= 'SELECT TAG_LINK.c_tag_id, TAG_LINK.p_tag_id ';
 	$finalQuery .= 'FROM ' . $dbPrefix . 'tag_link_to_tag TAG_LINK ';

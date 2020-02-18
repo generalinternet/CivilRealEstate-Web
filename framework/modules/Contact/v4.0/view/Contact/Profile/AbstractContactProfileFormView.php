@@ -93,6 +93,7 @@ abstract class AbstractContactProfileFormView extends FormStepView {
             return;
         } else {
             foreach($tagListFormViews as $tagListFormView){
+                $tagListFormView->setRequired(true);
                 $this->form->addHTML($tagListFormView->getHTMLView());
             }
         }

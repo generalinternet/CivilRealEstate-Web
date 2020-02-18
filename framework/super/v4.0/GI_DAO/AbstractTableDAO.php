@@ -75,10 +75,13 @@ abstract class AbstractTableDAO extends GI_DAO {
         if ($status !== '0') {
             $status = '1';
         }
-        $dbConnect = dbConnection::getInstance($dbType);
+        $dbConnection = dbConnection::getInstance($dbType);
+        if(empty($dbConnection)){
+            return false;
+        }
         $sql = 'SELECT * FROM ' . dbConfig::getDbPrefix($dbType) . $tableName . ' WHERE id=' . $id . ' AND status = ' . $status;
         try {
-            $req = $dbConnect->query($sql);
+            $req = $dbConnection->query($sql);
             $daoClass = get_called_class();
             $tempModel = new $daoClass($tableName, array(
                 'dbType' => $dbType

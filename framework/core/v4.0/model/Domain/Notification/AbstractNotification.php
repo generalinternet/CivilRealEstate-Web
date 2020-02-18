@@ -140,7 +140,9 @@ abstract class AbstractNotification extends GI_Model {
                 if ($loginArray) {
                     foreach ($loginArray as $login) {
                         $socketUserId = $login->getProperty('socket_user_id');
-                        array_push($socketUsersToNotify, $socketUserId);
+                        if (!empty($socketUserId)) {
+                            array_push($socketUsersToNotify, $socketUserId);
+                        }
                     }
                 }
                 foreach ($socketUsersToNotify as $socketUserId) {

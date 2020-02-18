@@ -837,7 +837,6 @@ abstract class AbstractContactCat extends GI_Model {
             static::addTagFilterGroupToDataSearch($catTypeRef, $dataSearch);
         }
         if (!is_null($form) && $form->wasSubmitted() && $form->validate()) {
-            $dataSearch->clearSearchValues();
             $dataSearch->setSearchValue('search_type', 'advanced');
 
             if(!empty($catTypeRef)){

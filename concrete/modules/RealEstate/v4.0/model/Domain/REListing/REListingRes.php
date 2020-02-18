@@ -142,23 +142,23 @@ class REListingRes extends AbstractREListingRes {
      * @param array $redirectArray
      * @return AbstractRESearchFormView
      */
-    public static function getSearchForm(GI_DataSearch $dataSearch, $type = NULL, &$redirectArray = array(), GI_Form $form = null){
-        $searchView = static::getSearchFormView($form, $dataSearch);
-        return $searchView;
-    }
+//    public static function getSearchForm(GI_DataSearch $dataSearch, $type = NULL, &$redirectArray = array(), GI_Form $form = null){
+//        $searchView = static::getSearchFormView($form, $dataSearch);
+//        return $searchView;
+//    }
 
     /**
      * @param GI_Form $form
      * @param GI_DataSearch $dataSearch
      * @return \AbstractRESearchFormView
      */
-    protected static function getSearchFormView(GI_Form $form, GI_DataSearch $dataSearch = NULL){
-        $searchValues = array();
-        if($dataSearch){
-            $searchValues = $dataSearch->getSearchValues();
-        }
-        $searchValues['queryId'] = $dataSearch->getQueryId();
-        $searchView = new RESearchFormView($form);
-        return $searchView;
-    }
+//    protected static function getSearchFormView(GI_Form $form, GI_DataSearch $dataSearch = NULL){
+//        $searchValues = array();
+//        if($dataSearch){
+//            $searchValues = $dataSearch->getSearchValues();
+//        }
+//        $searchValues['queryId'] = $dataSearch->getQueryId();
+//        $searchView = new RESearchFormView($form);
+//        return $searchView;
+//    }
 }

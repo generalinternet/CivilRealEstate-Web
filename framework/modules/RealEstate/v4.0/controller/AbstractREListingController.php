@@ -40,6 +40,10 @@ abstract class AbstractREListingController extends GI_Controller {
                 ->setItemsPerPage($itemPerPage)
                 ->setQueryId($queryId);
         
+        if(isset($attributes['openHouse']) && $attributes['openHouse'] == 1){
+            $mlsSearch->setSearchValue('openHouse', true, true);
+        }
+        
         $search->filterNull('mls_listing_id');
         $reListingTable = REListingFactory::getDbPrefix() . 're_listing';
         $search->innerJoin('re_listing_status', 'id', $reListingTable, 're_listing_status_id', 'rls')
@@ -135,6 +139,11 @@ abstract class AbstractREListingController extends GI_Controller {
         $returnArray = GI_Controller::getReturnArray($view);
         $returnArray['breadcrumbs'] = $listing->getBreadcrumbs();
         return $returnArray;
+    }
+    
+    public function actionOpenHouse($attributes){
+        $attributes['openHouse'] = 1;
+        return $this->actionIndex($attributes);
     }
     
 }
