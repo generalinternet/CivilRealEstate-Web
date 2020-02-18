@@ -7,7 +7,7 @@
     &__banner
         height: 100%
     &__banner-img
-        display: block
+        display: none
         width: 100%
         height: 100%
         object-fit: cover
@@ -35,7 +35,7 @@
         padding: 1.5em 3em
         .button
             padding: 1.6em 4em
-            font-size: 1em
+            font-size: 0.8em
         &_bg_secondary
             background-color: $color_secondary
         &:hover
@@ -51,6 +51,8 @@
         max-width: 400px
         display: block
     &__step
+        display: none
+        padding-top: 1em
         .form__input
             &:last-child
                 margin-bottom: 0!important
@@ -63,7 +65,7 @@
                     display: block
                     width: 100%!important
                     border: none!important
-                    background: $color_white!important
+                    background-color: $color_white!important
     &__step-1
         .form__input
             &_type_text
@@ -107,7 +109,7 @@
     &__step-selector
         padding: 1.5em 0
         padding-left: 5em
-        background: $color_white
+        background-color: $color_white
     &__step-selector-wrap
         position: relative
         display: inline-block
@@ -118,7 +120,7 @@
             width: 100%
             top: 12px
             height: 2px
-            background: $color_black
+            background-color: $color_black
             position: absolute
             z-index: 0
     &__step-selector-item
@@ -136,7 +138,6 @@
         font-weight: 700
         color: $color_secondary
         margin-top: 8px
-        cursor: pointer
     &__step-number
         display: block
         width: 26px
@@ -144,9 +145,49 @@
         line-height: 26px
         font-weight: 700
         border-radius: 4px
-        cursor: pointer
-        background: $color_secondary
+        background-color: $color_primary
         color: $color_white
+        background-position: center
+        background-repeat: no-repeat
+    
+    &_step_1
+        .charity
+            &__step-1,
+            &__banner-img_step-1
+                display: block
+            &__step-number_number-1
+                background-color: $color_secondary
+    &_step_2
+        .charity
+            &__step-2,
+            &__banner-img_step-2
+                display: block
+            &__step-number_number-2
+                background-color: $color_secondary
+            &__step-number_number-1
+                background-image: url('../media/img/icon/check.png')
+                span
+                    opacity: 0
+    &_step_3
+        .charity
+            &__step-3,
+            &__banner-img_step-3
+                display: block
+            &__step-number_number-3
+                background-color: $color_secondary
+            &__step-number_number-1,
+            &__step-number_number-2
+                background-image: url('../media/img/icon/check.png')
+                span
+                    opacity: 0
+    &_step_4
+        .charity
+            &__step-4,
+            &__banner-img_step-4
+                display: block
+            &__step-number_number-4
+                background-color: $color_secondary
+
 @media screen and ( max-width: 768px )
     .charity
         .row

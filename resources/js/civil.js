@@ -1,6 +1,7 @@
 $(document).ready(function () {
     RelistingSlider.init();
     RelistingSearch.init();
+    CharityForm.init();
 });
 
 var EmbeddedMap = function () {
@@ -251,6 +252,35 @@ var RelistingSearch = function (){
             var parentForm = $(this).parents('form').first();
             if(parentForm.length !== 0){
                 parentForm.submit();
+            }
+        });
+    };
+
+    return ins;
+}();
+
+var CharityForm = function(){
+    var ins = {};
+
+    var component = {
+        nextStepButtonClass: ".charity__button_next-step",
+        charityWrapClass: ".charity_step_1",
+        maxStep: 4
+    };
+
+    ins.init = function(){
+        var charityWrap = $(component.charityWrapClass);
+        if(charityWrap.length == 0){
+            return;
+        }
+        $(document).on('click', component.nextStepButtonClass, function(){
+            event.preventDefault();
+            var currentStep = charityWrap.data('step');
+            var nextStep = currentStep + 1;
+            if(nextStep < component.maxStep){
+                charityWrap.removeClass('charity_step_' + currentStep);
+                charityWrap.addClass('charity_step_' + nextStep);
+                charityWrap.data('step',nextStep);
             }
         });
     };
