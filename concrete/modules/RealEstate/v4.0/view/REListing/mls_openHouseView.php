@@ -2,7 +2,7 @@
 
 class MLSOpenHouseView extends AbstractMLSIndexView {
     
-    public function __construct($mlsListings, \GI_PageBarView $pageBar, \iMLSListing $sampleListing = null, \GI_SearchView $searchView = NULL) {
+    public function __construct($mlsListings, GI_PageBarView $pageBar, MLSListingRes $sampleListing = null, GI_SearchView $searchView = NULL) {
         parent::__construct($mlsListings, $pageBar, $sampleListing, $searchView);
 
         $this->addCSS('resources/css/search.css');

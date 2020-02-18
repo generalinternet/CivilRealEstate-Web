@@ -43,6 +43,7 @@ require_once 'model/Factory/AbstractMLSSubAreaFactory.php';
 // Abstract Views
 require_once 'view/AbstractMLSSearchFormView.php';
 require_once 'view/AbstractMLSIndexView.php';
+require_once 'view/AbstractMLSListingItemView.php';
 require_once 'view/AbstractMLSListingDetailView.php';
 
 //*** Concrete

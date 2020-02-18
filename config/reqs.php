@@ -30,4 +30,4 @@ set_include_path('framework/modules');
     require_once 'RealEstate/' . FRMWK_VERSION . '.0/realEstate.php';
 set_include_path('');
 
-// require_once 'concrete/modules/Civil/civil.php';
+require_once 'concrete/modules/Civil/civil.php';
