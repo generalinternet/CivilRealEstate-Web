@@ -8,7 +8,6 @@ set_include_path('framework/super');
     require_once 'GI_Form/' . FRMWK_VERSION . '.0/form.php';
     require_once 'GI_DataSearch/' . FRMWK_VERSION . '.0/dataSearch.php';
 set_include_path('');
-die('TEST 07');
 
 set_include_path('framework/core');
     require_once FRMWK_VERSION . '.0/core.php';
