@@ -13,7 +13,7 @@ $localHost = array(
     'aws_bucket' => 'gi12345'
 );
 $stagingHost = array(
-    'siteBase' => 'http://civilrealestate.zcb3x7sjpm.us-west-2.elasticbeanstalk.com/',
+    'siteBase' => 'http://civilrealestate-web.zcb3x7sjpm.us-west-2.elasticbeanstalk.com/',
     'projectBase' => '',
     'aws_bucket' => 'civil-real-estate'
 );
