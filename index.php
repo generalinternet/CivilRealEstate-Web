@@ -1,5 +1,4 @@
 <?php
-die('TEST 01');
 /** 
  * @const DEV_MODE Boolean, determines settings in "config.database.php" and "config.project.php" 
  */
@@ -7,7 +6,7 @@ DEFINE('DEV_MODE', false);
 DEFINE('STAGING_MODE', false);
 //Implied Production Mode if DEV_MODE and STAGING_MODE are both False.
 
-DEFINE('FORCE_ERRORS_ON', false);
+DEFINE('FORCE_ERRORS_ON', true);
 
 if (DEV_MODE || FORCE_ERRORS_ON) {
     error_reporting(E_ALL & ~E_STRICT);
