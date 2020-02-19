@@ -13,7 +13,7 @@ require_once 'service/AbstractAWSService.php';
 require_once 'service/AbstractAlertService.php';
 require_once 'service/AbstractKeyService.php';
 require_once 'service/AbstractSessionService.php';
-
+die('TEST 09');
 // Abstract Domain
 require_once 'model/Domain/Tag/AbstractTag.php';
 require_once 'model/Domain/Tag/AbstractTagInventory.php';
