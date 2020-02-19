@@ -14,7 +14,7 @@ if (DEV_MODE || FORCE_ERRORS_ON) {
     error_reporting(E_ERROR);
     ini_set('display_errors', 0);
 }
-die('TEST 03');
+
 require_once 'config/reqs.php';
 //@todo change to support multi-language selection
 require_once 'config/language/lang_english.php';
@@ -23,4 +23,5 @@ GI_Time::setTimezone('America/Vancouver');
 
 GI_Index::initSystem();
 
+die('TEST 04');
 GI_Index::routeRequest();
