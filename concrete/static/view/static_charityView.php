@@ -8,7 +8,6 @@ class StaticCharityView extends GI_View{
             $form = new GI_Form('charity_form');
         }
         $this->form = $form;
-        $this->buildForm();
     }
 
     protected $isSent = false;
@@ -17,10 +16,12 @@ class StaticCharityView extends GI_View{
     }
 
     protected function buildForm(){
+        if($this->isSent){
+            return $this->addThankyou();
+        }
         $this->addStep1();
         $this->addStep2();
         $this->addStep3();
-        $this->addThankyou();
     }
 
     protected function addStep1(){
@@ -113,7 +114,7 @@ class StaticCharityView extends GI_View{
     }
 
     protected function addThankyou(){
-        $this->form->addHTML('<div class="charity__step charity__step-th data-step="thank-you">');
+        $this->form->addHTML('<div class="charity__step charity__step-thankyou data-step="thank-you">');
             $this->form->addHTML('<div class="charity__content-wrap">');
                 $this->form->addHTML('<h3 class="charity__title"><b>THANK YOU</b> For Making a Difference!</h3>');
                 $this->form->addHTML('<p class="charity__description">A Civil Real Estate Local Expert will be in contact with you promtly.</p>');
@@ -122,13 +123,18 @@ class StaticCharityView extends GI_View{
             $this->form->addHTML('<br>');
             $this->form->addHTML('<div class="charity__content-wrap">');
                 $this->form->addHTML('<div class="charity__content-buttons">');
-                    $this->form->addHTML('<a href="" class="submit_btn button button_theme_primary button_has-icon">DONE <span class="button__icon button__icon_type_check"></span></a>');
+                    $indexURL = GI_URLUtils::buildCleanURL(array(
+                        'controller' => 'static',
+                        'action' => 'index',
+                    ));
+                    $this->form->addHTML('<a href="'.$indexURL.'" class="button button_theme_primary button_has-icon">DONE <span class="button__icon button__icon_type_check"></span></a>');
                 $this->form->addHTML('</div>');
             $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
     }
 
     public function buildView() {
+        $this->buildForm();
         $this->addCharityBannerSection();
         $this->addCharityFormSection();
     }
@@ -139,7 +145,11 @@ class StaticCharityView extends GI_View{
     }
 
     protected function addCharityFormSection(){
-        $this->addHTML('<div class="section section_type_charity charity charity_step_1" data-step="1">');
+        $pieces = 'charity_step_1" data-step="1"';
+        if($this->isSent){
+            $pieces = 'charity_step_thankyou" data-step="thankyou"';
+        }
+        $this->addHTML('<div class="section section_type_charity charity '.$pieces.'>');
             $this->addHTML('<div class="container-fluid">');
                 $this->addHTML('<div class="row">');
                     $this->addHTML('<div class="col-xs-12 col-md-6">');
