@@ -454,8 +454,6 @@ require_once 'view/tag/tag_listFormView.php';
 require_once 'view/tag/tag_formView.php';
 require_once 'view/tag/tag_indexView.php';
 require_once 'view/tag/tagInventory_formView.php';
-
-die('TEST 17');
 require_once 'view/import/import_fileFormView.php';
 require_once 'view/UITable/UITableView.php';
 require_once 'view/UITable/UITableRowView.php';
