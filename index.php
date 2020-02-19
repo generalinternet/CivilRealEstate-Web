@@ -1,4 +1,5 @@
 <?php
+die('TEST 01');
 /** 
  * @const DEV_MODE Boolean, determines settings in "config.database.php" and "config.project.php" 
  */
