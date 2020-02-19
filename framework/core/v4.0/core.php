@@ -13,7 +13,7 @@ require_once 'service/AbstractAWSService.php';
 require_once 'service/AbstractAlertService.php';
 require_once 'service/AbstractKeyService.php';
 require_once 'service/AbstractSessionService.php';
-die('TEST 09');
+
 // Abstract Domain
 require_once 'model/Domain/Tag/AbstractTag.php';
 require_once 'model/Domain/Tag/AbstractTagInventory.php';
@@ -78,6 +78,7 @@ require_once 'model/Domain/UserActionRequired/AbstractUserActionRequired.php';
 require_once 'model/Domain/UserActionRequired/AbstractUserActionRequiredRedirect.php';
 require_once 'model/Domain/InterfacePerspective/AbstractInterfacePerspective.php';
 require_once 'model/Domain/UserLinkToApp/AbstractUserLinkToApp.php';
+die('TEST 10');
 
 // Abstract Factory
 require_once 'model/Factory/AbstractTagFactory.php';
