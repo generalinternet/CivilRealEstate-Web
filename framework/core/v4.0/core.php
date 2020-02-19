@@ -382,7 +382,6 @@ require_once 'model/Domain/Core/UserActionRequired/UserActionRequired.php';
 require_once 'model/Domain/Core/UserActionRequired/UserActionRequiredRedirect.php';
 require_once 'model/Domain/Core/InterfacePerspective/InterfacePerspective.php';
 require_once 'model/Domain/Core/UserLinkToApp/UserLinkToApp.php';
-die('TEST 12');
 
 //Concrete Factory
 require_once 'model/Factory/TagFactory.php';
@@ -517,6 +516,7 @@ require_once 'view/generic/generic_view.php';
 require_once 'view/generic/generic_passwordRuleView.php';
 require_once 'view/generic/Elements/BirdBeakMenuView.php';
 require_once 'view/generic/Elements/BirdBeakMenuBtnView.php';
+die('TEST 13');
 
 //labour rate views
 require_once 'view/labourRate/labourRate_formView.php';
