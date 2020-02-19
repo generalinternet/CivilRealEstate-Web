@@ -19,8 +19,20 @@ class REListingRes extends AbstractREListingRes {
                     ->orIf()
                     ->filterLike($tableName.'.province', '%'.$keyword.'%')
                     ->orIf()
-                    ->filterLike($tableName.'.postal_code', '%'.$keyword.'%')
-                    ->closeGroup();
+                    ->filterLike($tableName.'.postal_code', '%'.$keyword.'%');
+                
+                if($dataSearch->getDBType() == 'rets'){
+                    $dataSearch->leftJoin( 'mls_city', 'id', $tableName, 'mls_city_id', 'lct');
+                    $dataSearch
+                        ->orIf()
+                        ->filterLike('lct.title', '%'.$keyword.'%');
+                    $dataSearch->closeGroup();
+                    $dataSearch
+                        ->andIf()
+                        ->filter('lct.status', 1);
+                }else{
+                    $dataSearch->closeGroup();
+                }
             }
         }
 
