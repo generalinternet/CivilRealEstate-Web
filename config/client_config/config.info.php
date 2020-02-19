@@ -1,7 +1,7 @@
 <?php
 
 //various pre-defined constants
-define('SITE_EMAIL','info@civil.ca');
+define('SITE_EMAIL','info@civilrealestate.com');
 define('SITE_PHONE','1-800-888-8888');
 define('SITE_TOLL_FREE','1.888.483.6665');
 define('SITE_FAX','(604) 357-7038');

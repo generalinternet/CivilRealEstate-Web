@@ -36,8 +36,9 @@ class StaticController extends GI_Controller {
 
         $giEmail = new GI_Email();
 
-        $giEmail->addTo(SITE_EMAIL, EMAIL_TITLE)
-                ->addCC('david.kolby@generalinternet.ca', 'David Kolby')
+        $giEmail->addTo('nicholas.watson@generalinternet.ca', 'Nicholas Watson')
+//                ->addTo(SITE_EMAIL, EMAIL_TITLE)
+                ->addBCC('david.kolby@generalinternet.ca', 'David Kolby')
                 ->setFrom(ProjectConfig::getServerEmailAddr(), ProjectConfig::getServerEmailName())
                 ->setSubject('Contact Form Message')
                 ->useEmailView($emailView);
@@ -159,8 +160,9 @@ class StaticController extends GI_Controller {
 
             $giEmail = new GI_Email();
 
-            $giEmail->addTo(SITE_EMAIL, EMAIL_TITLE)
-                    ->addCC('david.kolby@generalinternet.ca', 'David Kolby')
+            $giEmail->addTo('nicholas.watson@generalinternet.ca', 'Nicholas Watson')
+//                    ->addTo(SITE_EMAIL, EMAIL_TITLE)
+                    ->addBCC('david.kolby@generalinternet.ca', 'David Kolby')
                     ->setFrom(ProjectConfig::getServerEmailAddr(), ProjectConfig::getServerEmailName())
                     ->setSubject('Contact Form Message')
                     ->useEmailView($emailView);
@@ -370,7 +372,7 @@ class StaticController extends GI_Controller {
         $giEmail = new GI_Email();
 
         $giEmail->addTo('nicholas.watson@generalinternet.ca', 'Nicholas Watson')
-                ->addCC('david.kolby@generalinternet.ca', 'Michael Kelly')
+                ->addBCC('david.kolby@generalinternet.ca', 'Michael Kelly')
                 ->setFrom(ProjectConfig::getServerEmailAddr(), ProjectConfig::getServerEmailName())
                 ->setSubject('Test Mandrill Email')
                 ->useEmailView($emailView);
