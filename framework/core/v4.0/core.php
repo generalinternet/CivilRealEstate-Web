@@ -78,7 +78,6 @@ require_once 'model/Domain/UserActionRequired/AbstractUserActionRequired.php';
 require_once 'model/Domain/UserActionRequired/AbstractUserActionRequiredRedirect.php';
 require_once 'model/Domain/InterfacePerspective/AbstractInterfacePerspective.php';
 require_once 'model/Domain/UserLinkToApp/AbstractUserLinkToApp.php';
-die('TEST 10');
 
 // Abstract Factory
 require_once 'model/Factory/AbstractTagFactory.php';
@@ -298,6 +297,7 @@ require_once 'model/Utility/ActionResult/AbstractActionResultFactory.php';
 require_once 'model/Utility/Calculator/AbstractSubsetSumsCalculator.php';
 require_once 'model/Utility/Event/AbstractEventInstaller.php';
 require_once 'model/Utility/ContextRole/AbstractContextRoleInstaller.php';
+die('TEST 11');
 
 //*** End Abstract
 
