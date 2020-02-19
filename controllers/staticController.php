@@ -120,7 +120,14 @@ class StaticController extends GI_Controller {
             $lastName = filter_input(INPUT_POST, 'last_name');
             $email = filter_input(INPUT_POST, 'r_email');
             $phone = filter_input(INPUT_POST, 'phone');
-            $charityName = filter_input(INPUT_POST, 'charity_name');
+            $charityId = filter_input(INPUT_POST, 'charity_id');
+            $charityName = NULL;
+            if(!empty($charityId)){
+                $charity = CharityFactory::getModelById($charityId);
+                if($charity){
+                    $charityName = $charity->getProperty('name');
+                }
+            }
             $pickLater = filter_input(INPUT_POST, 'pick_later', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
             $buyOrSell = filter_input(INPUT_POST, 'buy_or_sell');
             

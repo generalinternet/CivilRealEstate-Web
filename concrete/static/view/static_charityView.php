@@ -35,17 +35,14 @@ class StaticCharityView extends GI_View{
                     'action' => 'searchCharity',
                     'ajax' => 1
                 ));
-                $charityName = filter_input(INPUT_POST, 'charity_name');
                 $otherArr = array(
                     'class' => 'form__input form__input_type_text',
                     'placeHolder' => 'Start Typing the Name of your Charity',
                     'autocompURL' => $autoCompURL,
                     'autocompMinLength' => 1,
-                    'autocompMultiple' => false,
-                    'value' => $charityName,
-                    'inputAutoCompleteVal' => $charityName
+                    'autocompMultiple' => false
                 );
-                $this->form->addField('charity_name', 'autocomplete', $otherArr);
+                $this->form->addField('charity_id', 'autocomplete', $otherArr);
                 $this->form->addHTML('<a href="" class="charity__form-link">see all charities »</a>');
                 $this->form->addField('pick_later', 'checkbox', array(
                     'class' => 'form__input form__input_type_checkbox',

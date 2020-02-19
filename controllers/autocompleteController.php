@@ -56,7 +56,7 @@ class AutocompleteController extends AbstractAutocompleteController {
 
                 $charityItemInfo = array(
                     'label' => $name,
-                    'value' => $name,
+                    'value' => $charityItem->getId(),
                     'autoResult' => '<span class="result_text"><i class="float_right">'.$name.'</i>' . $this->markTerm($term, $name) . '</span>'
                 );
                 //@todo get real per case value

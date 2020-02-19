@@ -296,10 +296,10 @@ var CharityForm = function(){
                 let centerErrorScrollTop = firstErrField.offset().top - ($(window).height()/2) + (firstErrField.outerHeight()/2);
                 $("html,body").animate({ scrollTop: centerErrorScrollTop }, 500, 'swing');
 
-                var charityName = $("#field_charity_name");
-                if(charityName.length != 0){
-                    var autoCompVal = charityName.val();
-                    $("#charity_name_autocomp").val(autoCompVal).attr('title', autoCompVal).trigger('change');
+                var charityId = $("#field_charity_id");
+                if(charityId.length != 0){
+                    var autoCompVal = charityId.val();
+                    $("#charity_id_autocomp").val(autoCompVal).attr('title', autoCompVal).trigger('change');
                 }
             }
         }
