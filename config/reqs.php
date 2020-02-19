@@ -1,6 +1,8 @@
 <?php
 //External Dependencies
 require 'vendor/autoload.php';
+
+die('TEST 06');
 define('FRMWK_VERSION', 'v4');
 set_include_path('framework/super');
     require_once FRMWK_VERSION . '.0/super.php';

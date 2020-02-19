@@ -21,7 +21,6 @@ require_once 'config/language/lang_english.php';
 //@todo Set Timezone to detected timezone
 GI_Time::setTimezone('America/Vancouver');
 
-die('TEST 05');
 GI_Index::initSystem();
 
 GI_Index::routeRequest();
