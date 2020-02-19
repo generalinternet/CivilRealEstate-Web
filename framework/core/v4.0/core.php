@@ -426,6 +426,7 @@ require_once 'model/Factory/UserActionRequiredFactory.php';
 require_once 'model/Factory/InterfacePerspectiveFactory.php';
 require_once 'model/Factory/UserLinkToAppFactory.php';
 
+die('TEST 14');
 //Concrete View
 require_once 'view/dashboard/dashboard_indexView.php';
 require_once 'view/dashboard/widgets/dashboard_poTableWidgetView.php';
@@ -516,7 +517,6 @@ require_once 'view/generic/generic_view.php';
 require_once 'view/generic/generic_passwordRuleView.php';
 require_once 'view/generic/Elements/BirdBeakMenuView.php';
 require_once 'view/generic/Elements/BirdBeakMenuBtnView.php';
-die('TEST 13');
 
 //labour rate views
 require_once 'view/labourRate/labourRate_formView.php';
