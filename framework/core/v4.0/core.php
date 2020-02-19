@@ -444,7 +444,6 @@ require_once 'view/dashboard/widgets/dashboard_APARTableWidgetView.php';
 require_once 'view/dashboard/widgets/dashboard_salesComparisonTableWidgetView.php';
 require_once 'view/dashboard/widgets/OrderValues/dashboard_salesOrderValuesTableWidgetView.php';
 require_once 'view/dashboard/widgets/OrderValues/dashboard_purchaseOrderValuesTableWidgetView.php';
-die('TEST 16');
 require_once 'view/admin/admin_indexView.php';
 require_once 'view/admin/admin_editCurrencyFormView.php';
 require_once 'view/admin/admin_echoView.php';
@@ -455,6 +454,8 @@ require_once 'view/tag/tag_listFormView.php';
 require_once 'view/tag/tag_formView.php';
 require_once 'view/tag/tag_indexView.php';
 require_once 'view/tag/tagInventory_formView.php';
+
+die('TEST 17');
 require_once 'view/import/import_fileFormView.php';
 require_once 'view/UITable/UITableView.php';
 require_once 'view/UITable/UITableRowView.php';
