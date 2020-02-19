@@ -426,7 +426,6 @@ require_once 'model/Factory/UserActionRequiredFactory.php';
 require_once 'model/Factory/InterfacePerspectiveFactory.php';
 require_once 'model/Factory/UserLinkToAppFactory.php';
 
-die('TEST 14');
 //Concrete View
 require_once 'view/dashboard/dashboard_indexView.php';
 require_once 'view/dashboard/widgets/dashboard_poTableWidgetView.php';
@@ -461,6 +460,7 @@ require_once 'view/UITable/UITableRowView.php';
 require_once 'view/UITable/UIRolodexView.php';
 require_once 'view/UITable/UICardView.php';
 require_once 'view/UITable/UICatalogView.php';
+die('TEST 15');
 //login views
 require_once 'view/login/login_indexView.php';
 require_once 'view/login/login_registerView.php';
