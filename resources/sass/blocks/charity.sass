@@ -66,6 +66,19 @@
                     width: 100%!important
                     border: none!important
                     background-color: $color_white!important
+            .field_error
+                position: absolute
+                padding: 0.5em 0
+                margin: 0
+                bottom: 0
+                transform: translateY(100%)
+                font-style: italic
+                font-weight: 400
+                font-size: 0.7em
+                color: red
+            &.error
+                position: relative
+                margin-bottom: 2.5em!important
     &__step-1
         .form__input
             &_type_text

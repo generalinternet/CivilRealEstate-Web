@@ -264,25 +264,66 @@ var CharityForm = function(){
 
     var component = {
         nextStepButtonClass: ".charity__button_next-step",
-        charityWrapClass: ".charity_step_1",
+        charityWrapClass: ".charity",
         maxStep: 4
     };
 
+    var charityWrap = null;
+
+    var moveToStep = function(nextStep, currentStep){
+        charityWrap.removeClass('charity_step_' + currentStep);
+        charityWrap.addClass('charity_step_' + nextStep);
+        charityWrap.data('step',nextStep);
+        charityWrap.attr('data-step',nextStep);
+    };
+
+    var hideLoading = function(){
+        setTimeout(function() {
+            charityWrap.removeClass('loading');
+        }, 300);
+    };
+    
+    var checkErrorField = function (){
+        var errFields = charityWrap.find('.form__input.error');
+        if(errFields.length != 0){
+            var firstErrField = errFields.first();
+            var stepWrap = firstErrField.parents('.charity__step');
+            if(stepWrap.length !== 0){
+                var currentStep = charityWrap.data('step');
+                var nextStep = stepWrap.data('step');
+                moveToStep(nextStep, currentStep);
+
+                let centerErrorScrollTop = firstErrField.offset().top - ($(window).height()/2) + (firstErrField.outerHeight()/2);
+                $("html,body").animate({ scrollTop: centerErrorScrollTop }, 500, 'swing');
+
+                var charityName = $("#field_charity_name");
+                if(charityName.length != 0){
+                    var autoCompVal = charityName.val();
+                    $("#charity_name_autocomp").val(autoCompVal).attr('title', autoCompVal).trigger('change');
+                }
+            }
+        }
+        hideLoading();
+    }
     ins.init = function(){
-        var charityWrap = $(component.charityWrapClass);
+        charityWrap = $(component.charityWrapClass);
         if(charityWrap.length == 0){
             return;
         }
+        charityWrap.addClass('loading');
+
         $(document).on('click', component.nextStepButtonClass, function(){
             event.preventDefault();
+            charityWrap.addClass('loading');
             var currentStep = charityWrap.data('step');
             var nextStep = currentStep + 1;
             if(nextStep < component.maxStep){
-                charityWrap.removeClass('charity_step_' + currentStep);
-                charityWrap.addClass('charity_step_' + nextStep);
-                charityWrap.data('step',nextStep);
+                moveToStep(nextStep, currentStep);
+                hideLoading();
             }
         });
+
+        checkErrorField();
     };
 
     return ins;

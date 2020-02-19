@@ -105,6 +105,78 @@ class StaticController extends GI_Controller {
         $returnArray['breadcrumbs'] = $breadcrumbs;
         return $returnArray;
     }
+
+    public function actionCharity($attributes){
+        $form = new GI_Form('charity_form');
+        $form->setBotValidation(true);
+        $view = new StaticCharityView($form, $attributes);
+        
+        if(isset($attributes['sent']) && $attributes['sent'] == 1){
+            $view->setSent(true);
+        }
+        
+        if($form->wasSubmitted() && $form->validate()){
+            $firstName = filter_input(INPUT_POST, 'first_name');
+            $lastName = filter_input(INPUT_POST, 'last_name');
+            $email = filter_input(INPUT_POST, 'r_email');
+            $phone = filter_input(INPUT_POST, 'phone');
+            $charityName = filter_input(INPUT_POST, 'charity_name');
+            $pickLater = filter_input(INPUT_POST, 'pick_later', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
+            $buyOrSell = filter_input(INPUT_POST, 'buy_or_sell');
+            
+            $emailView = new GenericEmailView();
+            $emailView->addParagraph('A message has been sent from your charity form.');
+
+            $emailView->addLineBreak();
+
+            $emailView->startBlock()
+                    ->startParagraph()
+                        ->addHTML('Name: <b>' . trim($firstName . ' ' . $lastName) . '</b><br/>');
+
+            if(!empty($charityName)){
+                $emailView->addHTML('Charity Name: <b>' . $charityName . '</b>');
+            }else if(!empty($pickLater)){
+                $emailView->addHTML('Charity Name: <i>pick later</i>');
+            }
+
+            if(!empty($email)){
+                $emailView->addHTML('Email: <b>' . $email . '</b>');
+            }
+            if(!empty($phone)){
+                $emailView->addHTML('<br/>Phone: <b>' . $phone . '</b>');
+            }
+
+            if(!empty($buyOrSell)){
+                $emailView->addHTML('Buying or Selling: <b>' . $buyOrSell . '</b>');
+            }
+
+            $giEmail = new GI_Email();
+
+            $giEmail->addTo(SITE_EMAIL, EMAIL_TITLE)
+                    ->addCC('david.kolby@generalinternet.ca', 'David Kolby')
+                    ->setFrom(ProjectConfig::getServerEmailAddr(), ProjectConfig::getServerEmailName())
+                    ->setSubject('Contact Form Message')
+                    ->useEmailView($emailView);
+
+            if($giEmail->send()){
+                $newAttributes = $attributes;
+                $newAttributes['sent'] = 1;
+                GI_URLUtils::redirect($newAttributes);
+            }
+        }
+        $returnArray = GI_Controller::getReturnArray($view);
+        $breadcrumbs = array(
+            array(
+                'label' => $view->getSiteTitle(),
+                'link' => GI_URLUtils::buildURL(array(
+                    'controller' => 'static',
+                    'action' => GI_URLUtils::getAction()
+                ))
+            ),
+        );
+        $returnArray['breadcrumbs'] = $breadcrumbs;
+        return $returnArray;
+    }
     
     public function actionNotify($attributes){
         $form = NULL;

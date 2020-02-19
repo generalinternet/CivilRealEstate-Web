@@ -3,12 +3,17 @@
 class StaticCharityView extends GI_View{
     protected $form;
 
-    public function __construct(GI_Form $form = NULL) {
+    public function __construct(GI_Form $form = NULL, $attrs) {
         if(empty($form)){
             $form = new GI_Form('charity_form');
         }
         $this->form = $form;
         $this->buildForm();
+    }
+
+    protected $isSent = false;
+    public function setSent(bool $isSent){
+        $this->isSent = $isSent;
     }
 
     protected function buildForm(){
@@ -19,7 +24,7 @@ class StaticCharityView extends GI_View{
     }
 
     protected function addStep1(){
-        $this->form->addHTML('<div class="charity__step charity__step-1">');
+        $this->form->addHTML('<div class="charity__step charity__step-1" data-step="1">');
             $this->form->addHTML('<div class="charity__content-wrap">');
                 $this->form->addHTML('<h3 class="charity__title"><b>STEP 1</b> Select your Charity</h3>');
                 $this->form->addHTML('<p class="charity__description">Choose the charity you would like funds from your real estate transaction to be directed to</p>');
@@ -30,13 +35,17 @@ class StaticCharityView extends GI_View{
                     'action' => 'searchCharity',
                     'ajax' => 1
                 ));
-                $this->form->addField('charity_name', 'autocomplete', array(
+                $charityName = filter_input(INPUT_POST, 'charity_name');
+                $otherArr = array(
                     'class' => 'form__input form__input_type_text',
                     'placeHolder' => 'Start Typing the Name of your Charity',
                     'autocompURL' => $autoCompURL,
                     'autocompMinLength' => 1,
                     'autocompMultiple' => false,
-                ));
+                    'value' => $charityName,
+                    'inputAutoCompleteVal' => $charityName
+                );
+                $this->form->addField('charity_name', 'autocomplete', $otherArr);
                 $this->form->addHTML('<a href="" class="charity__form-link">see all charities »</a>');
                 $this->form->addField('pick_later', 'checkbox', array(
                     'class' => 'form__input form__input_type_checkbox',
@@ -54,7 +63,7 @@ class StaticCharityView extends GI_View{
     }
 
     protected function addStep2(){
-        $this->form->addHTML('<div class="charity__step charity__step-2">');
+        $this->form->addHTML('<div class="charity__step charity__step-2" data-step="2">');
             $this->form->addHTML('<div class="charity__content-wrap">');
                 $this->form->addHTML('<h3 class="charity__title"><b>STEP 2</b> Contact</h3>');
                 $this->form->addHTML('<p class="charity__description">Please enter your phone number and/or email address.</p>');
@@ -72,13 +81,11 @@ class StaticCharityView extends GI_View{
                 ));
                 $this->form->addField('r_email', 'text', array(
                     'class' => 'form__input form__input_type_text',
-                    'placeHolder' => 'Email',
-                    'required' => true
+                    'placeHolder' => 'Email'
                 ));
                 $this->form->addField('phone', 'text', array(
                     'class' => 'form__input form__input_type_text',
-                    'placeHolder' => 'Phone Number',
-                    'required' => true
+                    'placeHolder' => 'Phone Number'
                 ));
                 $this->form->addHTML('<div class="charity__contact-form-buttons">');
                     $this->form->addHTML('<a href="" class="button button_theme_primary button_has-icon charity__button_next-step">Go To Next Step <span class="button__icon"></span></a>');
@@ -88,13 +95,13 @@ class StaticCharityView extends GI_View{
     }
 
     protected function addStep3(){
-        $this->form->addHTML('<div class="charity__step charity__step-3">');
+        $this->form->addHTML('<div class="charity__step charity__step-3" data-step="3">');
             $this->form->addHTML('<div class="charity__content-wrap">');
                 $this->form->addHTML('<h3 class="charity__title"><b>STEP 3</b> Buying or Selling?</h3>');
                 $this->form->addHTML('<p class="charity__description">Are you interested in finding or listing a home?</p>');
             $this->form->addHTML('</div>');
             $this->form->addHTML('<div class="charity__content-wrap charity__buy-or-sell">');
-            $this->form->addField('buy_or_sell', 'checkbox', array(
+            $this->form->addField('buy_or_sell', 'radio', array(
                 'class' => 'form__input form__input_type_checkbox',
                 'options' => array(
                     'buying' => 'Buying',
@@ -109,7 +116,7 @@ class StaticCharityView extends GI_View{
     }
 
     protected function addThankyou(){
-        $this->form->addHTML('<div class="charity__step charity__step-thank-you">');
+        $this->form->addHTML('<div class="charity__step charity__step-th data-step="thank-you">');
             $this->form->addHTML('<div class="charity__content-wrap">');
                 $this->form->addHTML('<h3 class="charity__title"><b>THANK YOU</b> For Making a Difference!</h3>');
                 $this->form->addHTML('<p class="charity__description">A Civil Real Estate Local Expert will be in contact with you promtly.</p>');
@@ -135,7 +142,7 @@ class StaticCharityView extends GI_View{
     }
 
     protected function addCharityFormSection(){
-        $this->addHTML('<div class="section section_type_charity charity charity_step_1" data-step=1>');
+        $this->addHTML('<div class="section section_type_charity charity charity_step_1" data-step="1">');
             $this->addHTML('<div class="container-fluid">');
                 $this->addHTML('<div class="row">');
                     $this->addHTML('<div class="col-xs-12 col-md-6">');
