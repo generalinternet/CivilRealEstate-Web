@@ -14,12 +14,21 @@ class REListingRes extends AbstractREListingRes {
         if($searchBarForm->wasSubmitted() && $searchBarForm->validate()){
             $keyword = filter_input(INPUT_POST, 'keyword');
             if(!empty($keyword)){
+
+                // find mls listing by MLS number
+                $mlsListing = MLSListingFactory::getModelByMLSNumber($keyword);
+                if(!empty($mlsListing)){
+                    GI_URLUtils::redirect($mlsListing->getViewURLAttrs());
+                }
+
                 $dataSearch->filterGroup()
                     ->filterLike($tableName.'.addr', '%'.$keyword.'%')
                     ->orIf()
                     ->filterLike($tableName.'.province', '%'.$keyword.'%')
                     ->orIf()
-                    ->filterLike($tableName.'.postal_code', '%'.$keyword.'%');
+                    ->filterLike($tableName.'.postal_code', '%'.$keyword.'%')
+                    ->orIf()
+                    ->filterLike($tableName.'.amenities', '%'.$keyword.'%');
                 
                 if($dataSearch->getDBType() == 'rets'){
                     $dataSearch->leftJoin( 'mls_city', 'id', $tableName, 'mls_city_id', 'lct');
@@ -96,7 +105,13 @@ class REListingRes extends AbstractREListingRes {
             $datePosted = filter_input(INPUT_POST, 'date_posted');
             if(!empty($datePosted)){
                 $compareDate = NULL;
+                $compareChar = '>=';
+
                 switch ($datePosted) {
+                    case 'older_than_1_month':
+                        $compareDate = date('Y-m-d H:i:s', strtotime('-4 week'));
+                        $compareDate = '<';
+                        break;
                     case 'last_four_weeks':
                         $compareDate = date('Y-m-d H:i:s', strtotime('-4 week'));
                         break;
@@ -114,7 +129,7 @@ class REListingRes extends AbstractREListingRes {
                         break;
                 }
                 if(!empty($compareDate)){
-                    $dataSearch->filter($tableName.'.inception', $compareDate, '>=');
+                    $dataSearch->filter($tableName.'.inception', $compareDate, $compareChar);
                 }
             }
 

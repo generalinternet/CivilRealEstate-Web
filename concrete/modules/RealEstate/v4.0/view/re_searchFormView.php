@@ -22,9 +22,9 @@ class RESearchFormView extends AbstractRESearchFormView{
         $this->addPriceField();
         $this->addPropertyTypeField();
         $this->addAreaField();
-        $this->addPropertyStatusField();
+        // $this->addPropertyStatusField();
         $this->addDatePostedField();
-        $this->addFeaturesField();
+        // $this->addFeaturesField();
         $this->form->addHTML('</div>');
     }
 
@@ -32,28 +32,99 @@ class RESearchFormView extends AbstractRESearchFormView{
         $options = array(
             'only_favourites' => 'Show Only Favourites'
         );
+        $this->form->addHTML('<div class="relisting-search__field">');
         $this->form->addField('favourites', 'checkbox', array(
             'class' => 'form__input form__input_type_checkbox',
             'displayName' => "Favourites",
             'options'=> $options
         ));
+        $this->addApplyButton();
+        $this->form->addHTML('</div>');
     }
     
     protected function addPriceField(){
-        $this->addRangeField('Price (in CAD)', 'price');
+        $options = array(
+            '00' => '0',
+            25000 => '25,000',
+            50000 => '50,000',
+            75000 => '75,000',
+            100000 => '100,000',
+            125000 => '125,000',
+            150000 => '150,000',
+            175000 => '175,000',
+            200000 => '200,000',
+            225000 => '225,000',
+            250000 => '250,000',
+            275000 => '275,000',
+            300000 => '300,000',
+            325000 => '325,000',
+            350000 => '350,000',
+            375000 => '375,000',
+            400000 => '400,000',
+            425000 => '425,000',
+            450000 => '450,000',
+            475000 => '475,000',
+            500000 => '500,000',
+            550000 => '550,000',
+            600000 => '600,000',
+            650000 => '650,000',
+            700000 => '700,000',
+            750000 => '750,000',
+            800000 => '800,000',
+            850000 => '850,000',
+            900000 => '900,000',
+            1000000 => '1,000,000',
+            1500000 => '1,500,000',
+            2000000 => '2,000,000',
+            2500000 => '2,500,000',
+            3000000 => '3,000,000',
+            3500000 => '3,500,000',
+            4000000 => '4,000,000',
+            4500000 => '4,500,000',
+            5000000 => '5,000,000',
+            5500000 => '5,500,000',
+            6000000 => '6,000,000',
+            6500000 => '6,500,000',
+            7000000 => '7,000,000',
+            8000000 => '8,000,000',
+            9000000 => '9,000,000',
+            10000000 => '10,000,000',
+            15000000 => '15,000,000',
+            20000000 => '20,000,000'
+        );
+        $this->form->addHTML('<div class="relisting-search__field">');
+        $this->addRangeField('Price (in CAD)', 'price', $options, $options);
+        $this->form->addHTML('</div>');
     }
 
     protected function addPropertyTypeField(){
-        $typeArr = MLSListingFactory::getTypesArray();
+        $mlsTypeArr = MLSListingFactory::getTypesArray();
+        $reTypeArr = REListingFactory::getTypesArray();
+
+        $typeArr = array_unique(array_merge($mlsTypeArr, $reTypeArr));
+
+        $this->form->addHTML('<div class="relisting-search__field">');
         $this->form->addField('property_type', 'checkbox', array(
             'class' => 'form__input form__input_type_checkbox',
             'displayName' => "Property Type",
             'options'=> $typeArr,
         ));
+        $this->addApplyButton();
+        $this->form->addHTML('</div>');
     }
 
     protected function addAreaField(){
-        $this->addRangeField('Area (in sqft)', 'area');
+        $options = array(
+            '00' => '0',
+            1000 => '1000',
+            2000 => '2000',
+            3000 => '3000',
+            4000 => '4000',
+            5000 => '5000',
+        );
+        $this->form->addHTML('<div class="relisting-search__field">');
+        $this->addRangeField('Area (in sqft)', 'area', $options, $options);
+        $this->form->addHTML('</div>');
     }
 
     protected function addPropertyStatusField(){
@@ -61,25 +132,32 @@ class RESearchFormView extends AbstractRESearchFormView{
             'ready_to_move_in' => 'Ready to Move In',
             'under_construction' => 'Under Construction',
         );
+        $this->form->addHTML('<div class="relisting-search__field">');
         $this->form->addField('property_status', 'checkbox', array(
             'class' => 'form__input form__input_type_checkbox',
             'displayName' => "Property Status",
             'options'=> $options
         ));
+        $this->addApplyButton();
+        $this->form->addHTML('</div>');
     }
 
     protected function addDatePostedField(){
         $options = array(
+            'older_than_1_month' => 'Older than 1 Month',
             'last_four_weeks' => 'Last Four Weeks',
             'last_three_weeks' => 'Last Three Weeks',
             'last_two_weeks' => 'Last Two Weeks',
             'last_week' => 'Last Week',
         );
+        $this->form->addHTML('<div class="relisting-search__field">');
         $this->form->addField('date_posted', 'dropdown', array(
             'class' => 'form__input form__input_type_dropdown',
             'displayName' => "Date Posted",
             'options'=> $options
         ));
+        $this->addApplyButton();
+        $this->form->addHTML('</div>');
     }
 
     protected function addFeaturesField(){
@@ -103,42 +181,39 @@ class RESearchFormView extends AbstractRESearchFormView{
             'Guest Suite' => 'Guest Suite',
             'Penthouse' => 'Penthouse',
         );
+        $this->form->addHTML('<div class="relisting-search__field">');
         $this->form->addField('features', 'checkbox', array(
             'class' => 'form__input form__input_type_checkbox',
             'displayName' => "Features",
             'options'=> $options,
         ));
+        $this->addApplyButton();
+        $this->form->addHTML('</div>');
     }
 
-    protected function addRangeField($title, $name){
+    protected function addRangeField($title, $name, $minOptions, $maxOptions){
         $this->form->addHTML('<div class="form__input form__input_type_range">');
             $this->form->addHTML('<label class="main">'.$title.'</label>');
             $this->form->addHTML('<div class="field_content">');
                 $this->form->addHTML('<div class="form__input-wrap">');
                     $this->form->addField($name.'_min', 'dropdown', array(
                         'class' => 'form__input form__input_type_dropdown',
-                        'placeHolder' => 'Min',
-                        'options' => array(
-                            '100' => 100,
-                            '200' => 200,
-                            '300' => 300,
-                            '400' => 400,
-                        )
+                        'nullText' => 'Min',
+                        'options' => $minOptions
                     ));
                     $this->form->addField($name.'_max', 'dropdown', array(
                         'class' => 'form__input form__input_type_dropdown',
-                        'placeHolder' => 'Max',
-                        'options' => array(
-                            '100' => 100,
-                            '200' => 200,
-                            '300' => 300,
-                            '400' => 400,
-                            '100000' => '100,000',
-                        )
+                        'nullText' => 'Max',
+                        'options' => $maxOptions
                     ));
                 $this->form->addHTML('</div>');
             $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
+        $this->addApplyButton();
+    }
+
+    protected function addApplyButton(){
+        $this->form->addHTML('<span class="button button_theme_primary submit_btn">Apply</span>');
     }
 
     protected function buildView()

@@ -247,25 +247,22 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
                         $this->addHTML('</div>');
                     $this->addHTML('</div>');
                 }
-                // $this->addHTML('<div class="row relisting-detail__info-row">');
-                //     $this->addHTML('<div class="col-xs-12 col-md-3 relisting-detail__col-pad-right">');
-                //         $this->addHTML('<h3 class="relisting-detail__info-title">Amenities</h3>');
-                //     $this->addHTML('</div>');
-                //     $this->addHTML('<div class="col-xs-12 col-md-9">');
-                //         $this->addHTML('<p class="relisting-detail__info-content">');
-                //             $listingFeatures = array(
-                //                 'Pool',
-                //                 'Steam',
-                //                 'Common Room',
-                //                 'Guest Suite',
-                //                 'Sauna',
-                //             );
-                //             foreach($listingFeatures as $feature) {
-                //                 $this->addHTML('<span class="relisting-detail__info-content-tag">'.$feature.'</span>');
-                //             }
-                //         $this->addHTML('</p>');
-                //     $this->addHTML('</div>');
-                // $this->addHTML('</div>');
+                $amenities = $this->listing->getProperty('amenities');
+                if(!empty($amenities)){
+                    $this->addHTML('<div class="row relisting-detail__info-row">');
+                        $this->addHTML('<div class="col-xs-12 col-md-3 relisting-detail__col-pad-right">');
+                            $this->addHTML('<h3 class="relisting-detail__info-title">Amenities</h3>');
+                        $this->addHTML('</div>');
+                        $this->addHTML('<div class="col-xs-12 col-md-9">');
+                            $this->addHTML('<p class="relisting-detail__info-content">');
+                                $listingFeatures = explode(',', $amenities);
+                                foreach($listingFeatures as $feature) {
+                                    $this->addHTML('<span class="relisting-detail__info-content-tag">'.$feature.'</span>');
+                                }
+                            $this->addHTML('</p>');
+                        $this->addHTML('</div>');
+                    $this->addHTML('</div>');
+                }
             $this->addHTML('</div>');
         $this->addHTML('</div>');
         return $this;
