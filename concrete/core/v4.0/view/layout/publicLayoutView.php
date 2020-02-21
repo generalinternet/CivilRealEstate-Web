@@ -403,7 +403,8 @@ class PublicLayoutView extends AbstractPublicLayoutView {
 
     protected $headerWidgetConfig = array(
         'relisting' => array(
-            'index' => ['search_bar', 'user']
+            'index' => ['search_bar', 'user'],
+            'openHouse' => ['search_bar', 'user'],
         ),
         'mls' => array(
             'view' => ['call', 'search_icon', 'user']
