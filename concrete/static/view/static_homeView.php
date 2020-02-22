@@ -2,6 +2,12 @@
 
 class StaticHomeView extends GI_View{
 
+    /**
+     * @var CharityFormView
+     */
+    protected $charityForm;
+    protected $form;
+
     public function __construct() {
         parent::__construct();
         $this->addJS('resources/js/youtube-player.js');
@@ -10,6 +16,8 @@ class StaticHomeView extends GI_View{
         $this->addCSS('resources/external/slick-1.6.0/slick/slick.css');
         $this->addCSS('resources/external/slick-1.6.0/slick/slick-theme.css');
         $this->addJS('resources/external/slick-1.6.0/slick/slick.js');
+
+        $this->charityForm = new CharityFormView($this->form);
     }
     
     public function buildView() {
@@ -215,7 +223,7 @@ class StaticHomeView extends GI_View{
     }
 
     public function addCharitySection(){
-        $this->addHTML('<div class="section section_type_charity charity">');
+        $this->addHTML('<div class="section section_type_charity charity charity_type_home charity_step_1" data-step="1">');
             $this->addHTML('<div class="container-fluid">');
                 $this->addHTML('<div class="row">');
                     $this->addHTML('<div class="col-xs-12 col-md-6">');
@@ -225,29 +233,8 @@ class StaticHomeView extends GI_View{
                     $this->addHTML('</div>');
                     $this->addHTML('<div class="col-xs-12 col-md-6">');
                         $this->addHTML('<div class="charity__content">');
-                            $this->addHTML('<div class="charity__steps">');
-                                $this->addHTML('<img src="resources/media/img/icon/process.png" class="charity__steps-image" alt="'.SITE_TITLE.'">');
-                            $this->addHTML('</div>');
-                            $this->addHTML('<div class="charity__content-wrap">');
-                                $this->addHTML('<h3 class="charity__title"><b>STEP 1</b> Select your Charity</h3>');
-                                $this->addHTML('<p class="charity__description">Choose the charity you would like funds from your real estate transaction to be directed to</p>');
-                            $this->addHTML('</div>');
-                            $this->addHTML('<div class="charity__content-wrap charity__content-wrap_bg_secondary">');
-                                $this->addHTML('<div class="charity__input-wrap">');
-                                    $this->addHTML('<label class="charity__input-label" for="">Choose your Charity</label>');
-                                    $this->addHTML('<input type="text" class="charity__input" placeholder="Start Typing the Name of your Charity">');
-                                $this->addHTML('</div>');
-                                $this->addHTML('<a href="" class="charity__form-link">see all charities »</a>');
-                                $this->addHTML('<span class="charity__checkbox-wrap">');
-                                    $this->addHTML('<input type="checkbox" class="charity__checkbox-input">');
-                                    $this->addHTML('<label for="" class="charity__checkbox-label">pick later</label>');
-                                $this->addHTML('</span>');
-                            $this->addHTML('</div>');
-                            $this->addHTML('<div class="charity__content-wrap">');
-                                $this->addHTML('<p class="charity__description">Some of Civil’s featured Charities</p>');
-                                $this->addHTML('<img src="resources/media/img/logo/logo_bar.png" alt="'.SITE_TITLE.'" class="charity__logos"> ');
-                                $this->addHTML('<a href="" class="button button_theme_primary button_has-icon">Go To Next Step <span class="button__icon"></span></a>');
-                            $this->addHTML('</div>');
+                            $this->addHTML($this->charityForm->getStepSelector());
+                            $this->addHTML($this->charityForm->getHTMLView());
                         $this->addHTML('</div>');
                     $this->addHTML('</div>');
                 $this->addHTML('</div>');
