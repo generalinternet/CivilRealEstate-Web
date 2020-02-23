@@ -19,6 +19,8 @@ class RESearchFormView extends AbstractRESearchFormView{
     protected function buildForm(){
         $this->form->addHTML('<div class="relisting-search">');
         $this->addFavouritesField();
+        $this->addBedroomsField();
+        $this->addBathroomsField();
         $this->addPriceField();
         $this->addPropertyTypeField();
         $this->addAreaField();
@@ -98,6 +100,52 @@ class RESearchFormView extends AbstractRESearchFormView{
             $this->form->addHTML('<h3 class="relisting-search__field-label">Price (in CAD)</h3>');
             $this->form->addHTML('<div class="relisting-search__field-wrap">');
                 $this->addRangeField('price', $options, $options);
+            $this->form->addHTML('</div>');
+        $this->form->addHTML('</div>');
+    }
+
+    protected function addBedroomsField(){
+        $leftOptions = array(
+            '00' => '0',
+            1 => '1',
+            2 => '2',
+            3 => '3',
+            4 => '4',
+        );
+        $rightOptions = array(
+            1 => '1',
+            2 => '2',
+            3 => '3',
+            4 => '4',
+            '5+' => '5+',
+        );
+        $this->form->addHTML('<div class="relisting-search__field">');
+            $this->form->addHTML('<h3 class="relisting-search__field-label">Bedrooms</h3>');
+            $this->form->addHTML('<div class="relisting-search__field-wrap">');
+                $this->addRangeField('bedroom', $leftOptions, $rightOptions);
+            $this->form->addHTML('</div>');
+        $this->form->addHTML('</div>');
+    }
+
+    protected function addBathroomsField(){
+        $leftOptions = array(
+            '00' => '0',
+            1 => '1',
+            2 => '2',
+            3 => '3',
+            4 => '4',
+        );
+        $rightOptions = array(
+            1 => '1',
+            2 => '2',
+            3 => '3',
+            4 => '4',
+            '5+' => '5+',
+        );
+        $this->form->addHTML('<div class="relisting-search__field">');
+            $this->form->addHTML('<h3 class="relisting-search__field-label">Bathrooms</h3>');
+            $this->form->addHTML('<div class="relisting-search__field-wrap">');
+                $this->addRangeField('bathroom', $leftOptions, $rightOptions);
             $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
     }
