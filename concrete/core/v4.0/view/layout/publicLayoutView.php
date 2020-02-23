@@ -466,24 +466,31 @@ class PublicLayoutView extends AbstractPublicLayoutView {
                 break;
 
             case 'user':
-                if(!Login::isLoggedIn()){
-                    return;
-                }
-                $img = '<img src="resources/media/img/art/avatar.png" alt="'.SITE_TITLE.'" class="header-widget__user-avatar-img">';
-                $user = Login::getUser();
-                $avtView = $user->getUserAvatarView();
-                if(!empty($avtView)){
-                    $avtView->setSize(50, 50);
-                    $avtImg = $this->getAvatarImg();
-                }
                 $this->addHTML('<div class="header-widget__item header-widget__item_type_user">');
-                    $this->addHTML('<span class="header-widget__user-wrap">');
+                    if(!Login::isLoggedIn()){
+                        $this->addHTML('<span class="header-widget__login-link-wrap">');
+                            $loginURL = GI_URLUtils::buildCleanURL(array(
+                                'controller' => 'user',
+                                'action' => 'login'
+                            ));
+                            $this->addHTML('<a href="'.$loginURL.'" class="header-widget__login-link">Log In</a>');
+                        $this->addHTML('</span>');
+                    }else{
+                        $this->addHTML('<span class="header-widget__user-wrap">');
+                        $img = '<img src="resources/media/img/art/avatar.png" alt="'.SITE_TITLE.'" class="header-widget__user-avatar-img">';
+                        $user = Login::getUser();
+                        $avtView = $user->getUserAvatarView();
+                        if(!empty($avtView)){
+                            $avtView->setSize(50, 50);
+                            $img = $avtView->getAvatarImg();
+                        }
                         $this->addHTML('<span class="header-widget__user-avatar">');
                             $this->addHTML($img);
                         $this->addHTML('</span>');
                         $this->addHTML('<span class="header-widget__user-name">'.$user->getFullName().'<span class="header-widget__avatar-dropdown-icon"></span></span>');
-                    $this->addHTML('</span>');
-                    $this->addHTML('</div>');
+                        $this->addHTML('</span>');
+                    }
+                $this->addHTML('</div>');
                 break;
 
             default:
