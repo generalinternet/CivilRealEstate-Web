@@ -242,9 +242,9 @@ var RelistingSearch = function (){
     var ins = {};
 
     ins.init = function() {
-        $(document).on('click', component.searchWrapClass + ' .form__input label.main', function () {
-            var parentInput = $(this).parents('.form__input').first();
-            var fieldContent = parentInput.find('.field_content').first();
+        $(document).on('click', component.searchWrapClass + ' .relisting-search__field-label', function () {
+            var parentInput = $(this).parents('.relisting-search__field').first();
+            var fieldContent = parentInput.find('.relisting-search__field-wrap').first();
             fieldContent.slideToggle();
             parentInput.toggleClass('open');
         });

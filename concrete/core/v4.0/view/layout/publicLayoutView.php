@@ -451,13 +451,17 @@ class PublicLayoutView extends AbstractPublicLayoutView {
                         'controller' => 'relisting',
                         'action' => 'index'
                     ));
-                    $this->addHTML('<a href="'.$relistingIndexURL.'" class="header-widget__search-link"><i class="header-widget__search-icon"></i> Search</a>');
+                    $this->addHTML('<div class="header-widget__search-link-wrap">');
+                        $this->addHTML('<a href="'.$relistingIndexURL.'" class="header-widget__search-link"><i class="header-widget__search-icon"></i> Search</a>');
+                    $this->addHTML('</div>');
                 $this->addHTML('</div>');
                 break;
 
             case 'call':
-                $this->addHTML('<div class="header-widget__item header-widget__item_type_search-bar">');
-                    $this->addHTML('<a href="'.SITE_TITLE.'" class="header-widget__call-link">Call Us '.SITE_TITLE.'</a>');
+                $this->addHTML('<div class="header-widget__item header-widget__item_type_call">');
+                    $this->addHTML('<div class="header-widget__call-link-wrap">');
+                        $this->addHTML('<a href="'.SITE_TITLE.'" class="header-widget__call-link">Call Us '.SITE_PHONE.'</a>');
+                    $this->addHTML('</div>');
                 $this->addHTML('</div>');
                 break;
 

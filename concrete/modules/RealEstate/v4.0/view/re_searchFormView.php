@@ -33,12 +33,14 @@ class RESearchFormView extends AbstractRESearchFormView{
             'only_favourites' => 'Show Only Favourites'
         );
         $this->form->addHTML('<div class="relisting-search__field">');
-        $this->form->addField('favourites', 'checkbox', array(
-            'class' => 'form__input form__input_type_checkbox',
-            'displayName' => "Favourites",
-            'options'=> $options
-        ));
-        $this->addApplyButton();
+            $this->form->addHTML('<h3 class="relisting-search__field-label">Favourites</h3>');
+            $this->form->addHTML('<div class="relisting-search__field-wrap">');
+                $this->form->addField('favourites', 'checkbox', array(
+                    'class' => 'form__input form__input_type_checkbox',
+                    'options'=> $options
+                ));
+                $this->addApplyButton();
+            $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
     }
     
@@ -93,7 +95,10 @@ class RESearchFormView extends AbstractRESearchFormView{
             20000000 => '20,000,000'
         );
         $this->form->addHTML('<div class="relisting-search__field">');
-        $this->addRangeField('Price (in CAD)', 'price', $options, $options);
+            $this->form->addHTML('<h3 class="relisting-search__field-label">Price (in CAD)</h3>');
+            $this->form->addHTML('<div class="relisting-search__field-wrap">');
+                $this->addRangeField('price', $options, $options);
+            $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
     }
 
@@ -104,12 +109,14 @@ class RESearchFormView extends AbstractRESearchFormView{
         $typeArr = array_unique(array_merge($mlsTypeArr, $reTypeArr));
 
         $this->form->addHTML('<div class="relisting-search__field">');
-        $this->form->addField('property_type', 'checkbox', array(
-            'class' => 'form__input form__input_type_checkbox',
-            'displayName' => "Property Type",
-            'options'=> $typeArr,
-        ));
-        $this->addApplyButton();
+            $this->form->addHTML('<h3 class="relisting-search__field-label">Property Type</h3>');
+            $this->form->addHTML('<div class="relisting-search__field-wrap">');
+                $this->form->addField('property_type', 'checkbox', array(
+                    'class' => 'form__input form__input_type_checkbox',
+                    'options'=> $typeArr,
+                ));
+                $this->addApplyButton();
+            $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
     }
 
@@ -123,7 +130,10 @@ class RESearchFormView extends AbstractRESearchFormView{
             5000 => '5000',
         );
         $this->form->addHTML('<div class="relisting-search__field">');
-        $this->addRangeField('Area (in sqft)', 'area', $options, $options);
+            $this->form->addHTML('<h3 class="relisting-search__field-label">Area (in sqft)</h3>');
+            $this->form->addHTML('<div class="relisting-search__field-wrap">');
+                $this->addRangeField('area', $options, $options);
+            $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
     }
 
@@ -133,12 +143,14 @@ class RESearchFormView extends AbstractRESearchFormView{
             'under_construction' => 'Under Construction',
         );
         $this->form->addHTML('<div class="relisting-search__field">');
-        $this->form->addField('property_status', 'checkbox', array(
-            'class' => 'form__input form__input_type_checkbox',
-            'displayName' => "Property Status",
-            'options'=> $options
-        ));
-        $this->addApplyButton();
+            $this->form->addHTML('<h3 class="relisting-search__field-label">Property Status</h3>');
+            $this->form->addHTML('<div class="relisting-search__field-wrap">');
+                $this->form->addField('property_status', 'checkbox', array(
+                    'class' => 'form__input form__input_type_checkbox',
+                    'options'=> $options
+                ));
+                $this->addApplyButton();
+            $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
     }
 
@@ -151,12 +163,14 @@ class RESearchFormView extends AbstractRESearchFormView{
             'last_week' => 'Last Week',
         );
         $this->form->addHTML('<div class="relisting-search__field">');
-        $this->form->addField('date_posted', 'dropdown', array(
-            'class' => 'form__input form__input_type_dropdown',
-            'displayName' => "Date Posted",
-            'options'=> $options
-        ));
-        $this->addApplyButton();
+            $this->form->addHTML('<h3 class="relisting-search__field-label">Date Posted</h3>');
+            $this->form->addHTML('<div class="relisting-search__field-wrap">');
+                $this->form->addField('date_posted', 'dropdown', array(
+                    'class' => 'form__input form__input_type_dropdown',
+                    'options'=> $options
+                ));
+                $this->addApplyButton();
+            $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
     }
 
@@ -182,18 +196,19 @@ class RESearchFormView extends AbstractRESearchFormView{
             'Penthouse' => 'Penthouse',
         );
         $this->form->addHTML('<div class="relisting-search__field">');
-        $this->form->addField('features', 'checkbox', array(
-            'class' => 'form__input form__input_type_checkbox',
-            'displayName' => "Features",
-            'options'=> $options,
-        ));
-        $this->addApplyButton();
+            $this->form->addHTML('<h3 class="relisting-search__field-label">Features</h3>');
+            $this->form->addHTML('<div class="relisting-search__field-wrap">');
+                $this->form->addField('features', 'checkbox', array(
+                    'class' => 'form__input form__input_type_checkbox',
+                    'options'=> $options,
+                ));
+                $this->addApplyButton();
+            $this->form->addHTML('</div>');
         $this->form->addHTML('</div>');
     }
 
-    protected function addRangeField($title, $name, $minOptions, $maxOptions){
+    protected function addRangeField($name, $minOptions, $maxOptions){
         $this->form->addHTML('<div class="form__input form__input_type_range">');
-            $this->form->addHTML('<label class="main">'.$title.'</label>');
             $this->form->addHTML('<div class="field_content">');
                 $this->form->addHTML('<div class="form__input-wrap">');
                     $this->form->addField($name.'_min', 'dropdown', array(
