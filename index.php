@@ -2,7 +2,7 @@
 /** 
  * @const DEV_MODE Boolean, determines settings in "config.database.php" and "config.project.php" 
  */
-DEFINE('DEV_MODE', false);
+DEFINE('DEV_MODE', true);
 DEFINE('STAGING_MODE', false);
 //Implied Production Mode if DEV_MODE and STAGING_MODE are both False.
 
