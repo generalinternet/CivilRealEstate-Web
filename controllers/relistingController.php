@@ -83,18 +83,17 @@ class REListingController extends AbstractREListingController {
 
         $sampleListing  = REListingFactory::buildNewModel($type);
         
-        $sampleListing->addCustomFiltersToDataSearch($mlsSearch);
-        $sampleListing->addUIFiltersToDataSearch($mlsSearch, $mlsListingTable);
-        
+        $sampleListing->addCustomFiltersToDataSearch($mlsSearch);        
         $sampleListing->addCustomFiltersToDataSearch($search);
-        $sampleListing->addUIFiltersToDataSearch($search, $reListingTable);
 
         $pageBarLinkProps = $attributes;
 
         $redirectArray = array();
 
         $filterForm = new GI_Form('real_estate_search');
-        $searchView = $sampleListing->getSearchForm($search, $type, $redirectArray, $filterForm);
+        $searchForm = new GI_Form('search_bar');
+
+        $searchView = $sampleListing->getFullSearchForm($search, $mlsSearch, $type, $redirectArray, $filterForm, $searchForm);
         $sampleListing->addSortingToDataSearch($search);
 
         $actionResult = ActionResultFactory::buildActionResult();
