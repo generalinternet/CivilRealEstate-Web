@@ -7,15 +7,6 @@ class RESearchFormView extends AbstractRESearchFormView{
     protected $useAjax = false;
     protected $form = null;
 
-    public function __construct(GI_Form $form = NULL)
-    {
-        if(empty($form)){
-            $form = new GI_Form('real_estate_search');
-        }
-        $this->form = $form;
-        $this->buildForm();
-    }
-
     protected function buildForm(){
         $this->form->addHTML('<div class="relisting-search">');
         $this->addFavouritesField();
@@ -39,7 +30,8 @@ class RESearchFormView extends AbstractRESearchFormView{
             $this->form->addHTML('<div class="relisting-search__field-wrap">');
                 $this->form->addField('favourites', 'checkbox', array(
                     'class' => 'form__input form__input_type_checkbox',
-                    'options'=> $options
+                    'options'=> $options,
+                    'value' => $this->getQueryValue('favourite')
                 ));
                 $this->addApplyButton();
             $this->form->addHTML('</div>');
@@ -162,6 +154,7 @@ class RESearchFormView extends AbstractRESearchFormView{
                 $this->form->addField('property_type', 'checkbox', array(
                     'class' => 'form__input form__input_type_checkbox',
                     'options'=> $typeArr,
+                    'value' => $this->getQueryValue('property_type')
                 ));
                 $this->addApplyButton();
             $this->form->addHTML('</div>');
@@ -195,7 +188,8 @@ class RESearchFormView extends AbstractRESearchFormView{
             $this->form->addHTML('<div class="relisting-search__field-wrap">');
                 $this->form->addField('property_status', 'checkbox', array(
                     'class' => 'form__input form__input_type_checkbox',
-                    'options'=> $options
+                    'options'=> $options,
+                    'value' => $this->getQueryValue('property_status')
                 ));
                 $this->addApplyButton();
             $this->form->addHTML('</div>');
@@ -215,7 +209,8 @@ class RESearchFormView extends AbstractRESearchFormView{
             $this->form->addHTML('<div class="relisting-search__field-wrap">');
                 $this->form->addField('date_posted', 'dropdown', array(
                     'class' => 'form__input form__input_type_dropdown',
-                    'options'=> $options
+                    'options'=> $options,
+                    'value' => $this->getQueryValue('date_posted')
                 ));
                 $this->addApplyButton();
             $this->form->addHTML('</div>');
@@ -249,6 +244,7 @@ class RESearchFormView extends AbstractRESearchFormView{
                 $this->form->addField('features', 'checkbox', array(
                     'class' => 'form__input form__input_type_checkbox',
                     'options'=> $options,
+                    'value' => $this->getQueryValue('features')
                 ));
                 $this->addApplyButton();
             $this->form->addHTML('</div>');
@@ -259,15 +255,19 @@ class RESearchFormView extends AbstractRESearchFormView{
         $this->form->addHTML('<div class="form__input form__input_type_range">');
             $this->form->addHTML('<div class="field_content">');
                 $this->form->addHTML('<div class="form__input-wrap">');
-                    $this->form->addField($name.'_min', 'dropdown', array(
+                    $minName = $name.'_min';
+                    $this->form->addField($minName, 'dropdown', array(
                         'class' => 'form__input form__input_type_dropdown',
                         'nullText' => 'Min',
-                        'options' => $minOptions
+                        'options' => $minOptions,
+                        'value' => $this->getQueryValue($minName)
                     ));
-                    $this->form->addField($name.'_max', 'dropdown', array(
+                    $minName = $name.'_max';
+                    $this->form->addField($minName, 'dropdown', array(
                         'class' => 'form__input form__input_type_dropdown',
                         'nullText' => 'Max',
-                        'options' => $maxOptions
+                        'options' => $maxOptions,
+                        'value' => $this->getQueryValue($minName)
                     ));
                 $this->form->addHTML('</div>');
             $this->form->addHTML('</div>');
