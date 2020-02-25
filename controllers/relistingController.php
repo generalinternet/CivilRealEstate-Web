@@ -42,12 +42,16 @@ class REListingController extends AbstractREListingController {
         
         $search->filterNull('mls_listing_id');
         $reListingTable = REListingFactory::getDbPrefix() . 're_listing';
+        $search->leftJoin('re_listing_res', 'parent_id', $reListingTable, 'id', 'rlRes');
+        $search->leftJoin('re_listing_res_type', 'id', 'rlRes', 're_listing_res_type_id', 'rlResType');
         $search->innerJoin('re_listing_status', 'id', $reListingTable, 're_listing_status_id', 'rls')
                 ->filter('rls.active', 1);
         
         $reCount = $search->count();
         
         $mlsListingTable = MLSListingFactory::getDbPrefix() . 'mls_listing';
+        $mlsSearch->leftJoin('mls_listing_res', 'parent_id', $mlsListingTable, 'id', 'mlRes');
+        $mlsSearch->leftJoin('mls_listing_res_type', 'id', 'mlRes', 'mls_listing_res_type_id', 'mlResType');
         $mlsSearch->filter('active', 1);
         $mlsSearch->setOffsetRowCount($reCount);
         

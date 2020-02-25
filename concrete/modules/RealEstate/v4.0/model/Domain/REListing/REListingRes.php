@@ -4,6 +4,16 @@ use function Aws\filter;
 
 class REListingRes extends AbstractREListingRes {
 
+    protected static $resTableAlias = array(
+        'client' => 'rlRes',
+        'rets' => 'mlRes'
+    );
+
+    protected static $resTypeTableAlias = array(
+        'client' => 'rlResType',
+        'rets' => 'mlResType'
+    );
+
     /**
      * @param GI_DataSearch $dataSearch
      * @param GI_Form $form
@@ -36,9 +46,9 @@ class REListingRes extends AbstractREListingRes {
             static::addPriceFilterToDataSearch($dataSearch, $priceMin, $priceMax);
         }
         // Property Type
-        $propertyType = $dataSearch->getSearchValue('property_type');
-        if(!empty($propertyType) && $propertyType != 'NULL'){
-            static::addPropertyTypeFilterToDataSearch($propertyType, $dataSearch);
+        $propertyTypes = $dataSearch->getSearchValue('property_type');
+        if(!empty($propertyTypes) && $propertyTypes != 'NULL'){
+            static::addPropertyTypeFilterToDataSearch($propertyTypes, $dataSearch);
         }
         // Area
         $areaMin = $dataSearch->getSearchValue('area_min');
@@ -56,22 +66,23 @@ class REListingRes extends AbstractREListingRes {
     }
 
     public static function addBedroomRangeFilterToDataSearch(GI_DataSearch $dataSearch, $bedroomMin, $bedroomMax){
-        $tableName = $dataSearch->getTableName();
+        $dbType = $dataSearch->getDBType();
         if(!empty($bedroomMin) && $bedroomMin != 'NULL'){
-            $dataSearch->filterGreaterOrEqualTo($tableName.'.total_bedrooms', $bedroomMin);
+            $dataSearch->filterGreaterOrEqualTo(self::$resTableAlias[$dbType].'.total_bedrooms', $bedroomMin);
         }
         if(!empty($bedroomMax) && $bedroomMax != 'NULL'){
-            $dataSearch->filterGreaterOrEqualTo($tableName.'.total_bedrooms', $bedroomMax);
+            $dataSearch->filterGreaterOrEqualTo(self::$resTableAlias[$dbType].'.total_bedrooms', $bedroomMax);
         }
     }
 
     public static function addBathroomRangeFilterToDataSearch(GI_DataSearch $dataSearch, $bathroomMin, $bathroomMax){
+        $dbType = $dataSearch->getDBType();
         $tableName = $dataSearch->getTableName();
         if(!empty($bathroomMin) && $bathroomMin != 'NULL'){
-            $dataSearch->filterGreaterOrEqualTo($tableName.'.total_baths', $bathroomMin);
+            $dataSearch->filterGreaterOrEqualTo(self::$resTableAlias[$dbType].'.total_baths', $bathroomMin);
         }
         if(!empty($bathroomMax) && $bathroomMax != 'NULL'){
-            $dataSearch->filterGreaterOrEqualTo($tableName.'.total_baths', $bathroomMax);
+            $dataSearch->filterGreaterOrEqualTo(self::$resTableAlias[$dbType].'.total_baths', $bathroomMax);
         }
     }
 
@@ -116,8 +127,12 @@ class REListingRes extends AbstractREListingRes {
         if(!empty($areaMin) && $areaMin != 'NULL'){
             $dataSearch->filter($tableName.'.lot_size_acres', $areaMin, '>=');
         }
-        if(!empty($areaMax) && $areaMax != 'NULL' && $areaMax != '5+'){
-            $dataSearch->filter($tableName.'.lot_size_acres', $areaMax, '<=');
+        if(!empty($areaMax) && $areaMax != 'NULL'){
+            if($areaMax != '5000+'){
+                $dataSearch->filterLessOrEqualTo($tableName.'.lot_size_acres', $areaMax);
+            }else{
+                $dataSearch->filterGreaterThan($tableName.'.lot_size_acres', $areaMax);
+            }
         }
     }
 
@@ -130,6 +145,14 @@ class REListingRes extends AbstractREListingRes {
         if(!empty($priceMax) && $priceMax != 'NULL') {
             $dataSearch->filterLessOrEqualTo($tableName.'.list_price', $priceMax);
         }
+    }
+
+    public static function addPropertyTypeFilterToDataSearch($propertyTypeRefs, GI_DataSearch $dataSearch){
+        if(empty($propertyTypeRefs)) {
+            return;
+        }
+        $dbType = $dataSearch->getDBType();
+        $dataSearch->filterIn(self::$resTypeTableAlias[$dbType].'.ref', $propertyTypeRefs);
     }
     
     public static function addKeywordFilterToDataSearch(GI_DataSearch $dataSearch, $keyword = NULL){
@@ -150,7 +173,7 @@ class REListingRes extends AbstractREListingRes {
             ->filterLike($tableName.'.amenities', '%'.$keyword.'%');
         
         if($dataSearch->getDBType() == 'rets'){
-            $dataSearch->leftJoin( 'mls_city', 'id', $tableName, 'mls_city_id', 'lct');
+            $dataSearch->leftJoin( 'mls_city', 'id', REListingFactory::getDbPrefix().$tableName, 'mls_city_id', 'lct');
             $dataSearch
                 ->orIf()
                 ->filterLike('lct.title', '%'.$keyword.'%');
@@ -174,16 +197,11 @@ class REListingRes extends AbstractREListingRes {
         
         static::filterSearchForm($relistingSearch);
         static::filterSearchForm($mlsListingSearch);
-        
-        if(
-            (!is_null($filterForm) && $filterForm->wasSubmitted() && $filterForm->validate()) ||
-            (!is_null($searchForm) && $searchForm->wasSubmitted() && $searchForm->validate())
-        ){
-            
-            $relistingSearch->clearSearchValues();
 
-            $keyword = filter_input(INPUT_POST, 'keyword');
-            $relistingSearch->setSearchValue('keyword', $keyword);
+         $isSubmitted = false;
+        
+        if(!is_null($filterForm) && $filterForm->wasSubmitted() && $filterForm->validate()){
+            $isSubmitted = true;
 
             $bedroomMin = filter_input(INPUT_POST, 'bedroom_min');
             $relistingSearch->setSearchValue('bedroom_min', $bedroomMin);
@@ -212,7 +230,15 @@ class REListingRes extends AbstractREListingRes {
 
             $datePosted = filter_input(INPUT_POST, 'date_posted');
             $relistingSearch->setSearchValue('date_posted', $datePosted);
+        }
+        if((!is_null($searchForm) && $searchForm->wasSubmitted() && $searchForm->validate())){
+            $isSubmitted = true;
 
+            $keyword = filter_input(INPUT_POST, 'keyword');
+            $relistingSearch->setSearchValue('keyword', $keyword);
+        }
+        
+        if($isSubmitted){
             $queryId = $relistingSearch->getQueryId();
             
             if(empty($redirectArray)){
@@ -242,4 +268,5 @@ class REListingRes extends AbstractREListingRes {
         }
         return $searchView;
     }
+
 }

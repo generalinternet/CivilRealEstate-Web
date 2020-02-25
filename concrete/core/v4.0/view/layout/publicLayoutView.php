@@ -431,13 +431,23 @@ class PublicLayoutView extends AbstractPublicLayoutView {
     protected function addHeaderWidget($widget){
         switch($widget){
             case 'search_bar':
+                $keyword = null;
+                $queryId = GI_URLUtils::getAttribute('queryId');
+                if(!empty($queryId)){
+                    $query = REListingFactory::search()->setQueryId($queryId);
+                    $queryKeyword = $query->getSearchValue('keyword');
+                    if(!empty($queryKeyword)){
+                        $keyword = $queryKeyword;
+                    }
+                }
                 $searchForm = new GI_Form('search_bar');
                 $this->addHTML('<div class="header-widget__item header-widget__item_type_search-bar">');
                     $searchForm->addHTML('<div class="header-widget__search-bar-wrap">');
                         $searchForm->addField('keyword', 'text', array(
                             'class' => 'form__input form__input_type_text',
                             'placeHolder' => 'Port Moody, British Columbia',
-                            'displayName' => ''
+                            'displayName' => '',
+                            'value' => $keyword
                         ));
                         $searchForm->addHTML('<a href="" class="submit_btn button button_theme_primary">Search</a>');
                     $searchForm->addHTML('</div>');
