@@ -238,6 +238,7 @@ var RelistingSlider = function () {
 var RelistingSearch = function (){
     var component = {
         searchWrapClass: '.relisting-search',
+        sortFormInput: ".relisting__sortby-list .form__input"
     };
     var ins = {};
 
@@ -248,12 +249,12 @@ var RelistingSearch = function (){
             fieldContent.slideToggle();
             parentInput.toggleClass('open');
         });
-        // $(document).on('change', component.searchWrapClass + ' input, ' + component.searchWrapClass + ' select', function(){
-        //     var parentForm = $(this).parents('form').first();
-        //     if(parentForm.length !== 0){
-        //         parentForm.submit();
-        //     }
-        // });
+        $(document).on('change', component.sortFormInput + ' input', function(){
+            var parentForm = $(this).parents('form').first();
+            if(parentForm.length !== 0){
+                parentForm.submit();
+            }
+        });
     };
 
     return ins;

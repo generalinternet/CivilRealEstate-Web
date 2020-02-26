@@ -8,15 +8,42 @@
             font-weight: 500
     &__sortby-list
         padding: 30px 0
-        font-size: 1.1em
+        font-size: 1em
         text-align: right
-    &__sortby-item
-        margin-left: 1.5em
-        font-weight: 400
-        color: $color_dark
-        &_selected
-            color: $color_primary
-            font-weight: 600
+        .form__input
+            margin-bottom: 0!important
+            label.main
+                display: inline-block
+                margin-bottom: 0
+                font-weight: 500
+                color: $color_dark
+            .field_content,
+            .options_wrap
+                display: inline-block!important
+                label
+                    margin: 0
+                    margin-left: 1em
+                    &:hover,
+                    &:focus
+                        .radio_label
+                            font-weight: 500!important
+            .options_wrap
+                padding: 0
+                .radio_box,
+                input[type="radio"] + .radio_box:before
+                    display: none
+                .radio_label
+                    max-width: unset!important
+                    margin-left: 1em
+                    font-weight: 500
+                    color: $color_dark
+                    transition: .3s
+                    &:hover
+                        color: $color_primary
+                        font-weight: 500!important
+                label
+                    input[type="radio"]:checked ~ .radio_label
+                        color: $color_primary
     &__main-content
         .view_wrap
             padding: 0

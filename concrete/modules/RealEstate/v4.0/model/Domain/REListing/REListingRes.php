@@ -61,29 +61,37 @@ class REListingRes extends AbstractREListingRes {
         if(!empty($datePosted) && $datePosted != 'NULL'){
             static::addDatePostedFilterToDataSearch($datePosted, $dataSearch);
         }
+        // Sort By
+        $sortBy = $dataSearch->getSearchValue('sort_by');
+        if(!empty($sortBy) && $sortBy != 'NULL'){
+            static::addCustomSortingToDataSearch($sortBy, $dataSearch);
+        }
         
         return true;
     }
 
     public static function addBedroomRangeFilterToDataSearch(GI_DataSearch $dataSearch, $bedroomMin, $bedroomMax){
         $dbType = $dataSearch->getDBType();
+        $colName = self::$resTableAlias[$dbType].'.total_bedrooms';
         if(!empty($bedroomMin) && $bedroomMin != 'NULL'){
-            $dataSearch->filterGreaterOrEqualTo(self::$resTableAlias[$dbType].'.total_bedrooms', $bedroomMin);
+            $dataSearch->filterGreaterOrEqualTo($colName, $bedroomMin);
         }
         if(!empty($bedroomMax) && $bedroomMax != 'NULL'){
-            $dataSearch->filterGreaterOrEqualTo(self::$resTableAlias[$dbType].'.total_bedrooms', $bedroomMax);
+            $dataSearch->filterGreaterOrEqualTo($colName, $bedroomMax);
         }
+        // $dataSearch->orderBy($colName);
     }
 
     public static function addBathroomRangeFilterToDataSearch(GI_DataSearch $dataSearch, $bathroomMin, $bathroomMax){
         $dbType = $dataSearch->getDBType();
-        $tableName = $dataSearch->getTableName();
+        $colName = self::$resTableAlias[$dbType].'.total_baths';
         if(!empty($bathroomMin) && $bathroomMin != 'NULL'){
-            $dataSearch->filterGreaterOrEqualTo(self::$resTableAlias[$dbType].'.total_baths', $bathroomMin);
+            $dataSearch->filterGreaterOrEqualTo($colName, $bathroomMin);
         }
         if(!empty($bathroomMax) && $bathroomMax != 'NULL'){
-            $dataSearch->filterGreaterOrEqualTo(self::$resTableAlias[$dbType].'.total_baths', $bathroomMax);
+            $dataSearch->filterGreaterOrEqualTo($colName, $bathroomMax);
         }
+        // $dataSearch->orderBy($colName);
     }
 
     public static function addDatePostedFilterToDataSearch($postedDate, GI_DataSearch $dataSearch){
@@ -119,6 +127,7 @@ class REListingRes extends AbstractREListingRes {
 
         if(!empty($compareDate)){
             $dataSearch->filter($tableName.'.inception', $compareDate, $compareChar);
+            // $dataSearch->orderBy($tableName.'.inception');
         }
     }
 
@@ -145,7 +154,7 @@ class REListingRes extends AbstractREListingRes {
         if(!empty($priceMax) && $priceMax != 'NULL') {
             $dataSearch->filterLessOrEqualTo($tableName.'.list_price', $priceMax);
         }
-    }
+    }       
 
     public static function addPropertyTypeFilterToDataSearch($propertyTypeRefs, GI_DataSearch $dataSearch){
         if(empty($propertyTypeRefs)) {
@@ -192,7 +201,7 @@ class REListingRes extends AbstractREListingRes {
      * @param array $redirectArrayrelistingSearch
      * @return AbstractRESearchFormView
      */
-    public function getFullSearchForm(GI_DataSearch $relistingSearch, GI_DataSearch $mlsListingSearch = NULL, $type = NULL, &$redirectArray = array(), GI_Form $filterForm, GI_Form $searchForm){
+    public function getFullSearchForm(GI_DataSearch $relistingSearch, GI_DataSearch $mlsListingSearch = NULL, $type = NULL, &$redirectArray = array(), GI_Form $filterForm, GI_Form $searchForm, GI_Form $sortByForm){
         $searchView = static::getSearchFormView($filterForm, $relistingSearch);
         
         static::filterSearchForm($relistingSearch);
@@ -238,6 +247,13 @@ class REListingRes extends AbstractREListingRes {
             $relistingSearch->setSearchValue('keyword', $keyword);
         }
         
+        if((!is_null($sortByForm) && $sortByForm->wasSubmitted() && $sortByForm->validate())){
+            $isSubmitted = true;
+
+            $keyword = filter_input(INPUT_POST, 'sort_by');
+            $relistingSearch->setSearchValue('sort_by', $keyword);
+        }
+
         if($isSubmitted){
             $queryId = $relistingSearch->getQueryId();
             
@@ -269,4 +285,17 @@ class REListingRes extends AbstractREListingRes {
         return $searchView;
     }
 
+    public static function addCustomSortingToDataSearch($sortBy, GI_DataSearch $dataSearch){
+        switch ($sortBy) {
+            case 'relevance':
+                # code...
+                break;
+            case 'price_low_to_high':
+                $dataSearch->orderBy('list_price', 'ASC');
+                break;
+            case 'price_high_to_low':
+                $dataSearch->orderBy('list_price', 'DESC');
+                break;
+        }
+    }
 }

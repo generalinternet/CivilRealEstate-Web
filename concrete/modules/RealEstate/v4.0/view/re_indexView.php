@@ -61,28 +61,26 @@ class REIndexView extends AbstractREIndexView{
             }
         $this->addHTML('</div>');
         $this->addHTML('<div class="col-xs-12 col-md-6">');
-            $this->addHTML('<p class="relisting__sortby-list">');
-                $this->addHTML('<span class="relisting__sortby-title">Sort by</span>');
+            $this->addHTML('<div class="relisting__sortby-list">');
                 $sortArr = array(
-                    'low_to_high' => 'Price · Low to High',
-                    'high_to_low' => 'Price · High to Low',
+                    'relevance' => 'Relevance',
+                    'price_low_to_high' => 'Price · Low to High',
+                    'price_high_to_low' => 'Price · High to Low',
                 );
-                $sortBy = GI_URLUtils::getAttribute('sort');
-                $controller = GI_URLUtils::getController();
-                $action = GI_URLUtils::getAction();
-                foreach($sortArr as $ref => $title){
-                    $selected = '';
-                    if($ref === $sortBy){
-                        $selected = 'relisting__sortby-item_selected';
-                    }
-                    $url = GI_URLUtils::buildURL(array(
-                        'controller' => $controller,
-                        'action' => $action,
-                        'sort' => $ref
-                    ));
-                    $this->addHTML('<a href="'.$url.'" class="relisting__sortby-item '.$selected.'">'.$title.'</a>');
+                
+                $sortByVal = REListingFactory::getSearchValue('sort_by');
+                if(empty($sortByVal)){
+                    $sortByVal = 'relevance';
                 }
-            $this->addHTML('</p>');
+                $sortByForm = new GI_Form('sort_by_form');
+                $sortByForm->addField('sort_by', 'radio', array(
+                    'class' => 'form__input form__input_type_text',
+                    'options' => $sortArr,
+                    'value' => $sortByVal,
+                ));
+
+                $this->addHTML($sortByForm->getForm());
+            $this->addHTML('</div>');
         $this->addHTML('</div>');
     }
 

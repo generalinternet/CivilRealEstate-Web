@@ -428,18 +428,11 @@ class PublicLayoutView extends AbstractPublicLayoutView {
         }
         $this->addHTML('</div>');
     }
+
     protected function addHeaderWidget($widget){
         switch($widget){
             case 'search_bar':
-                $keyword = null;
-                $queryId = GI_URLUtils::getAttribute('queryId');
-                if(!empty($queryId)){
-                    $query = REListingFactory::search()->setQueryId($queryId);
-                    $queryKeyword = $query->getSearchValue('keyword');
-                    if(!empty($queryKeyword)){
-                        $keyword = $queryKeyword;
-                    }
-                }
+                $keyword = REListingFactory::getSearchValue('keyword');
                 $searchForm = new GI_Form('search_bar');
                 $this->addHTML('<div class="header-widget__item header-widget__item_type_search-bar">');
                     $searchForm->addHTML('<div class="header-widget__search-bar-wrap">');

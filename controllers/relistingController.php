@@ -96,8 +96,9 @@ class REListingController extends AbstractREListingController {
 
         $filterForm = new GI_Form('real_estate_search');
         $searchForm = new GI_Form('search_bar');
+        $sortByForm = new GI_Form('sort_by_form');
 
-        $searchView = $sampleListing->getFullSearchForm($search, $mlsSearch, $type, $redirectArray, $filterForm, $searchForm);
+        $searchView = $sampleListing->getFullSearchForm($search, $mlsSearch, $type, $redirectArray, $filterForm, $searchForm, $sortByForm);
         $sampleListing->addSortingToDataSearch($search);
 
         $actionResult = ActionResultFactory::buildActionResult();
