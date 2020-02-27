@@ -902,23 +902,23 @@ function replaceUITableRow(newRowHTML, modelId){
     newContentLoaded();
 }
 
-$(document).on('click', '.pagination_btn', function(e){
-    e.preventDefault();
-    var loadFromPaginationEvent = jQuery.Event('loadFromPagination');
-    $(this).trigger(loadFromPaginationEvent);
-    if(!loadFromPaginationEvent.isDefaultPrevented()){
-        var indexUrl = $(this).attr('href');
-        var uiTableWrap = $(this).parents('.ui_table_wrap');
-        elmStartLoading(uiTableWrap, 'circle');
-        jQuery.post(indexUrl + '&ajax=1', function (data) {
-            //var parsedData = JSON.parse(data);
-            if (data.uiTable != undefined) {
-                uiTableWrap.replaceWith(data.uiTable);
-                newContentLoaded();
-            }
-        });
-    }
-});
+// $(document).on('click', '.pagination_btn', function(e){
+//     e.preventDefault();
+//     var loadFromPaginationEvent = jQuery.Event('loadFromPagination');
+//     $(this).trigger(loadFromPaginationEvent);
+//     if(!loadFromPaginationEvent.isDefaultPrevented()){
+//         var indexUrl = $(this).attr('href');
+//         var uiTableWrap = $(this).parents('.ui_table_wrap');
+//         elmStartLoading(uiTableWrap, 'circle');
+//         jQuery.post(indexUrl + '&ajax=1', function (data) {
+//             //var parsedData = JSON.parse(data);
+//             if (data.uiTable != undefined) {
+//                 uiTableWrap.replaceWith(data.uiTable);
+//                 newContentLoaded();
+//             }
+//         });
+//     }
+// });
 
 $(document).on('click', '.limit_btn', function(e){
     e.preventDefault();

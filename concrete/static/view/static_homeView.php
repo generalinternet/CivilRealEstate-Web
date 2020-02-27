@@ -60,7 +60,13 @@ class StaticHomeView extends GI_View{
                                     $this->addHTML('<a href="" class="home-search__tab-item">sell a home</a> ');
                                 $this->addHTML('</div>'); // home-search
                                 $this->addHTML('<div class="home-search__input-wrap">');
-                                    $this->addHTML('<input type="text" class="home-search__input">');
+                                    $homeSearchForm = new GI_Form('home_search_form');
+                                    $homeSearchForm->addField('home_search', 'text', array(
+                                        'class' => 'form__input form__input_type_text',
+                                        'placeHolder' => 'Enter Subdivision, Address, City, Postal Code, School District, Subdivision or MLS® Number ...'
+                                    ));
+                                    $homeSearchForm->addHTML('<a class="button button_has-icon submit_btn"><span class="button__icon button__icon_type_search"></span></a>');
+                                    $this->addHTML($homeSearchForm->getForm());
                                 $this->addHTML('</div>'); // home-search__input-wrap
                             $this->addHTML('</div>'); // home-search
                         $this->addHTML('</div>'); // banner__content-wrap

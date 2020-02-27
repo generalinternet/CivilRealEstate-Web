@@ -107,6 +107,39 @@ class StaticController extends GI_Controller {
         return $returnArray;
     }
 
+    public function actionHome($attributes){
+        $form = new GI_Form('home_search_form');
+        $view = new StaticHomeView($attributes);
+        
+        if($form->wasSubmitted() && $form->validate()){
+            $searchKeyword = filter_input(INPUT_POST, 'home_search');
+            if(!empty($searchKeyword)){
+                $relistingSearch = REListingFactory::search();
+                $relistingSearch->setSearchValue('keyword', $relistingSearch);
+                $queryId = $relistingSearch->getQueryId();
+                $redirectArray = array(
+                    'controller' => 'relisting',
+                    'action' => 'index',
+                    'type' => 'res',
+                    'queryId' => $queryId
+                );
+                GI_URLUtils::redirect($redirectArray);
+            }
+        }
+        $returnArray = GI_Controller::getReturnArray($view);
+        $breadcrumbs = array(
+            array(
+                'label' => $view->getSiteTitle(),
+                'link' => GI_URLUtils::buildURL(array(
+                    'controller' => 'static',
+                    'action' => GI_URLUtils::getAction()
+                ))
+            ),
+        );
+        $returnArray['breadcrumbs'] = $breadcrumbs;
+        return $returnArray;
+    }
+
     public function actionCharity($attributes){
         $form = new GI_Form('charity_form');
         $form->setBotValidation(true);

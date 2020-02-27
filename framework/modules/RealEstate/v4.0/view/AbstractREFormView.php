@@ -229,7 +229,7 @@ abstract class AbstractREFormView extends MainWindowView {
     
     protected function addLotSizeField($overWriteSettings = array()){
         $fieldSettings = GI_Form::overWriteSettings(array(
-            'displayName' => 'Lot Size (sq ft)',
+            'displayName' => 'Lot Size (sqft)',
             'value' => $this->reListing->getProperty('lot_size_sqft')
         ), $overWriteSettings);
         

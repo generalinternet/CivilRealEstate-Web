@@ -2,13 +2,15 @@
 
 class REIndexView extends AbstractREIndexView{
     protected $mainContentClass = "relisting__main-content";
+    protected $pageBar;
     
-    public function __construct($listings, AbstractUITableView $uiTableView, AbstractREListing $sampleListing, GI_View $searchView = NULL)
+    public function __construct($listings, AbstractUITableView $uiTableView, AbstractREListing $sampleListing, GI_View $searchView = NULL, GI_PageBarView $pageBar)
     {
         $this->listings = $listings;
         $this->uiTableView = $uiTableView;
         $this->sampleListing = $sampleListing;
         $this->searchView = $searchView;
+        $this->pageBar = $pageBar;
         $siteTitle = $sampleListing->getViewTitle();
         $this->addSiteTitle($siteTitle);
         $this->setWindowTitle($siteTitle);
@@ -49,7 +51,10 @@ class REIndexView extends AbstractREIndexView{
 
     protected function addTable($class = ''){
         $this->addHTML('<div class="list_table_wrap '.$class.' relisting__list-wrap">');
+        $this->uiTableView->setLoadMore(false);
+        $this->uiTableView->setLoadPrev(false);
         $this->addHTML($this->uiTableView->getHTMLView());
+        $this->addHTML($this->pageBar->getHTMLView());
         $this->addHTML('</div>');
     }
 

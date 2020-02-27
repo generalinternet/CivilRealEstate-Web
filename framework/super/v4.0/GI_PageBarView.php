@@ -1,6 +1,6 @@
 <?php
 /**
- * Description of GI_PageBarView
+ * Description of GI_PageBarViewprev_btn
  *
  * @author General Internet
  * @copyright  2017 General Internet

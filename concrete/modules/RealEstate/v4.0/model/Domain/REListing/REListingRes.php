@@ -260,7 +260,7 @@ class REListingRes extends AbstractREListingRes {
             if(empty($redirectArray)){
                 $redirectArray = array(
                     'controller' => 'relisting',
-                    'action' => 'index'
+                    'action' => $redirectArray['action']
                 );
                 
                 if(!empty($type)){
