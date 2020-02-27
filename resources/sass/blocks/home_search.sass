@@ -19,6 +19,47 @@
     &__input-wrap
         background: rgba(0, 0, 0, .5)
         padding: 0.8em
+        .form__input
+            margin-bottom: 0
+            width: calc(100% - 40px)
+            display: inline-block
+            label.main
+                display: none
+            input
+                line-height: 40px!important
+                height: 40px!important
+                font-size: .8em!important
+                border-radius: 0!important
+                background: #fff!important
+                font-weight: 500!important
+        .button
+            width: 40px
+            height: 40px
+            padding: 0
+            text-align: center
+            display: inline-block
+            position: relative
+            background: $color_primary
+            border-top-right-radius: 5px
+            border-bottom-right-radius: 5px
+            min-width: unset
+            border: none
+            margin-right: 0!important
+            &__icon
+                margin: 0
+                transform: unset
+                width: 100%
+                height: 100%
+                padding: 0
+                background: url("../media/img/icon/search_dark.png")
+                background-repeat: no-repeat
+                background-size: initial
+                background-position: center
+            &:hover
+                background: $color_grey
+                .button__icon
+                    left: unset
+
     &__input
         display: block
         width: 100%

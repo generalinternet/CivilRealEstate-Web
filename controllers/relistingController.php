@@ -74,15 +74,15 @@ class REListingController extends AbstractREListingController {
             }
         }
         
-        $pageBarLinkArray = array(
+        $pageBarLinkProps = array(
             'controller' => 'relisting',
-            'action' => 'index'
+            'action' => $attributes['action'],
         );
 
         if(!empty($type)){
             $mlsSearch->filterByTypeRef($type);
             $search->filterByTypeRef($type);
-            $pageBarLinkArray['type'] = $type;
+            $pageBarLinkProps['type'] = $type;
         }
 
         $sampleListing  = REListingFactory::buildNewModel($type);
@@ -90,38 +90,33 @@ class REListingController extends AbstractREListingController {
         $sampleListing->addCustomFiltersToDataSearch($mlsSearch);        
         $sampleListing->addCustomFiltersToDataSearch($search);
 
-        $pageBarLinkProps = $attributes;
-
-        $redirectArray = array();
-
         $filterForm = new GI_Form('real_estate_search');
         $searchForm = new GI_Form('search_bar');
         $sortByForm = new GI_Form('sort_by_form');
 
-        $searchView = $sampleListing->getFullSearchForm($search, $mlsSearch, $type, $redirectArray, $filterForm, $searchForm, $sortByForm);
+        $searchView = $sampleListing->getFullSearchForm($search, $mlsSearch, $type, $pageBarLinkProps, $filterForm, $searchForm, $sortByForm);
         $sampleListing->addSortingToDataSearch($search);
 
         $actionResult = ActionResultFactory::buildActionResult();
         $actionResult
                 ->setSampleModel($sampleListing)
                 ->setUseAjax(true)
-                ->setRedirectArray($redirectArray);
+                ->setRedirectArray($pageBarLinkProps);
 
         if(!GI_URLUtils::getAttribute('search')){
             $mlsListings = $mlsSearch->select();
             $reListings = $search->select();
             $listings = array_merge($reListings, $mlsListings);
             
-            $pageBar = $search->getPageBar($pageBarLinkProps);
+            $pageBar = REListingFactory::getUnionPageBar($search, $mlsSearch, $pageBarLinkProps);
             $uiTableCols = $sampleListing->getUIRolodexCols();
             
             $catalogView = new UICatalogView($listings, $uiTableCols, $pageBar);
             $catalogView->setLoadLinksWithAJAX(false);
             
-            $view = new REIndexView($listings, $catalogView, $sampleListing, $searchView);
+            $view = new REIndexView($listings, $catalogView, $sampleListing, $searchView, $pageBar);
             $actionResult->setView($view)
                     ->setPageBar($pageBar)
-                    //->setUITableView($uiTableView);
                     ->setUITableView($catalogView);
         }
 
@@ -193,7 +188,7 @@ class REListingController extends AbstractREListingController {
             'action' => 'openHouse',
             'type' => $type
         );
-                
+
         $pageBar = $listingSearch->getPageBar($pageBarLinkArray);
         $sampleListing = MLSListingFactory::buildNewModel($type);
         $view = new MLSOpenHouseView($listings, $pageBar, $sampleListing);

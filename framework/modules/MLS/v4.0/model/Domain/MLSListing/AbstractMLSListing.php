@@ -1110,7 +1110,7 @@ abstract class AbstractMLSListing extends GI_Model {
     public function getDisplayLotSizeSqft() {
         $string = '<span class="amount">';
         $string .= GI_StringUtils::formatFloat($this->getProperty('lot_size_sqft'));
-        $string .= ' <span class="unit right_unit">sq ft</span></span>';
+        $string .= ' <span class="unit right_unit">sqft</span></span>';
         return $string;
     }
     
