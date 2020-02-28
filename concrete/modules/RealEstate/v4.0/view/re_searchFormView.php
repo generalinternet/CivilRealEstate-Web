@@ -9,7 +9,7 @@ class RESearchFormView extends AbstractRESearchFormView{
 
     protected function buildForm(){
         $this->form->addHTML('<div class="relisting-search">');
-        $this->addFavouritesField();
+        // $this->addFavouritesField();
         $this->addBedroomsField();
         $this->addBathroomsField();
         $this->addPriceField();

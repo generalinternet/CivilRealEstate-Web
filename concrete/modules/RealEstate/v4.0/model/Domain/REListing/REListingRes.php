@@ -77,7 +77,7 @@ class REListingRes extends AbstractREListingRes {
             $dataSearch->filterGreaterOrEqualTo($colName, $bedroomMin);
         }
         if(!empty($bedroomMax) && $bedroomMax != 'NULL'){
-            $dataSearch->filterGreaterOrEqualTo($colName, $bedroomMax);
+            $dataSearch->filterLessOrEqualTo($colName, $bedroomMax);
         }
         // $dataSearch->orderBy($colName);
     }
@@ -89,7 +89,7 @@ class REListingRes extends AbstractREListingRes {
             $dataSearch->filterGreaterOrEqualTo($colName, $bathroomMin);
         }
         if(!empty($bathroomMax) && $bathroomMax != 'NULL'){
-            $dataSearch->filterGreaterOrEqualTo($colName, $bathroomMax);
+            $dataSearch->filterLessOrEqualTo($colName, $bathroomMax);
         }
         // $dataSearch->orderBy($colName);
     }
