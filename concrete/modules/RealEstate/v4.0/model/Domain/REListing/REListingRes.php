@@ -182,10 +182,21 @@ class REListingRes extends AbstractREListingRes {
             ->filterLike($tableName.'.amenities', '%'.$keyword.'%');
         
         if($dataSearch->getDBType() == 'rets'){
+            // area
             $dataSearch->leftJoin( 'mls_city', 'id', REListingFactory::getDbPrefix().$tableName, 'mls_city_id', 'lct');
             $dataSearch
                 ->orIf()
                 ->filterLike('lct.title', '%'.$keyword.'%');
+            $dataSearch->closeGroup();
+            $dataSearch
+                ->andIf()
+                ->filter('lct.status', 1);
+
+            // sub area 
+            $dataSearch->leftJoin( 'mls_sub_area', 'id', REListingFactory::getDbPrefix().$tableName, 'mls_sub_area_id', 'lse');
+            $dataSearch
+                ->orIf()
+                ->filterLike('lse.title', '%'.$keyword.'%');
             $dataSearch->closeGroup();
             $dataSearch
                 ->andIf()
