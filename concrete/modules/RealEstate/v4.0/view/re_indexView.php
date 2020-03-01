@@ -4,7 +4,7 @@ class REIndexView extends AbstractREIndexView{
     protected $mainContentClass = "relisting__main-content";
     protected $pageBar;
     
-    public function __construct($listings, AbstractUITableView $uiTableView, AbstractREListing $sampleListing, GI_View $searchView = NULL, GI_PageBarView $pageBar)
+    public function __construct($listings, REUICatalogView $uiTableView, AbstractREListing $sampleListing, GI_View $searchView = NULL, GI_PageBarView $pageBar)
     {
         $this->listings = $listings;
         $this->uiTableView = $uiTableView;
@@ -25,6 +25,11 @@ class REIndexView extends AbstractREIndexView{
         return $this;
     }
 
+    protected $isOpenHouse = false;
+    public function setIsOpenHouse(bool $isOpenHouse){
+        $this->isOpenHouse = $isOpenHouse;
+    }
+
     protected function addViewBodyContent() {
         $this->addHTML('<section class="section section_type_relisting">');
             $this->addHTML('<div class="container">');
@@ -34,11 +39,17 @@ class REIndexView extends AbstractREIndexView{
                 $this->addHTML('</div>');
                 
                 $this->addHTML('<div class="row">');
+                
+                $tableCol = "col-md-12";
+                if(!$this->isOpenHouse){
                     $this->addHTML('<div class="col-xs-12 col-md-4">');
                     $this->addSearchBox();
                     $this->addHTML('</div>');
 
-                    $this->addHTML('<div class="col-xs-12 col-md-8">');
+                    $tableCol = "col-md-8";
+                }
+
+                    $this->addHTML('<div class="col-xs-12 '.$tableCol.'">');
                     $this->addTable();
                     $this->addHTML('</div>');
                 $this->addHTML('</div>');

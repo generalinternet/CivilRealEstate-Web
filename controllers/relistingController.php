@@ -107,14 +107,19 @@ class REListingController extends AbstractREListingController {
             $mlsListings = $mlsSearch->select();
             $reListings = $search->select();
             $listings = array_merge($reListings, $mlsListings);
+
+            $isOpenHouse = (isset($attributes['openHouse']) && $attributes['openHouse'] == 1);
             
             $pageBar = REListingFactory::getUnionPageBar($search, $mlsSearch, $pageBarLinkProps);
             $uiTableCols = $sampleListing->getUIRolodexCols();
             
-            $catalogView = new UICatalogView($listings, $uiTableCols, $pageBar);
+            $catalogView = new REUICatalogView($listings, $uiTableCols, $pageBar, $isOpenHouse);
             $catalogView->setLoadLinksWithAJAX(false);
             
+            // TODO: is openhouse
             $view = new REIndexView($listings, $catalogView, $sampleListing, $searchView, $pageBar);
+            $view->setIsOpenHouse($isOpenHouse);
+            
             $actionResult->setView($view)
                     ->setPageBar($pageBar)
                     ->setUITableView($catalogView);
@@ -128,71 +133,5 @@ class REListingController extends AbstractREListingController {
     public function actionOpenHouse($attributes){
         $attributes['openHouse'] = 1;
         return $this->actionIndex($attributes);
-        $queryId = 'gi_1';
-
-        /*items displayed per page*/
-        $itemPerPage = 5;
-
-        /*starting page number*/
-        if(isset($attributes['pageNumber'])){
-            $pageNumber = $attributes['pageNumber'];
-        }else{
-            $pageNumber = 1;
-        }
-
-        $type = 'res';
-        $mlsListingTable = dbConfig::getDbPrefix() . 'mls_listing';
-        $date = new DateTime();
-        $ohExpiryDate = GI_Time::formatDateTime($date, 'datetime');
-
-        $listingSearch = MLSListingFactory::search()
-            ->filter('active', 1)
-            ->filterTypeByRef('listing', $type)
-            ->innerJoin('mls_open_house', 'mls_listing_id', $mlsListingTable, 'id', 'moh')
-            ->filterGreaterOrEqualTo('moh.oh_end_date_time', $ohExpiryDate)
-            ->groupBy('moh.mls_listing_id')
-        ;
-
-        $mlltrJoin = $listingSearch->createLeftJoin('mls_listing_link_to_realtor', 'mls_listing_id', $mlsListingTable, 'id', 'mlltr');
-        $mlltrJoin->filter('mlltr.status', 1);
-
-        $mrJoin = $listingSearch->createLeftJoin('mls_realtor', 'id', 'mlltr', 'mls_realtor_id', 'mr');
-        $mrJoin->filterIn('mr.login', unserialize(RETS_REALTOR_IDS));
-
-        $listingSearch->setAutoStatus(false);
-        $listingSearch
-            ->filter('status', 1)
-            ->filter('moh.status', 1);
-
-        $ourListingCase = $listingSearch->newCase();
-        $ourListingCase->filterNotNull('MAX(mr.login)')
-            ->setThen(1)
-            ->setElse(0);
-        
-        $listingSearch->orderByCase($ourListingCase, 'DESC');
-        
-        $listingSearch
-            ->orderBy('last_trans_date', 'DESC')
-            ->setPageNumber($pageNumber)
-            ->setItemsPerPage($itemPerPage)
-            ->setQueryId($queryId)
-        ;
-
-        $sort = 'last_trans_date';
-        $order = 'desc';
-        $listingSearch->orderBy($sort, $order);
-        $listings = $listingSearch->select();
-
-        $pageBarLinkArray = array(
-            'controller' => 'listing',
-            'action' => 'openHouse',
-            'type' => $type
-        );
-
-        $pageBar = $listingSearch->getPageBar($pageBarLinkArray);
-        $sampleListing = MLSListingFactory::buildNewModel($type);
-        $view = new MLSOpenHouseView($listings, $pageBar, $sampleListing);
-        $returnArray = GI_Controller::getReturnArray($view);
-        return $returnArray;
     }
 }

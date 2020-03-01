@@ -1,6 +1,15 @@
 <?php
 
 class RECatalogView extends AbstractRECatalogView{
+    public function __construct($listing, bool $isOpenHouse) {
+        parent::__construct($listing);
+        $this->isOpenHouse = $isOpenHouse;
+    }
+
+    protected $isOpenHouse = false;
+    public function setIsOpenHouse(bool $isOpenHouse){
+        $this->isOpenHouse = $isOpenHouse;
+    }
 
     function checkValue($val, $prefix = null, $surfix = null){
         if(!empty($val)){
@@ -11,7 +20,11 @@ class RECatalogView extends AbstractRECatalogView{
     }
     
     protected function openListingWrap(){
-        $this->addHTML('<div class="relisting-item">');
+        $addClass = '';
+        if($this->isOpenHouse){
+            $addClass = 'relisting-item_type_open-house';
+        }
+        $this->addHTML('<div class="relisting-item '.$addClass.'">');
         return $this;
     }
 
@@ -43,28 +56,40 @@ class RECatalogView extends AbstractRECatalogView{
                         $otherField = implode(', ', $otherField);
                         $this->addHTML('<p>'.$otherField.'</p>');
                     $this->addHTML('</div>');
+                    if($this->isOpenHouse){
+                        $this->addFeatures();
+                    }
                     // $this->addSummary();
                 $this->addHTML('</div>');
                 $this->addHTML('<div class="relisting-item__view-button-wrap">');
+                    if($this->isOpenHouse){
+                        $this->addOpenHouseSchedules();
+                    }
                     $this->addViewCTA();
                 $this->addHTML('</div>');
             $this->addHTML('</div>');
-            $this->addHTML('<div class="relisting-item__features-wrap">');
-                $this->addHTML('<div class="relisting-item__square-footage">');
-                    $this->addHTML('<span class="relisting-item__feature-title">Square Footage</span>');
-                    $lotSize = $this->listing->getDisplaySquareFootage();
-                    $this->addHTML('<span class="relisting-item__feature-value">'.$lotSize.'</span>');
-                $this->addHTML('</div>');
-                $this->addHTML('<div class="relisting-item__price">');
-                    $this->addHTML('<span class="relisting-item__feature-title">Price</span>');
-                    $this->addHTML('<span class="relisting-item__feature-value">');
-                        $this->addListingPrice();
-                    $this->addHTML('</span>');
-                $this->addHTML('</div>');
-                $this->addHTML('<div class="relisting-item__favourite">');
-                    $this->addHTML('<p class="relisting-item__favourite-text">Favourite <span class="relisting-item__favourite-icon"></span></p>');
-                $this->addHTML('</div>');
+            if(!$this->isOpenHouse){
+                $this->addFeatures();
+            }
+        $this->addHTML('</div>');
+    }
+
+    protected function addFeatures(){
+        $this->addHTML('<div class="relisting-item__features-wrap">');
+            $this->addHTML('<div class="relisting-item__square-footage">');
+                $this->addHTML('<span class="relisting-item__feature-title">Square Footage</span>');
+                $lotSize = $this->listing->getDisplaySquareFootage();
+                $this->addHTML('<span class="relisting-item__feature-value">'.$lotSize.'</span>');
             $this->addHTML('</div>');
+            $this->addHTML('<div class="relisting-item__price">');
+                $this->addHTML('<span class="relisting-item__feature-title">Price</span>');
+                $this->addHTML('<span class="relisting-item__feature-value">');
+                    $this->addListingPrice();
+                $this->addHTML('</span>');
+            $this->addHTML('</div>');
+            // $this->addHTML('<div class="relisting-item__favourite">');
+            //     $this->addHTML('<p class="relisting-item__favourite-text">Favourite <span class="relisting-item__favourite-icon"></span></p>');
+            // $this->addHTML('</div>');
         $this->addHTML('</div>');
     }
 
@@ -77,9 +102,18 @@ class RECatalogView extends AbstractRECatalogView{
         }
         $this->addHTML($address);
     }
+
+    protected function addOpenHouseSchedules(){
+        $openHouses = $this->listing->getOpenHouses();
+        foreach($openHouses as $openHouse){
+            $this->addHTML('open house schedules');
+        }
+        $this->addHTML('<a href="" class="relisting-item__open-house-btn button button_theme_primary button_has-icon"> <span class="button__icon button__icon_type_clock"></span> Saturday, February 28, 2020<br> 2:00pm to 4:00pm</a>');
+        $this->addHTML('<a href="" class="relisting-item__open-house-btn button button_theme_secondary button_has-icon"> <span class="button__icon button__icon_type_clock"></span> Saturday, February 28, 2020<br> 2:00pm to 4:00pm</a>');
+    }
     
     protected function addViewCTA(){
         $url = $this->listing->getViewURL();
-        $this->addHTML('<a href="' . $url . '" class="button button_theme_primary" title="View Details">View Details</a>');
+        $this->addHTML('<a href="' . $url . '" class="button button_theme_primary relisting-item__view-detail" title="View Details">View Details</a>');
     }
 }

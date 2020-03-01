@@ -143,4 +143,9 @@ class MLSListingRes extends AbstractMLSListingRes {
         }
         return explode(',', $features);
     }
+
+    public function getCatalogItemWithOpenHouseView($isOpenHouse) {
+        $view = new RECatalogView($this, $isOpenHouse);
+        return $view;
+    }
 }

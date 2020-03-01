@@ -86,3 +86,16 @@
     &__search-link
         font-weight: 500
         color: $color_primary
+
+@media screen and ( max-width: 991px )
+    .header-widget
+        padding: .5em 0
+        width: auto
+        &__item
+            &_type_search-bar
+                .button
+                    min-width: unset
+                    margin: 0
+                .form__input,
+                .form__input input
+                    width: auto!important

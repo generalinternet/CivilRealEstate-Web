@@ -184,6 +184,36 @@
             background-repeat: no-repeat
             &_empty
                 background-image: url('../media/img/icon/star-o.png')
+        &__open-house-btn
+            margin-bottom: 20px
+        
+        &_type_open-house
+            .relisting-item
+                &__features-wrap
+                    margin-top: 30px
+                &__title-description
+                    flex: 2
+                &__view-button-wrap
+                    .button
+                        width: 100%
+                &__view-detail
+                    text-align: center
+                &__open-house-btn
+                    padding-left: 100px
+                    text-align: left
+                    position: relative
+                    line-height: 1.3em
+                    .button__icon
+                        position: absolute
+                        left: 0
+                        top: 0
+                        width: 100px
+                        height: 100%
+                        transform: unset
+                        margin: 0
+                        background-size: initial
+                &__overview-wrap
+                    margin-bottom: 0
 
 @media screen and ( max-width: 767px )
     .relisting
