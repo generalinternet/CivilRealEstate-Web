@@ -63,7 +63,7 @@ class StaticHomeView extends GI_View{
                                     $homeSearchForm = new GI_Form('home_search_form');
                                     $homeSearchForm->addField('home_search', 'text', array(
                                         'class' => 'form__input form__input_type_text',
-                                        'placeHolder' => 'Enter Subdivision, Address, City, Postal Code, School District, Subdivision or MLS® Number ...'
+                                        'placeHolder' => 'Enter Subdivision, Address, City, Postal Code, School District or MLS® Number ...'
                                     ));
                                     $homeSearchForm->addHTML('<a class="button button_has-icon submit_btn"><span class="button__icon button__icon_type_search"></span></a>');
                                     $this->addHTML($homeSearchForm->getForm());
