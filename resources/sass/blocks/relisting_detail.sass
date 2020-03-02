@@ -53,24 +53,38 @@
     &__col-pad-right
         padding-right: 2em
         text-align: right
+    &__col-pad-left
+        padding-left: 3em
+        text-align: left
     //     // images
+    &__back-link,
     &__favourite
         font-size: 1.1em
         padding: 1em 0
+    &__back-link-text,
     &__favourite-text
+        font-weight: 400
         color: $color_subtite_grey
+    &__back-link-text:hover
+        color: $color_dark
+        text-decoration: none
+    &__back-link-icon,
     &__favourite-icon
         display: inline-block
-        vertical-align: sub
-        margin-left: 5px
+        vertical-align: bottom
+        margin-right: 5px
         width: 20px
         height: 21px
         background-image: url('../media/img/icon/star.png')
         background-size: contain
         background-position: center
         background-repeat: no-repeat
+        position: relative
+        bottom: -1px
         &_empty
             background-image: url('../media/img/icon/star-o.png')
+    &__back-link-icon
+        background-image: url('../media/img/icon/back.png')
     &__highlight-info
         font-size: 1.1em
     &__highlight-row
@@ -80,7 +94,7 @@
         &_type_features
             flex-wrap: wrap
     &__address-wrap
-        flex: 1
+        flex: 3
     &__address
         font-size: 1.1em
         font-weight: 400
@@ -151,7 +165,9 @@
         margin-top: 1em
         padding: 0 1em
     &__contact-form-wrap
+        background: radial-gradient(#fff, #D1D3D4)
         .contact__form-wrap
+            background: none
             margin-bottom: 0
     &__contact-left-col
         padding-top: 2em

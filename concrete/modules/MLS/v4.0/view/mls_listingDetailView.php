@@ -3,6 +3,7 @@
 class MLSListingDetailView extends AbstractMLSListingDetailView{
     protected $form = NULL;
     protected $mainContentClass = "relisting__main-content";
+    protected $openHouses = array();
 
     public function __construct(AbstractMLSListing $listing, GI_Form $form = NULL)
     {
@@ -18,6 +19,8 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
         $this->addCSS('resources/external/slick-1.6.0/slick/slick.css');
         $this->addCSS('resources/external/slick-1.6.0/slick/slick-theme.css');
         $this->addJS('resources/external/slick-1.6.0/slick/slick.js');
+
+        $this->openHouses = $this->listing->getOpenHouses();
     }
 
     protected function buildForm(){
@@ -77,6 +80,7 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
         $this->addCTASection();
         $this->addDetailInfoSection();
         $this->addMapSection();
+        $this->addOpenHouseHoursSection();
         $this->addContactFormSection();
     }
 
@@ -84,9 +88,24 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
         $this->addHTML('<div class="section section_type_listing-detail-highlight">');
             $this->addHTML('<div class="container">');
                 $this->addHTML('<div class="row">');
-                    $this->addHTML('<div class="col-xs-12 col-md-3 relisting-detail__col-pad-right">');
+                    $this->addHTML('<div class="col-xs-12 col-md-3 relisting-detail__col-pad-left">');
+                        $this->addHTML('<div class="relisting-detail__back-link">');
+                        
+                            $url = GI_URLUtils::buildURL(array(
+                                'controller' => 'relisting',
+                                'action' => 'index'
+                            ));
+                            if(($this->openHouses)){
+                                $url = GI_URLUtils::buildURL(array(
+                                    'controller' => 'relisting',
+                                    'action' => 'openHouse'
+                                ));
+                            }
+                            $this->addHTML('<a href="'.$url.'" class="relisting-detail__back-link-text"><span class="relisting-detail__back-link-icon"></span> Back to List</a>');
+
+                        $this->addHTML('</div>');
                         $this->addHTML('<div class="relisting-detail__favourite">');
-                            $this->addHTML('<p class="relisting-detail__favourite-text">Favourite <span class="relisting-item__favourite-icon"></span></p>');
+                            $this->addHTML('<p class="relisting-detail__favourite-text"><span class="relisting-detail__favourite-icon"></span> Favourite</p>');
                         $this->addHTML('</div>');
                     $this->addHTML('</div>');
                     $this->addHTML('<div class="col-xs-12 col-md-9">');
@@ -266,6 +285,25 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
             $this->addHTML('</div>');
         $this->addHTML('</div>');
         return $this;
+    }
+
+    protected function addOpenHouseHoursSection(){
+        $this->addHTML('<div class="section section_type_open-house-hours open-house-hours">');
+            $this->addHTML('<div class="container">');
+                $this->addHTML('<div class="row">');
+                    $this->addHTML('<div class="col-xs-12 col-md-6 col-md-push-3">');
+                        $this->addHTML('<h3 class="open-house-hours__title">Open House for this Property</h3>');
+                        $this->addHTML('<div class="open-house-hours__schedule-wrap">');
+                            $this->addHTML('<a href="" class="button button_theme_secondary button_has-icon"> <span class="button__icon button__icon_type_clock"></span> Saturday, February 28, 2020 <span class="hour">2:00pm to 4:00pm</span></a>');
+                            $this->addHTML('<a href="" class="button button_theme_secondary button_has-icon"> <span class="button__icon button__icon_type_clock"></span> Saturday, February 28, 2020 <span class="hour">2:00pm to 4:00pm</span></a>');
+                        $this->addHTML('</div>');
+                        $this->addHTML('<div class="open-house-hours__buttons">');
+                            $this->addHTML('<a href="" class="button button_theme_outline">View All Open Houses</a>');
+                        $this->addHTML('</div>');
+                    $this->addHTML('</div>');
+                $this->addHTML('</div>');
+            $this->addHTML('</div>');
+        $this->addHTML('</div>');
     }
 
     protected function addMapSection(){

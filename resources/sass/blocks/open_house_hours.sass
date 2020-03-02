@@ -1,0 +1,29 @@
+.open-house-hours
+    background: radial-gradient(#fff, #D1D3D4)
+    text-align: center
+    &__title
+        font-weight: 600
+    &__schedule-wrap
+        padding: 1.5em 1em
+        .button
+            padding-left: 100px
+            text-align: left
+            position: relative
+            line-height: 1.3em
+            display: block
+            margin-bottom: 1.5em
+            .button__icon
+                position: absolute
+                left: 0
+                top: 0
+                width: 100px
+                height: 100%
+                transform: unset
+                margin: 0
+                background-size: initial
+            .hour
+                float: right
+                margin-left: 2em
+            &:hover
+                background: $color_primary
+                border-color: $color_primary
