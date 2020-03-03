@@ -94,12 +94,16 @@
 
     // RELISTING ITEM
     &-item
+        cursor: pointer
         width: 100%
         display: block
         background: $color_white
         padding: 1.5em
         box-shadow: 0 0 6px rgba(0,0,0,.2)
         display: flex
+        transition: .3s
+        &:hover
+            box-shadow:  0 4px 6px rgba(0,0,0,.3)
         &:not(:last-child)
             margin-bottom: 1.5em
         &__featured-image
@@ -212,6 +216,10 @@
                         transform: unset
                         margin: 0
                         background-size: initial
+                    &:hover
+                        color: $color_white
+                        background: $color_primary
+                        border-color: $color_primary
                 &__overview-wrap
                     margin-bottom: 0
 

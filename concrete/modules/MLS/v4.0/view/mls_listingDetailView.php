@@ -90,17 +90,23 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
                 $this->addHTML('<div class="row">');
                     $this->addHTML('<div class="col-xs-12 col-md-3 relisting-detail__col-pad-left">');
                         $this->addHTML('<div class="relisting-detail__back-link">');
-                        
-                            $url = GI_URLUtils::buildURL(array(
-                                'controller' => 'relisting',
-                                'action' => 'index'
-                            ));
-                            if(($this->openHouses)){
+                            
+                            $lastURL = SessionService::getValue('last_listing_list_url');
+                            if(!empty($lastURL)){
+                                $url = GI_URLUtils::buildURL($lastURL);
+                            }else{
                                 $url = GI_URLUtils::buildURL(array(
                                     'controller' => 'relisting',
-                                    'action' => 'openHouse'
+                                    'action' => 'index'
                                 ));
+                                if(($this->openHouses)){
+                                    $url = GI_URLUtils::buildURL(array(
+                                        'controller' => 'relisting',
+                                        'action' => 'openHouse'
+                                    ));
+                                }
                             }
+
                             $this->addHTML('<a href="'.$url.'" class="relisting-detail__back-link-text"><span class="relisting-detail__back-link-icon"></span> Back to List</a>');
 
                         $this->addHTML('</div>');
@@ -288,17 +294,28 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
     }
 
     protected function addOpenHouseHoursSection(){
+        if(empty($this->openHouses)){
+            return;
+        }
         $this->addHTML('<div class="section section_type_open-house-hours open-house-hours">');
             $this->addHTML('<div class="container">');
                 $this->addHTML('<div class="row">');
                     $this->addHTML('<div class="col-xs-12 col-md-6 col-md-push-3">');
                         $this->addHTML('<h3 class="open-house-hours__title">Open House for this Property</h3>');
                         $this->addHTML('<div class="open-house-hours__schedule-wrap">');
-                            $this->addHTML('<a href="" class="button button_theme_secondary button_has-icon"> <span class="button__icon button__icon_type_clock"></span> Saturday, February 28, 2020 <span class="hour">2:00pm to 4:00pm</span></a>');
-                            $this->addHTML('<a href="" class="button button_theme_secondary button_has-icon"> <span class="button__icon button__icon_type_clock"></span> Saturday, February 28, 2020 <span class="hour">2:00pm to 4:00pm</span></a>');
+                            foreach($this->openHouses as $openHouse){
+                                $startDate = date('l, F j, Y', strtotime($openHouse->getProperty('oh_start_date')));
+                                $startTime = date('g:i a', strtotime($openHouse->getProperty('oh_start_time')));
+                                $endTime = date('g:i a', strtotime($openHouse->getProperty('oh_end_time')));
+                                $this->addHTML('<a href="" class="button button_theme_secondary button_has-icon"> <span class="button__icon button__icon_type_clock"></span> '.$startDate.' <span class="hour">'.$startTime.' to '.$endTime.'</span></a>');
+                            }
+                            // $this->addHTML('<a href="" class="button button_theme_secondary button_has-icon"> <span class="button__icon button__icon_type_clock"></span> Saturday, February 28, 2020 <span class="hour">2:00pm to 4:00pm</span></a>');
                         $this->addHTML('</div>');
                         $this->addHTML('<div class="open-house-hours__buttons">');
-                            $this->addHTML('<a href="" class="button button_theme_outline">View All Open Houses</a>');
+                            $this->addHTML('<a href="'.GI_URLUtils::buildURL(array(
+                                'controller' => 'relisting',
+                                'action' => 'openHouse'
+                            )).'" class="button button_theme_outline">View All Open Houses</a>');
                         $this->addHTML('</div>');
                     $this->addHTML('</div>');
                 $this->addHTML('</div>');
@@ -323,7 +340,7 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
                     $this->addHTML('<div class="col-xs-12 col-md-5 col-md-push-1 relisting-detail__contact-left-col">');
                         $this->addHTML('<h3 class="relisting-detail__contact-title">Want to know more?</h3>');
                         $this->addHTML('<div class="relisting-detail__contact-button-wrap">');
-                            $this->addHTML('<a href="" class="button button_theme_outline_white">Call Us  888.333.7777</a>');
+                            $this->addHTML('<a href="tel:'.SITE_PHONE.'" class="button button_theme_outline_white">Call Us '.SITE_PHONE.'</a>');
                         $this->addHTML('</div>');
                     $this->addHTML('</div>');
                     $this->addHTML('<div class="col-xs-12 col-md-5 col-md-push-1">');

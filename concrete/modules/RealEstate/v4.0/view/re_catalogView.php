@@ -24,7 +24,7 @@ class RECatalogView extends AbstractRECatalogView{
         if($this->isOpenHouse){
             $addClass = 'relisting-item_type_open-house';
         }
-        $this->addHTML('<div class="relisting-item '.$addClass.'">');
+        $this->addHTML('<div class="relisting-item '.$addClass.'" onclick="location.href=\''.$this->listing->getViewURL().'\'">');
         return $this;
     }
 
@@ -105,11 +105,14 @@ class RECatalogView extends AbstractRECatalogView{
 
     protected function addOpenHouseSchedules(){
         $openHouses = $this->listing->getOpenHouses();
+        $url = $this->listing->getViewURL();
         foreach($openHouses as $openHouse){
-            $this->addHTML('open house schedules');
+            $startDate = date('l, F j, Y', strtotime($openHouse->getProperty('oh_start_date')));
+            $startTime = date('g:i a', strtotime($openHouse->getProperty('oh_start_time')));
+            $endTime = date('g:i a', strtotime($openHouse->getProperty('oh_end_time')));
+            $this->addHTML('<a href="'.$url.'" class="relisting-item__open-house-btn button button_theme_secondary button_has-icon"> <span class="button__icon button__icon_type_clock"></span>'.$startDate.'<br> '.$startTime.' to '.$endTime.'</a>');
         }
-        $this->addHTML('<a href="" class="relisting-item__open-house-btn button button_theme_primary button_has-icon"> <span class="button__icon button__icon_type_clock"></span> Saturday, February 28, 2020<br> 2:00pm to 4:00pm</a>');
-        $this->addHTML('<a href="" class="relisting-item__open-house-btn button button_theme_secondary button_has-icon"> <span class="button__icon button__icon_type_clock"></span> Saturday, February 28, 2020<br> 2:00pm to 4:00pm</a>');
+        // $this->addHTML('<a href="" class="relisting-item__open-house-btn button button_theme_secondary button_has-icon"> <span class="button__icon button__icon_type_clock"></span> Saturday, February 28, 2020<br> 2:00pm to 4:00pm</a>');
     }
     
     protected function addViewCTA(){

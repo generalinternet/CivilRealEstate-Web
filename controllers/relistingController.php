@@ -127,6 +127,10 @@ class REListingController extends AbstractREListingController {
 
         $returnArray = $actionResult->getIndexReturnArray();
         $interfacePerspectiveRef = Login::getCurrentInterfacePerspectiveRef();
+
+        // set last listing list
+        SessionService::setValue('last_listing_list_url', GI_URLUtils::getAttributes());
+
         return $returnArray;
     }
 

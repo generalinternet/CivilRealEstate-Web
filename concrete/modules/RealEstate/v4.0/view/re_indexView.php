@@ -78,11 +78,13 @@ class REIndexView extends AbstractREIndexView{
         $this->addHTML('</div>');
         $this->addHTML('<div class="col-xs-12 col-md-6">');
             $this->addHTML('<div class="relisting__sortby-list">');
-                $sortArr = array(
-                    'relevance' => 'Relevance',
-                    'price_low_to_high' => 'Price · Low to High',
-                    'price_high_to_low' => 'Price · High to Low',
-                );
+                if($this->isOpenHouse){
+                    $sortArr['upcoming'] = 'Upcoming';
+                }else{
+                    $sortArr['relevance'] = 'Relevance';
+                }
+                $sortArr['price_low_to_high'] = 'Price · Low to High';
+                $sortArr['price_high_to_low'] = 'Price · High to Low';
                 
                 $sortByVal = REListingFactory::getSearchValue('sort_by');
                 if(empty($sortByVal)){

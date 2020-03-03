@@ -301,12 +301,40 @@ class REListingRes extends AbstractREListingRes {
             case 'relevance':
                 # code...
                 break;
-            case 'price_low_to_high':
+            case 'upcoming':
+                if($dataSearch->getDBType() == 'rets'){
+                    $mlsListingTable = $dataSearch->prefixTableName('mls_listing');
+                    $dataSearch
+                        ->innerJoin('mls_open_house', 'mls_listing_id', $mlsListingTable, 'id', 'moh')
+                        ->groupBy('moh.mls_listing_id')
+                        ->orderBy('moh.oh_start_date')
+                    ;
+                }
+                break;
+            case 'pric
+        ;e_low_to_high':
                 $dataSearch->orderBy('list_price', 'ASC');
                 break;
             case 'price_high_to_low':
                 $dataSearch->orderBy('list_price', 'DESC');
                 break;
+        }
+    }
+
+    public static function addOpenHouseFilterToDataSearch(GI_DataSearch $dataSearch){
+        $dbType = $dataSearch->getDBType();
+        if(dbConnection::verifyTableExists('mls_open_house', $dbType)){
+            $mlsListingTable = $dataSearch->prefixTableName('mls_listing');
+            if(DEV_MODE){
+                $date = new DateTime('2020-03-03');
+            } else {
+                $date = new DateTime();
+            }
+            $ohExpiryDate = GI_Time::formatDateTime($date, 'datetime');
+            
+            $dataSearch->innerJoin('mls_open_house', 'mls_listing_id', $mlsListingTable, 'id', 'moh')
+                ->filterGreaterOrEqualTo('moh.oh_end_date_time', $ohExpiryDate)
+                ->groupBy('moh.mls_listing_id');
         }
     }
 }
