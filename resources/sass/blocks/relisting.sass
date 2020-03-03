@@ -94,6 +94,7 @@
 
     // RELISTING ITEM
     &-item
+        position: relative
         cursor: pointer
         width: 100%
         display: block
@@ -190,7 +191,29 @@
                 background-image: url('../media/img/icon/star-o.png')
         &__open-house-btn
             margin-bottom: 20px
-        
+        &__oh-tag
+            width: 0
+            height: 0
+            border-top: 80px solid $color_primary
+            border-bottom: 80px solid transparent
+            border-right: 80px solid transparent
+            position: absolute
+            left: 0
+            z-index: 1
+            top: 0
+
+        &__oh-tag-text
+            position: absolute
+            top: -70px
+            width: 70px
+            left: -10px
+            text-align: center
+            font-size: 0.8em
+            font-weight: 900
+            color: $color_white
+            transform: rotate(-45deg)
+            display: block
+
         &_type_open-house
             .relisting-item
                 &__features-wrap

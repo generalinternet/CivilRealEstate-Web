@@ -1,6 +1,8 @@
 <?php
 
 class RECatalogView extends AbstractRECatalogView{
+    protected $listingOpenHouses = NULL;
+
     public function __construct($listing, bool $isOpenHouse) {
         parent::__construct($listing);
         $this->isOpenHouse = $isOpenHouse;
@@ -25,6 +27,15 @@ class RECatalogView extends AbstractRECatalogView{
             $addClass = 'relisting-item_type_open-house';
         }
         $this->addHTML('<div class="relisting-item '.$addClass.'" onclick="location.href=\''.$this->listing->getViewURL().'\'">');
+
+        if($this->isOpenHouse){
+            return $this;
+        }
+
+        $listingOpenHouses = $this->getListingOpenHouses();
+        if(!empty($listingOpenHouses)){
+            $this->addOpenHouseTag();
+        }
         return $this;
     }
 
@@ -104,7 +115,7 @@ class RECatalogView extends AbstractRECatalogView{
     }
 
     protected function addOpenHouseSchedules(){
-        $openHouses = $this->listing->getOpenHouses();
+        $openHouses = $this->getListingOpenHouses();
         $url = $this->listing->getViewURL();
         foreach($openHouses as $openHouse){
             $startDate = date('l, F j, Y', strtotime($openHouse->getProperty('oh_start_date')));
@@ -118,5 +129,16 @@ class RECatalogView extends AbstractRECatalogView{
     protected function addViewCTA(){
         $url = $this->listing->getViewURL();
         $this->addHTML('<a href="' . $url . '" class="button button_theme_primary relisting-item__view-detail" title="View Details">View Details</a>');
+    }
+
+    protected function getListingOpenHouses(){
+        if(is_null($this->listingOpenHouses)){
+            $this->listingOpenHouses = $this->listing->getOpenHouses();
+        }
+        return $this->listingOpenHouses;
+    }
+
+    protected function addOpenHouseTag(){
+        $this->addHTML('<div class="relisting-item__oh-tag"><span class="relisting-item__oh-tag-text">OPEN HOUSE</span></div>');
     }
 }
