@@ -61,11 +61,21 @@ class MLSListing extends AbstractMLSListing {
     }
 
     public function getDisplaySquareFootage(){
-        $sqFt = $this->getProperty('floor_area_total');
-        if(empty($sqFt)){
-            $sqFt = $this->getProperty('lot_size_acres');
+        $sqFt = $this->getProperty('mls_listing_res.floor_area_total');
+        if($sqFt){
+            return '<span class="amount">' . GI_StringUtils::formatFloat($sqFt) . ' <span class="unit right_unit">sqft</span></span>';
         }
         
-        return '<span class="amount">'.GI_StringUtils::formatFloat($sqFt).' <span class="unit right_unit">sqft</span></span>';
+        return NULL;
     }
+    
+    public function getDisplayAcreage(){
+        $acres = $this->getProperty('lot_size_acres');
+        if($acres){
+            return '<span class="amount">' . GI_StringUtils::formatFloat($acres) . ' <span class="unit right_unit">acres</span></span>';
+        }
+        
+        return NULL;
+    }
+    
 }

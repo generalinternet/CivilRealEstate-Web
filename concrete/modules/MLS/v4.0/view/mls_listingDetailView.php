@@ -139,7 +139,11 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
                                 $featureInfo = array(
                                     [
                                         'title' => 'Square Footage',
-                                        'value' => $this->listing->getDisplaySquareFootage()
+                                        'value' => $this->listing->getDisplaySquareFootage(),
+                                        'replacement' => array(
+                                            'title' => 'Acreage',
+                                            'value' => $this->listing->getDisplayAcreage()
+                                        )
                                     ],
                                     [
                                         'title' => 'Property Type',
@@ -179,13 +183,21 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
                                     ],
                                 );
                                 foreach($featureInfo as $feature){
-                                    if(empty($feature['value'])){
-                                        continue;
+                                    $title = $feature['title'];
+                                    $value = $feature['value'];
+                                    if(empty($value)){
+                                        if(isset($feature['replacement'])){
+                                            $title = $feature['replacement']['title'];
+                                            $value = $feature['replacement']['value'];
+                                        }
+                                        if(empty($value)){
+                                            continue;
+                                        }
                                     }
                                     $this->addHTML('<div class="relisting-detail__feature-item">');
-                                        $this->addHTML('<span class="relisting-detail__feature-title">'.$feature['title'].'</span>');
+                                        $this->addHTML('<span class="relisting-detail__feature-title">'.$title.'</span>');
                                         $this->addHTML('<span class="relisting-detail__feature-value">');
-                                            $this->addHTML($feature['value']);
+                                            $this->addHTML($value);
                                         $this->addHTML('</span>');
                                     $this->addHTML('</div>');
                                 }

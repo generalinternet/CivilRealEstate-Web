@@ -88,9 +88,19 @@ class RECatalogView extends AbstractRECatalogView{
     protected function addFeatures(){
         $this->addHTML('<div class="relisting-item__features-wrap">');
             $this->addHTML('<div class="relisting-item__square-footage">');
-                $this->addHTML('<span class="relisting-item__feature-title">Square Footage</span>');
-                $lotSize = $this->listing->getDisplaySquareFootage();
-                $this->addHTML('<span class="relisting-item__feature-value">'.$lotSize.'</span>');
+                $sqft = $this->listing->getDisplaySquareFootage();
+                if(!empty($sqft)){
+                    $this->addHTML('<span class="relisting-item__feature-title">Square Footage</span>');
+
+                    $this->addHTML('<span class="relisting-item__feature-value">'.$sqft.'</span>');
+                } else {
+                    $acreage = $this->listing->getDisplayAcreage();
+                    if(!empty($acreage)){
+                        $this->addHTML('<span class="relisting-item__feature-title">Acreage</span>');
+
+                        $this->addHTML('<span class="relisting-item__feature-value">'.$acreage.'</span>');
+                    }
+                }
             $this->addHTML('</div>');
             $this->addHTML('<div class="relisting-item__price">');
                 $this->addHTML('<span class="relisting-item__feature-title">Price</span>');
