@@ -311,8 +311,7 @@ class REListingRes extends AbstractREListingRes {
                     ;
                 }
                 break;
-            case 'pric
-        ;e_low_to_high':
+            case 'price_low_to_high':
                 $dataSearch->orderBy('list_price', 'ASC');
                 break;
             case 'price_high_to_low':

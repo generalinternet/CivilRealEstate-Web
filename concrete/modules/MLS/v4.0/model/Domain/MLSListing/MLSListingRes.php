@@ -157,4 +157,26 @@ class MLSListingRes extends AbstractMLSListingRes {
         $view = new RECatalogView($this, $isOpenHouse);
         return $view;
     }
+
+    /**
+     * @return AbstractMLSOpenHouse[]
+     */
+    public function getOpenHouses($pastOpenHouses = false){
+        if(is_null($this->openHouses)){
+            $openHouseSearch = MLSOpenHouseFactory::search()
+                    ->filter('mls_listing_id', $this->getProperty('id'));
+            
+            if(!$pastOpenHouses){
+                $date = new DateTime();
+                //$date->sub(new DateInterval('P14D'));
+                $ohExpiryDate = GI_Time::formatDateTime($date, 'datetime');
+                $openHouseSearch->filterGreaterOrEqualTo('oh_start_date', $ohExpiryDate);
+            }
+            
+            $openHouseSearch->orderBy('oh_start_date');
+            $openHouseSearch->orderBy('oh_start_time');
+            $this->openHouses = $openHouseSearch->select();
+        }
+        return $this->openHouses;
+    }
 }
