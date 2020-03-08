@@ -8,18 +8,19 @@ class StaticCharityView extends GI_View{
      */
     protected $charityForm;
 
-    public function __construct(GI_Form $form = NULL, $attrs) {
+    public function __construct(GI_Form $form = NULL, $attrs, $isSent) {
         if(empty($form)){
             $form = new GI_Form('charity_form');
         }
         $this->form = $form;
-        $this->charityForm = new CharityFormView($form);
+        $this->setSent($isSent);
+
+        $this->charityForm = new CharityFormView($form, $isSent);
     }
 
     protected $isSent = false;
     public function setSent(bool $isSent){
         $this->isSent = $isSent;
-        $this->charityForm->setSent($isSent);
     }
 
     public function buildView() {

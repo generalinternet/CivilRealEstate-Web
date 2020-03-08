@@ -2,6 +2,7 @@ $(document).ready(function () {
     RelistingSlider.init();
     RelistingSearch.init();
     CharityForm.init();
+    RelistingDetail.init();
 });
 
 var EmbeddedMap = function () {
@@ -326,6 +327,26 @@ var CharityForm = function(){
 
         checkErrorField();
     };
+
+    return ins;
+}();
+
+var RelistingDetail = function(){
+    var ins = {};
+    var component = {
+        detailContactForm: $(".relisting-detail__contact-form-wrap .contact__form-wrap")
+    };
+ 
+    ins.init = function (){
+        if(component.detailContactForm.length == 0){
+            return;
+        }
+
+        if(component.detailContactForm.hasClass('contact__form-wrap_type_thankyou')){
+            let centerErrorScrollTop = parseInt(component.detailContactForm.offset().top - ($(window).height()/2)) + (component.detailContactForm.outerHeight()/2);
+            $("html,body").animate({ scrollTop: centerErrorScrollTop }, 500, 'swing');
+        }
+    }
 
     return ins;
 }();

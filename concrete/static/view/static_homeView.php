@@ -17,7 +17,8 @@ class StaticHomeView extends GI_View{
         $this->addCSS('resources/external/slick-1.6.0/slick/slick-theme.css');
         $this->addJS('resources/external/slick-1.6.0/slick/slick.js');
 
-        $this->charityForm = new CharityFormView($this->form);
+        $isSent = false;
+        $this->charityForm = new CharityFormView($this->form, $isSent);
     }
     
     public function buildView() {

@@ -1,20 +1,12 @@
 <?php
 
 class MLSListingDetailView extends AbstractMLSListingDetailView{
-    protected $form = NULL;
     protected $mainContentClass = "relisting__main-content";
     protected $openHouses = array();
 
-    public function __construct(AbstractMLSListing $listing, GI_Form $form = NULL)
+    public function __construct(AbstractMLSListing $listing)
     {
         parent::__construct($listing);
-
-        if(empty($form)){
-            $form = new GI_Form('contact');
-        }
-
-        $this->form = $form;
-        $this->buildForm();
         
         $this->addCSS('resources/external/slick-1.6.0/slick/slick.css');
         $this->addCSS('resources/external/slick-1.6.0/slick/slick-theme.css');
@@ -23,30 +15,57 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
         $this->openHouses = $this->listing->getOpenHouses();
     }
 
+    protected $isSent = false;
+    public function setSent($isSent){
+        $this->isSent = $isSent;
+    }
+
+    protected $form = NULL;
+    public function setForm($form){
+        $this->form = $form;
+        $this->buildForm();
+    }
+
     protected function buildForm(){
-        $this->form->addHTML('<div class="contact__form-wrap">');
-            $this->form->addHTML('<h3 class="relisting-detail__contact-form-title">Please enter your contact info</h3>');
-            $this->form->addHTML('<div class="relisting-detail__contact-form-fields">');
-                $this->form->addField('first_name', 'text', array(
-                    'required' => true,
-                    'placeHolder' => 'First Name*'
-                ));
-                $this->form->addField('last_name', 'text', array(
-                    'required' => true,
-                    'placeHolder' => 'Last Name*'
-                ));
-                $this->form->addField('email', 'email', array(
-                    'required' => true,
-                    'placeHolder' => 'Email*'
-                ));
-                $this->form->addField('phone', 'phone', array(
-                    'required' => true,
-                    'placeHolder' => 'Phone Number*'
-                ));
-            $this->form->addHTML('</div>');
-            $this->form->addHTML('<div class="relisting-detail__contact-form-buttons">');
-                $this->form->addHTML('<a href="" class="button button_theme_secondary button_has_icon">Submit <span class="button__icon"></span></a>');
-            $this->form->addHTML('</div>');
+        if(empty($this->form)){
+            $this->form = new GI_Form('detail_contact');
+        }
+
+        $addClasses = '';
+        if($this->isSent){
+            $addClasses = 'contact__form-wrap_type_thankyou';
+        }
+
+        $this->form->addHTML('<div class="contact__form-wrap '.$addClasses.'">');
+            if(!$this->isSent){
+                $this->form->addHTML('<h3 class="relisting-detail__contact-form-title">Please enter your contact info</h3>');
+                $this->form->addHTML('<div class="relisting-detail__contact-form-fields">');
+                    $this->form->addField('first_name', 'text', array(
+                        'required' => true,
+                        'placeHolder' => 'First Name*'
+                    ));
+                    $this->form->addField('last_name', 'text', array(
+                        'required' => true,
+                        'placeHolder' => 'Last Name*'
+                    ));
+                    $this->form->addField('r_email', 'email', array(
+                        'required' => true,
+                        'placeHolder' => 'Email*'
+                    ));
+                    $this->form->addField('phone', 'phone', array(
+                        'required' => true,
+                        'placeHolder' => 'Phone Number*'
+                    ));
+                    $this->form->addField('mls_number', 'hidden', array(
+                        'value' => $this->listing->getMLSNumber()
+                    ));
+                $this->form->addHTML('</div>');
+                $this->form->addHTML('<div class="relisting-detail__contact-form-buttons">');
+                    $this->form->addHTML('<span class="submit_btn button button_theme_secondary button_has_icon">Submit <span class="button__icon"></span></span>');
+                $this->form->addHTML('</div>');
+            }else{
+                $this->form->addHTML('<h3 class="relisting-detail__contact-form-title"><b>Thank you,</b><br><br> Civil Real Estate Local Expert will be in contact with you promtly</h3>');
+            }
         $this->form->addHTML('</div>');
     }
 
@@ -63,12 +82,20 @@ class MLSListingDetailView extends AbstractMLSListingDetailView{
         $height = 80;
 
         $this->addHTML('<div class="section section_type_listing-detail-slider">');
-            $this->addHTML('<div class="relisting-detail__slider-wrap">');
-                $this->addHTML('<div class="relisting-detail__slider">');
-                    $this->addHTML($this->listing->getImagesHTML($width, $height));
+            $this->addHTML('<div class="container">');
+                $this->addHTML('<div class="row">');
+                    $this->addHTML('<div class="col-xs-12">');
+
+                        $this->addHTML('<div class="relisting-detail__slider-wrap">');
+                            $this->addHTML('<div class="relisting-detail__slider">');
+                                $this->addHTML($this->listing->getImagesHTML($width, $height));
+                            $this->addHTML('</div>');
+                            $this->addHTML('<span class="relisting-detail__slider-next"></span>');
+                            $this->addHTML('<span class="relisting-detail__slider-prev"></span>');
+                        $this->addHTML('</div>');
+
+                    $this->addHTML('</div>');
                 $this->addHTML('</div>');
-                $this->addHTML('<span class="relisting-detail__slider-next"></span>');
-                $this->addHTML('<span class="relisting-detail__slider-prev"></span>');
             $this->addHTML('</div>');
         $this->addHTML('</div>');
     }

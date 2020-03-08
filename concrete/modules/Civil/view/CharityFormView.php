@@ -4,7 +4,7 @@ class CharityFormView extends GI_View{
 
     protected $form = NULL;
 
-    public function __construct(GI_Form $form = NULL)
+    public function __construct(GI_Form $form = NULL, $isSent)
     {
         parent::__construct();
         if(empty($form)){
@@ -16,6 +16,8 @@ class CharityFormView extends GI_View{
             'action' => 'charity'
         ));
         $this->form->setFormAction($charityURL);
+        $this->setSent($isSent);
+
         $this->buildForm();
     }
 
@@ -88,7 +90,8 @@ class CharityFormView extends GI_View{
                 ));
                 $this->form->addField('r_email', 'text', array(
                     'class' => 'form__input form__input_type_text',
-                    'placeHolder' => 'Email'
+                    'placeHolder' => 'Email *',
+                    'required' => true
                 ));
                 $this->form->addField('phone', 'text', array(
                     'class' => 'form__input form__input_type_text',

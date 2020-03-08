@@ -143,11 +143,12 @@ class StaticController extends GI_Controller {
     public function actionCharity($attributes){
         $form = new GI_Form('charity_form');
         $form->setBotValidation(true);
-        $view = new StaticCharityView($form, $attributes);
         
+        $isSent = false;
         if(isset($attributes['sent']) && $attributes['sent'] == 1){
-            $view->setSent(true);
+            $isSent = true;
         }
+        $view = new StaticCharityView($form, $attributes, $isSent);
         
         if($form->wasSubmitted() && $form->validate()){
             $firstName = filter_input(INPUT_POST, 'first_name');

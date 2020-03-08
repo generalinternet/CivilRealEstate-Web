@@ -1,6 +1,6 @@
 .relisting-detail
     &__slider-wrap
-        overflow: hidden
+        // overflow: hidden
         position: relative
     &__slider
         position: relative
@@ -45,11 +45,11 @@
     &__slider-prev
         left: 0
         padding-left: 1em
-        transform: translateY(-50%) rotate(45deg)
+        transform: translateY(-50%) translateX(-100%) rotate(45deg)
     &__slider-next
         right: 0
         padding-right: 1em
-        transform: translateY(-50%) rotate(-135deg)
+        transform: translateY(-50%) translateX(100%) rotate(-135deg)
     &__col-pad-right
         padding-right: 2em
         text-align: right
@@ -171,6 +171,8 @@
         .contact__form-wrap
             background: none
             margin-bottom: 0
+            &_type_thankyou
+                margin-top: 2em
     &__contact-left-col
         padding-top: 2em
         padding-bottom: 2em
