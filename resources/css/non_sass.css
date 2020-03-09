@@ -2,3 +2,11 @@
     width: auto;
     margin: auto;
 }
+.relisting-detail__slider{
+    min-height: 200px;
+}
+@media screen and (max-width: 767px) {
+    .relisting-detail__slider{
+        height: 50vh;
+    }
+}
