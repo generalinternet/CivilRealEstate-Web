@@ -12,6 +12,7 @@ class PublicLayoutView extends AbstractPublicLayoutView {
     protected function addDefaultCSS() {
         $this->addCSS('https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700,900&display=swap');
         parent::addDefaultCSS();
+        $this->addCSS('resources/css/non_sass.css');
     }
     
     protected function addDefaultJS() {
