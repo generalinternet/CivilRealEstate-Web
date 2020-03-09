@@ -133,14 +133,19 @@ class REListingRes extends AbstractREListingRes {
 
     public static function addFloorAreaRangeFilterToDataSearch(GI_DataSearch $dataSearch, $areaMin, $areaMax){
         $tableName = $dataSearch->getTableName();
+        if($tableName == 'mls_listing'){
+            $searchColumn = 'mls_listing_res.floor_area_total';
+        } else {
+            $searchColumn = 're_listing_res.floor_area_total';
+        }
         if(!empty($areaMin) && $areaMin != 'NULL'){
-            $dataSearch->filter($tableName.'.lot_size_acres', $areaMin, '>=');
+            $dataSearch->filter($searchColumn, $areaMin, '>=');
         }
         if(!empty($areaMax) && $areaMax != 'NULL'){
             if($areaMax != '5000+'){
-                $dataSearch->filterLessOrEqualTo($tableName.'.lot_size_acres', $areaMax);
+                $dataSearch->filterLessOrEqualTo($searchColumn, $areaMax);
             }else{
-                $dataSearch->filterGreaterThan($tableName.'.lot_size_acres', $areaMax);
+                $dataSearch->filterGreaterThan($searchColumn, 5000);
             }
         }
     }
