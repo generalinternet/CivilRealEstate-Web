@@ -281,4 +281,117 @@ $("#' . $graphId . '").show();
 
     }
     
+    public function actionCharity($attibutes){
+        if(!DEV_MODE){
+            exit('oops');
+        }
+        $apiKey = CHARITY_NAVIGATOR_API_KEY;
+        $appId = CHARITY_NAVIGATOR_APP_ID;
+        
+        $baseURL = 'https://api.data.charitynavigator.org/v2';
+        
+        $endPoint = 'Organizations';
+        
+        $pageNumber = 1;
+        if(isset($attibutes['pageNumber'])){
+            $pageNumber = $attibutes['pageNumber'];
+        }
+        
+        //organization params
+        $queryParams = array(
+            'app_id' => $appId,
+            'app_key' => $apiKey,
+            'pageSize' => 1000, //between 1 and 1000
+            'pageNum' => $pageNumber,
+            'search' => '', //whitespace separated terms (searches all text properties by default)
+//            'searchType' => 'DEFAULT', //DEFAULT or NAME_ONLY (to search only name property)
+            'rated' => 1, //whether to return only rated or unrated charities
+//            'categoryID' => '', //id of a category
+//            'causeID' => '', //id of a cause
+//            'state' => '', //2 letter state code
+//            'city' => '',
+//            'zip' => '',
+//            'minRating' => 0, //integer between 0 and 4
+//            'maxRating' => 4, //integer between 0 and 4
+            'scopeOfWork' => 'ALL', //ALL, REGIONAL, NATIONAL, OR INTERNATIONAL
+            'sort' => 'NAME:ASC' //NAME, RATING, RELEVANCE            
+        );
+        
+        $finalURL = sprintf("%s?%s", $baseURL . '/' . $endPoint, http_build_query($queryParams));
+        
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $finalURL);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($curl);
+        if(!$result){
+            die('Connection Failure');
+        }
+        curl_close($curl);
+        $data = json_decode($result);
+        
+        $updater = new DBDirectUpdater('charity');
+        $categoryUpdater = new DBDirectUpdater('charity_category');
+        $causeUpdater = new DBDirectUpdater('charity_cause');
+        
+//        echo '<pre>';
+//        print_r($data);
+//        echo '</pre>';
+//        exit();
+        foreach($data as $charity){
+            $ein = $charity->ein;
+            if(empty($ein)){
+                continue;
+            }
+            $props = array(
+                'name' => $charity->charityName,
+                'cn_url' => $charity->charityNavigatorURL,
+                'website' => $charity->websiteURL,
+                'tag_line' => $charity->tagLine,
+                'mission' => $charity->mission
+            );
+            if(isset($charity->mailingAddress) && !empty($charity->mailingAddress)){
+                $props['addr_street'] = $charity->mailingAddress->streetAddress1;
+                $props['addr_street_two'] = $charity->mailingAddress->streetAddress2;
+                $props['addr_city'] = $charity->mailingAddress->city;
+                $props['addr_region'] = $charity->mailingAddress->stateOrProvince;
+                $props['addr_code'] = $charity->mailingAddress->postalCode;
+                $props['addr_country'] = $charity->mailingAddress->country;
+            }
+            if(isset($charity->category) && !empty($charity->category)){
+                $cnCatId = $charity->category->categoryID;
+                $categoryProps = array(
+                    'name' => $charity->category->categoryName,
+                    'cn_url' => $charity->category->charityNavigatorURL,
+                    'cn_image' => $charity->category->image,
+                );
+                
+                $categoryId = $categoryUpdater->save($categoryProps, $cnCatId, 'cn_id');
+                
+                if(!empty($categoryId)){
+                    $props['charity_category_id'] = $categoryId;
+                }
+            }
+            if(isset($charity->cause) && !empty($charity->cause)){
+                $cnCauseId = $charity->cause->causeID;
+                $causeProps = array(
+                    'name' => $charity->cause->causeName,
+                    'cn_url' => $charity->cause->charityNavigatorURL,
+                    'cn_image' => $charity->cause->image,
+                );
+                
+                $causeId = $causeUpdater->save($causeProps, $cnCauseId, 'cn_id');
+                
+                if(!empty($causeId)){
+                    $props['charity_cause_id'] = $causeId;
+                }
+            }
+            if(isset($charity->currentRating) && !empty($charity->currentRating)){
+                $props['rating'] = $charity->currentRating->rating;
+            }
+            
+            $updater->save($props, $ein, 'ein');
+        }
+        exit('done');
+    }
+    
 }

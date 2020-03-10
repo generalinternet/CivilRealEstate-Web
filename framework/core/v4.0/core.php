@@ -297,6 +297,7 @@ require_once 'model/Utility/ActionResult/AbstractActionResultFactory.php';
 require_once 'model/Utility/Calculator/AbstractSubsetSumsCalculator.php';
 require_once 'model/Utility/Event/AbstractEventInstaller.php';
 require_once 'model/Utility/ContextRole/AbstractContextRoleInstaller.php';
+require_once 'model/Utility/DBDirectUpdater/AbstractDBDirectUpdater.php';
 
 //*** End Abstract
 
@@ -615,6 +616,7 @@ require_once 'model/Utility/Calculator/SubsetSumsCalculator.php';
 require_once 'model/Utility/Event/EventInstaller.php';
 require_once 'model/Utility/ContextRole/ContextRoleInstaller.php';
 require_once 'model/Utility/Tag/LocationTagInstaller.php';
+require_once 'model/Utility/DBDirectUpdater/DBDirectUpdater.php';
 
 set_include_path('');
 //Non-routed Controllers
