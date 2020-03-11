@@ -104,3 +104,18 @@
             &_type_user
                 width: auto
                 margin-left: 2em
+
+@media screen and ( max-width: 768px )
+    .header-widget
+        &__item
+            &_type_search-bar
+                max-width: calc(100% - 80px)
+                .button
+                    width: 75px
+                .form__input
+                    width: calc(100% - 75px)!important
+                    input
+                        padding: 0 5px!important
+                        width: 100%!important
+        &__search-bar-wrap
+            text-align: left

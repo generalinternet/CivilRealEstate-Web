@@ -218,7 +218,7 @@
         &_type_open-house
             .relisting-item
                 &__features-wrap
-                    margin-top: 30px
+                    margin-top: 20px
                 &__title-description
                     flex: 2
                 &__view-button-wrap
@@ -279,14 +279,15 @@
                 padding-bottom: 1.5em
             &__featured-image
                 width: calc(100% - 140px)
+                margin-bottom: 1em
                 .no_cover_image
-                    height: 130px
+                    height: 80px
             &__features-wrap
                 width: 140px
                 padding-left: 1em
                 position: absolute
                 right: 1em
-                top: 6em
+                top: 15%
                 display: block
                 padding-top: 35px
             &__square-footage
@@ -309,3 +310,18 @@
                 top: 0
             &__other-fields
                 margin-top: 1.5em
+            
+            &_type_open-house
+                .relisting-item
+                    &__features-wrap
+                        top: 3.5em
+                        right: 2em
+                        margin-top: 0
+                    &__view-button-wrap
+                        display: none
+                        &_type_mobile
+                            margin-top: 1.5em
+                            display: block
+                            position: static
+                            padding: 0
+                            width: 100%

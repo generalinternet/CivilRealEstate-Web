@@ -44,6 +44,11 @@ class RECatalogView extends AbstractRECatalogView{
         $this->addFeaturedImage();
         $this->addHTML('</div>');
 
+        $openHourHTML = '';
+        if($this->isOpenHouse){
+            $openHourHTML = $this->getOpenHouseSchedulesHTML();
+        }
+
         $this->addHTML('<div class="relisting-item__main-content-wrap">');
             $this->addHTML('<div class="relisting-item__overview-wrap">');
                 $this->addHTML('<div class="relisting-item__title-description">');
@@ -74,13 +79,20 @@ class RECatalogView extends AbstractRECatalogView{
                 $this->addHTML('</div>');
                 $this->addHTML('<div class="relisting-item__view-button-wrap">');
                     if($this->isOpenHouse){
-                        $this->addOpenHouseSchedules();
+                        $this->addHTML($openHourHTML);
                     }
                     $this->addViewCTA();
                 $this->addHTML('</div>');
             $this->addHTML('</div>');
             if(!$this->isOpenHouse){
                 $this->addFeatures();
+            }
+            
+            if($this->isOpenHouse){
+                $this->addHTML('<div class="relisting-item__view-button-wrap relisting-item__view-button-wrap_type_mobile">');
+                    $this->addHTML($openHourHTML);
+                    $this->addViewCTA();
+                $this->addHTML('</div>');
             }
         $this->addHTML('</div>');
     }
@@ -124,15 +136,17 @@ class RECatalogView extends AbstractRECatalogView{
         $this->addHTML($address);
     }
 
-    protected function addOpenHouseSchedules(){
+    protected function getOpenHouseSchedulesHTML(){
         $openHouses = $this->getListingOpenHouses();
         $url = $this->listing->getViewURL();
+        $html = '';
         foreach($openHouses as $openHouse){
             $startDate = date('l, F j, Y', strtotime($openHouse->getProperty('oh_start_date')));
             $startTime = date('g:i a', strtotime($openHouse->getProperty('oh_start_time')));
             $endTime = date('g:i a', strtotime($openHouse->getProperty('oh_end_time')));
-            $this->addHTML('<a href="'.$url.'" class="relisting-item__open-house-btn button button_theme_secondary button_has-icon"> <span class="button__icon button__icon_type_clock"></span>'.$startDate.'<br> '.$startTime.' to '.$endTime.'</a>');
+            $html .= '<a href="'.$url.'" class="relisting-item__open-house-btn button button_theme_secondary button_has-icon"> <span class="button__icon button__icon_type_clock"></span>'.$startDate.'<br> '.$startTime.' to '.$endTime.'</a>';
         }
+        return $html;
         // $this->addHTML('<a href="" class="relisting-item__open-house-btn button button_theme_secondary button_has-icon"> <span class="button__icon button__icon_type_clock"></span> Saturday, February 28, 2020<br> 2:00pm to 4:00pm</a>');
     }
     
