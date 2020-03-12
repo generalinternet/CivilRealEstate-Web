@@ -1,7 +1,36 @@
 .listing
     text-align: center
-    margin-bottom: 3em
-    // &__image-wrap
+    // margin-bottom: 3em
+    position: relative
+    padding-bottom: 4em
+    height: 100%
+    &__col
+        margin-bottom: 3em
+    &__image-wrap
+        display: block
+        position: relative
+        .img_wrap
+            display: block
+            height: 12em
+            img
+                display: block
+                width: 100%
+                height: 100%
+                object-fit: cover
+                object-position: center
+        .no_img
+            height: 12em
+            display: block
+            background-image: url('../media/img/logo/header_logo.png')
+            border: solid 1px $color_border_grey
+            background-size: 70%
+            background-position: center
+            background-repeat: no-repeat
+    &__button-wrap
+        position: absolute
+        bottom: 0
+        left: 0
+        width: 100%
     &__image
         display: block
         width: 100%
@@ -27,7 +56,13 @@
         font-size: 0.9em
         font-weight: 400
         margin-bottom: 1.5em!important
-    // &__button-wrap
+@media screen and ( max-width: 991px )
+    .listing
+        &__col
+            max-width: 400px
+            display: block
+            margin: auto
+            margin-bottom: 3em
 @media screen and ( max-width: 767px )
     .listing
         font-size: 1.1em

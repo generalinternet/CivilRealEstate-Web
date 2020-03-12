@@ -25,4 +25,12 @@ class MLSListingFactory extends AbstractMLSListingFactory {
         $models = $search->select();
         return $models;
     }
+
+    public static function getLatestListing(){
+        $mlsSearch = MLSListingFactory::search();
+        $mlsSearch->filter('active', 1);
+        $mlsSearch->orderBy('inception', 'DESC');
+        $mlsSearch->setItemsPerPage('3');
+        return $mlsSearch->select();
+    }
 }
